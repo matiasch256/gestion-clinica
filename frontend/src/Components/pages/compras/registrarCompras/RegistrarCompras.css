@@ -1,0 +1,98 @@
+.registro-compra {
+  width: 100%;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #fefefe;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+h2,
+h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.productos-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.productos-table th,
+.productos-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.productos-table input {
+  width: 100%;
+  padding: 0.25rem;
+}
+
+.add-btnn,
+.registrar-btnn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #3f8cff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-btnn {
+  background-color: #4caf50;
+  margin-right: 1rem;
+}
+
+.add-btnn:hover,
+.registrar-btnn:hover {
+  opacity: 0.9;
+}
+
+.total {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+.producto-select {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+#btneliminar {
+  background-color: transparent;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,0 +1,32 @@
+.detalle-producto {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: auto;
+  background-color: #fefefe;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.detalle-producto h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.detalle-producto p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.volver {
+  margin-top: 20px;
+  padding: 8px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.volver:hover {
+  background-color: #2980b9;
+}

@@ -1,0 +1,59 @@
+.registro-categoria {
+  max-width: 500px;
+  margin: 30px auto;
+  background-color: #fafafa;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.registro-categoria h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #222;
+}
+
+.form-categoria {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 15px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.registrar-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 11px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.registrar-btn:hover {
+  background-color: #0056b3;
+}

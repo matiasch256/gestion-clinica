@@ -1,0 +1,198 @@
+.registro-proveedor {
+  max-width: 900px; /* Un poco más ancho para más espacio */
+  margin: 2rem auto; /* Margen superior e inferior para centrarlo y separarlo */
+  padding: 2.5rem; /* Más padding para un mejor "aire" interno */
+  background-color: #ffffff; /* Fondo blanco limpio */
+  border-radius: 12px; /* Bordes más redondeados */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Sombra suave y moderna */
+  font-family: Arial, sans-serif; /* Asegurar la fuente */
+  color: #333; /* Color de texto principal */
+}
+
+.registro-proveedor h2,
+.registro-proveedor h3 {
+  text-align: center;
+  margin-bottom: 2rem; /* Espacio uniforme debajo de los títulos */
+  color: #333; /* Color de título consistente */
+  font-size: 1.8rem; /* Tamaño de fuente ligeramente más grande para h2 */
+}
+
+.form-proveedor {
+  display: grid; /* Cambiado a Grid para un mejor control de la alineación */
+  grid-template-columns: 1fr 1fr; /* Dos columnas de igual ancho */
+  gap: 1.5rem 2rem; /* Espacio entre filas y columnas (vertical y horizontal) */
+  margin-bottom: 2.5rem; /* Más espacio debajo del formulario */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600; /* Un poco más de peso a la fuente */
+  margin-bottom: 0.5rem; /* Más espacio entre la etiqueta y el input */
+  color: #555; /* Color de etiqueta ligeramente más suave */
+}
+
+.form-group input {
+  padding: 0.75rem; /* Más padding para un mejor toque */
+  border: 1px solid #ddd; /* Borde más suave */
+  border-radius: 8px; /* Bordes más redondeados */
+  width: 100%; /* Asegura que ocupe todo el ancho de su columna */
+  box-sizing: border-box; /* Incluye padding y borde en el ancho */
+  font-size: 1rem; /* Tamaño de fuente consistente */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transición para focus */
+}
+
+.form-group input:focus {
+  border-color: #3f8cff; /* Color azul al enfocar */
+  box-shadow: 0 0 0 3px rgba(63, 140, 255, 0.2); /* Sombra suave al enfocar */
+  outline: none; /* Eliminar el contorno predeterminado del navegador */
+}
+
+.full-width-field {
+  /* Nueva clase para campos que deben ocupar todo el ancho */
+  grid-column: span 2; /* Hace que este campo ocupe ambas columnas */
+}
+
+.form-actions {
+  /* Nuevo contenedor para los botones al final del formulario */
+  grid-column: span 2; /* Ocupa ambas columnas */
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 1rem; /* Espacio entre los botones */
+  margin-top: 1rem; /* Margen superior para separarlo de los campos */
+}
+
+.registrar-btn {
+  background-color: #4caf50; /* Verde para registrar */
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem; /* Padding más generoso */
+  border-radius: 8px; /* Bordes más redondeados */
+  cursor: pointer;
+  font-size: 1rem; /* Tamaño de fuente consistente */
+  font-weight: 600; /* Un poco más de peso a la fuente */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Añadimos transform */
+}
+
+.registrar-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px); /* Pequeño efecto de elevación */
+}
+
+/* Estilo para un posible botón de cancelar, si lo tienes */
+.cancel-btn {
+  background-color: #6c757d; /* Gris para cancelar */
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
+.tabla-proveedores {
+  width: 100%;
+  border-collapse: separate; /* Cambiado a separate para usar border-spacing */
+  border-spacing: 0 8px; /* Espacio entre filas */
+  margin-top: 2rem; /* Más espacio entre el formulario y la tabla */
+  background-color: #ffffff; /* Fondo blanco para la tabla */
+  border-radius: 8px; /* Bordes redondeados para la tabla */
+  overflow: hidden; /* Para que los bordes redondeados se apliquen bien */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra ligera para la tabla */
+}
+
+.tabla-proveedores th,
+.tabla-proveedores td {
+  border: none; /* Quitamos los bordes individuales */
+  padding: 1rem 1.2rem; /* Padding más cómodo */
+  text-align: left; /* Alineamos a la izquierda */
+}
+
+.tabla-proveedores th {
+  background-color: #eef1f6; /* Un gris claro más moderno para los encabezados */
+  color: #555; /* Color de texto para encabezados */
+  font-weight: 700; /* Mayor peso de fuente */
+  text-transform: uppercase; /* Texto en mayúsculas */
+  font-size: 0.9rem; /* Tamaño de fuente un poco más pequeño */
+  position: sticky; /* Encabezado fijo al hacer scroll */
+  top: 0;
+  z-index: 1;
+}
+
+.tabla-proveedores tr:nth-child(even) {
+  /* Filas pares con un fondo ligeramente diferente */
+  background-color: #f9f9f9;
+}
+
+.tabla-proveedores tr:hover {
+  /* Efecto hover en las filas */
+  background-color: #f0f5ff; /* Un azul muy claro al pasar el mouse */
+  cursor: pointer;
+}
+
+.tabla-proveedores td {
+  background-color: #ffffff; /* Fondo blanco para celdas */
+  border-bottom: 1px solid #eee; /* Separador sutil entre filas */
+}
+
+/* Redondear las esquinas de las primeras y últimas celdas del encabezado y del cuerpo */
+.tabla-proveedores th:first-child {
+  border-top-left-radius: 8px;
+}
+.tabla-proveedores th:last-child {
+  border-top-right-radius: 8px;
+}
+.tabla-proveedores tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+.tabla-proveedores tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+/* Estilos para los botones de acción dentro de la tabla */
+.tabla-proveedores td .action-buttons {
+  /* Contenedor para botones de acción en la tabla */
+  display: flex;
+  gap: 0.5rem; /* Espacio entre los botones */
+  justify-content: center; /* Centramos los botones en la celda */
+}
+
+.tabla-proveedores td .action-buttons button {
+  padding: 0.6rem 1rem; /* Padding adecuado para botones pequeños */
+  color: white;
+  border: none;
+  border-radius: 6px; /* Bordes redondeados */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.9rem; /* Tamaño de fuente más pequeño para botones de acción */
+  display: inline-flex; /* Para centrar texto y posibles íconos */
+  align-items: center;
+  justify-content: center;
+}
+
+.tabla-proveedores td .action-buttons button:first-child {
+  /* Botón de editar/azul */
+  background-color: #2196f3; /* Azul estándar */
+}
+
+.tabla-proveedores td .action-buttons button:last-child {
+  /* Botón de eliminar/rojo */
+  background-color: #f44336; /* Rojo estándar */
+}
+
+.tabla-proveedores td .action-buttons button:hover {
+  opacity: 0.9;
+  transform: translateY(
+    -1px
+  ); /* Pequeño efecto de elevación al pasar el mouse */
+}

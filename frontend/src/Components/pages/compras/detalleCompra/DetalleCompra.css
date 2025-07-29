@@ -1,0 +1,42 @@
+.detalle-compra {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: auto;
+  background-color: #fefefe;
+}
+
+.detalle-compra h2 {
+  margin-bottom: 10px;
+}
+
+.detalle-compra p {
+  margin: 5px 0;
+}
+
+.detalle-table {
+  width: 100%;
+  max-width: 900px;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.detalle-table th,
+.detalle-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.volver {
+  margin-top: 20px;
+  padding: 8px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.volver:hover {
+  background-color: #2980b9;
+}
