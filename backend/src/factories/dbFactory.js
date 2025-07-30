@@ -1,3 +1,5 @@
+import mssql from "mssql";
+
 class DatabaseConnection {
   async connect() {
     throw new Error("Método connect() debe ser implementado");
@@ -13,7 +15,7 @@ class SQLServerConnection extends DatabaseConnection {
 
   async connect() {
     if (!this.pool) {
-      this.pool = await require("mssql").connect(this.config);
+      this.pool = await mssql.connect(this.config);
     }
     return this.pool;
   }
@@ -34,4 +36,4 @@ class DatabaseFactory {
   }
 }
 
-module.exports = DatabaseFactory;
+export default DatabaseFactory;
