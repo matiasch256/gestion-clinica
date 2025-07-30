@@ -1,26 +1,16 @@
 const express = require("express");
-require("dotenv").config();
 const cors = require("cors");
-const sql = require("mssql");
+require("dotenv").config();
 
+const proveedoresRoutes = require("./routes/proveedores");
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// #region ------ CONFIG ------
-const config = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER,
-  database: process.env.DB_DATABASE,
-  options: {
-    encrypt: false,
-    trustServerCertificate: true,
-  },
-};
+app.use("/proveedores", proveedoresRoutes);
 
-console.log("Conectando a la base de datos: configdatabase", config.database);
 //#endregion
 
 // #region ------ Función para validar y normalizar fechas ------
