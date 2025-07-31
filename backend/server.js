@@ -1,14 +1,13 @@
+import "./src/config/env.js";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import proveedoresRoutes from "./routes/proveedores.js";
-import comprasRoutes from "./routes/compras.js";
-import productosRoutes from "./routes/productos.js";
-import categoriasRoutes from "./routes/categorias.js";
-import usuariosRoutes from "./routes/usuarios.js";
-import gastosRoutes from "./routes/gastos.js";
+import proveedoresRoutes from "./src/routes/proveedores.js";
+import comprasRoutes from "./src/routes/compras.js";
+import productosRoutes from "./src/routes/productos.js";
+import categoriasRoutes from "./src/routes/categorias.js";
+import usuariosRoutes from "./src/routes/usuarios.js";
+import gastosRoutes from "./src/routes/gastos.js";
 
-dotenv.config();
 const app = express();
 
 app.use(cors());
