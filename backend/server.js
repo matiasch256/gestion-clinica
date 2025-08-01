@@ -1,4 +1,6 @@
 import "./src/config/env.js";
+import { validateEnvVars } from "./src/config/validateEnv.js";
+validateEnvVars();
 import express from "express";
 import cors from "cors";
 import proveedoresRoutes from "./src/routes/proveedores.js";

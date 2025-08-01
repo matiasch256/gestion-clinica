@@ -8,7 +8,7 @@ router.post("/", async (req, res) => {
   const { proveedor, fecha, productos } = req.body;
   try {
     const pool = await getPool();
-    console.log("Conectado a la base de datos");
+
     const normalizedDate = normalizeDate(fecha);
     if (!normalizedDate) {
       return res.status(400).json({ error: "Formato de fecha inválido" });
@@ -20,7 +20,6 @@ router.post("/", async (req, res) => {
     `;
     const compraId = compraResult.recordset[0].id;
     for (const p of productos) {
-      console.log("Producto:", p);
       await pool.query`
         INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
         VALUES (${compraId}, ${p.nombre}, ${p.cantidad}, ${p.precio})
@@ -28,7 +27,6 @@ router.post("/", async (req, res) => {
     }
     res.status(200).json({ message: "Compra registrada correctamente" });
   } catch (error) {
-    console.error("Error al registrar la compra:", error);
     res.status(500).json({ error: "Error al registrar la compra" });
   }
 });
@@ -48,10 +46,9 @@ router.get("/", async (req, res) => {
       `;
       compra.productos = detallesResult.recordset;
     }
-    console.log("Compras devueltas:", JSON.stringify(compras, null, 2));
+
     res.status(200).json(compras);
   } catch (error) {
-    console.error("Error al obtener las compras:", error);
     res.status(500).json({ error: "Error al obtener las compras" });
   }
 });
@@ -75,7 +72,6 @@ router.get("/:id", async (req, res) => {
     compra.productos = detallesResult.recordset;
     res.status(200).json(compra);
   } catch (error) {
-    console.error("Error al obtener la compra:", error);
     res.status(500).json({ error: "Error al obtener la compra" });
   }
 });
@@ -108,7 +104,6 @@ router.put("/:id", async (req, res) => {
     }
     res.status(200).json({ message: "Compra actualizada correctamente" });
   } catch (error) {
-    console.error("Error al actualizar la compra:", error);
     res.status(500).json({ error: "Error al actualizar la compra" });
   }
 });
@@ -166,7 +161,6 @@ router.get("/cantidad-compras", async (req, res) => {
       ORDER BY SUM(d.Cantidad) DESC
     `);
     res.status(200).json(result.recordset);
-    console.log("Resultado de la consulta:", result.recordset);
   } catch (error) {
     console.error("Error en la consulta:", error.message, error.stack);
     res.status(500).json({

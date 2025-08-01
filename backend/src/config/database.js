@@ -16,14 +16,6 @@ const config = {
   },
 };
 
-// Validar variables de entorno
-const requiredEnvVars = ["DB_USER", "DB_PASSWORD", "DB_SERVER", "DB_DATABASE"];
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    throw new Error(`La variable de entorno ${envVar} no está definida`);
-  }
-}
-
 let pool;
 export const getPool = async () => {
   try {
