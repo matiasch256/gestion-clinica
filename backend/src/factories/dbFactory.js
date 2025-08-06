@@ -7,17 +7,17 @@ class DatabaseConnection {
 }
 
 class SQLServerConnection extends DatabaseConnection {
+  #config;
+  #pool = null;
+
   constructor(config) {
     super();
-    this.config = config;
-    this.pool = null;
+    this.#config = config;
   }
 
   async connect() {
-    if (!this.pool) {
-      this.pool = await mssql.connect(this.config);
-    }
-    return this.pool;
+    this.#pool = this.#pool ?? (await mssql.connect(this.#config));
+    return this.#pool;
   }
 }
 
