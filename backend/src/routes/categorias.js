@@ -3,6 +3,25 @@ import { getPool } from "../config/database.js";
 
 const router = express.Router();
 
+const validateInput = (id, body, res) => {
+  if (id && (isNaN(parseInt(id)) || !id)) {
+    res.status(400).json({ error: "ID inválido" });
+    return false;
+  }
+  if (body) {
+    const { nombre, descripcion, ...rest } = body;
+    if (Object.keys(rest).length > 0) {
+      res.status(400).json({ error: "Campos no permitidos" });
+      return false;
+    }
+    if (!nombre?.trim() || !descripcion?.trim()) {
+      res.status(400).json({ error: "Nombre y descripción son requeridos" });
+      return false;
+    }
+  }
+  return true;
+};
+
 router.get("/", async (req, res) => {
   try {
     const pool = await getPool();
@@ -16,9 +35,12 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
+  if (!validateInput(id, null, res)) return;
   try {
     const pool = await getPool();
-    const result = await pool.query`SELECT * FROM categorias WHERE id = ${id}`;
+    const request = pool.request();
+    request.input("id", mssql.Int, parseInt(id));
+    const result = await request.query`SELECT * FROM categorias WHERE id = @id`;
     if (result.recordset.length > 0) {
       res.status(200).json(result.recordset[0]);
     } else {
@@ -31,10 +53,14 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { nombre, descripcion } = req.body;
+  const { nombre, descripcion, ...rest } = req.body;
+  if (!validateInput(null, req.body, res)) return;
   try {
     const pool = await getPool();
-    await pool.query`INSERT INTO categorias (nombre, descripcion) VALUES (${nombre}, ${descripcion})`;
+    const request = pool.request();
+    request.input("nombre", mssql.VarChar, nombre.trim());
+    request.input("descripcion", mssql.VarChar, descripcion.trim());
+    await request.query`INSERT INTO categorias (nombre, descripcion) VALUES (@nombre, @descripcion)`;
     res.status(201).json({ message: "Categoría creada correctamente" });
   } catch (error) {
     console.error("❌ Error al crear categoría:", error);
@@ -45,12 +71,17 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { nombre, descripcion } = req.body;
+  if (!validateInput(id, req.body, res)) return;
   try {
     const pool = await getPool();
-    const result = await pool.query`
+    const request = pool.request();
+    request.input("id", mssql.Int, parseInt(id));
+    request.input("nombre", mssql.VarChar, nombre.trim());
+    request.input("descripcion", mssql.VarChar, descripcion.trim());
+    const result = await request.query`
       UPDATE categorias
-      SET nombre = ${nombre}, descripcion = ${descripcion}
-      WHERE id = ${id}
+      SET nombre = @nombre, descripcion = @descripcion
+      WHERE id = @id
     `;
     if (result.rowsAffected[0] > 0) {
       res.status(200).json({ message: "Categoría actualizada correctamente" });
@@ -65,9 +96,12 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
+  if (!validateInput(id, null, res)) return;
   try {
     const pool = await getPool();
-    const result = await pool.query`DELETE FROM categorias WHERE id = ${id}`;
+    const request = pool.request();
+    request.input("id", mssql.Int, parseInt(id));
+    const result = await request.query`DELETE FROM categorias WHERE id = @id`;
     if (result.rowsAffected[0] > 0) {
       res.status(200).json({ message: "Categoría eliminada correctamente" });
     } else {
