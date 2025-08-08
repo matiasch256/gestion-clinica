@@ -1,7 +1,7 @@
 import "./Form.css";
 import Logo from "./Logo/Logo.png";
 import { Navbar } from "../../layouts/navbar/Navbar";
-import { Footer } from "../../layouts/footer/Footer";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/authContext";
@@ -27,36 +27,37 @@ export const Form = ({ formToggle, formTitle, submitButtonText }) => {
   return (
     <>
       <Navbar />
-      <div className="login-form-container">
-        <div className="login-form-logo">
-          <img src={Logo} alt="Logo de la empresa" />
-        </div>
+      <div className="container">
+        <div className="login-form-container">
+          <div className="login-form-logo">
+            <img src={Logo} alt="Logo de la empresa" />
+          </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="login-form-group">
-            <label htmlFor="username-input">Usuario</label>
-            <input
-              type="text"
-              id="username-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)} // Actualiza el estado username
-            />
-          </div>
-          <div className="login-form-group">
-            <label htmlFor="password-input">Password</label>
-            <input
-              type="password"
-              id="password-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)} // Actualiza el estado password
-            />
-          </div>
-          <button type="submit" className="login-form-button">
-            {submitButtonText || "Enviar"}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="login-form-group">
+              <label htmlFor="username-input">Usuario</label>
+              <input
+                type="text"
+                id="username-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)} // Actualiza el estado username
+              />
+            </div>
+            <div className="login-form-group">
+              <label htmlFor="password-input">Password</label>
+              <input
+                type="password"
+                id="password-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)} // Actualiza el estado password
+              />
+            </div>
+            <button type="submit" className="login-form-button">
+              {submitButtonText || "Enviar"}
+            </button>
+          </form>
+        </div>
       </div>
-      <Footer />
     </>
   );
 };
