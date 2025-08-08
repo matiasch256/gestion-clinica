@@ -1,31 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Grid, Card, CardContent } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import InfoCard from "../../../common/InfoCard";
+import QuickActionButton from "../../../common/QuickActionButton";
 
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
-
-  const buttonStyle = {
-    height: 50,
-    borderColor: "#1976d2 !important",
-    color: "#1976d2 !important",
-    backgroundColor: "transparent !important",
-    "&:hover": {
-      borderColor: "#115293 !important",
-      backgroundColor: "rgba(25, 118, 210, 0.04) !important",
-    },
-  };
 
   return (
     <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
@@ -60,38 +43,27 @@ export const ComprasDashboard = () => {
             Acciones Rápidas
           </Typography>
           <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
+            <QuickActionButton
+              icon={<AddIcon />}
+              label="Registrar Compra"
               onClick={() => navigate("/compras/registrar")}
-              sx={buttonStyle}
-            >
-              Registrar Compra
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<ReceiptIcon />}
+            />
+            <QuickActionButton
+              icon={<ReceiptIcon />}
+              label="Ver Facturas"
               onClick={() => navigate("/compras/lista")}
-              sx={buttonStyle}
-            >
-              Ver Facturas
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<InventoryIcon />}
-              onClick={() => navigate("/stock")} // Ajusta la ruta según tu app
-              sx={buttonStyle}
-            >
-              Consultar Stock
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<VisibilityIcon />}
-              onClick={() => navigate("/ordenes")} // Ajusta la ruta según tu app
-              sx={buttonStyle}
-            >
-              Emitir Orden
-            </Button>
+            />
+
+            <QuickActionButton
+              icon={<InventoryIcon />}
+              label="Consultar Stock"
+              onClick={() => navigate("/stock")}
+            />
+            <QuickActionButton
+              icon={<VisibilityIcon />}
+              label="Ver Orden"
+              onClick={() => navigate("/ordenes")}
+            />
           </Box>
         </CardContent>
       </Card>
