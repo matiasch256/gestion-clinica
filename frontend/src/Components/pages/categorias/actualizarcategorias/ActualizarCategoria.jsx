@@ -11,7 +11,7 @@ export const ActualizarCategoria = () => {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/categorias/${id}`)
+    fetch(`http://localhost:3000/api/categorias/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Error al obtener categoría");
         return res.json();
@@ -42,7 +42,7 @@ export const ActualizarCategoria = () => {
       return;
     }
 
-    fetch(`http://localhost:3000/categorias/${id}`, {
+    fetch(`http://localhost:3000/api/categorias/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nombre, descripcion }),

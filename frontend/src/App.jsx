@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { Form } from "./Components/pages/form/Form";
+import { Form } from "./components/pages/form/Form";
 
 import { ComprasLayout } from "./components/pages/compras/comprasLayout/ComprasLayout";
 import { ComprasDashboard } from "./components/pages/compras/comprasDashboard/ComprasDashboard";
@@ -8,28 +8,28 @@ import { RegistrarCompras } from "./components/pages/compras/registrarCompras/Re
 import { Proveedores } from "./components/pages/Proveedores/Proveedores";
 
 import { ProveedoresDashBoard } from "./Components/pages/Proveedores/ProveedoresDashboard";
-import { Usuario } from "./Components/pages/usuarios/Usuario";
+import { Usuario } from "./components/pages/usuarios/Usuario";
 
 import ModificarCompra from "./components/pages/compras/modificarCompra/ModificarCompra";
 import ListaCompras from "./components/pages/compras/listaCompras/ListaCompras";
 import DetalleCompra from "./components/pages/compras/detalleCompra/DetalleCompra";
-import ComprasReportes from "./Components/pages/compras/comprasReportes/ComprasReportes";
+import ComprasReportes from "./components/pages/compras/comprasReportes/ComprasReportes";
 import { AuthProvider } from "./context/authContext";
-import { ProductosLayout } from "./Components/pages/productos/productosLayout/ProductosLayout";
-import { RegistrarProducto } from "./Components/pages/productos/registrarProducto/RegistrarProducto";
-import { ProductosDashboard } from "./Components/pages/productos/productosDashboard/ProductosDashboard";
-import { ListaProductos } from "./Components/pages/productos/listaProductos/ListaProductos";
-import { DetalleProducto } from "./Components/pages/productos/detalleProducto/DetalleProducto";
-import { ModificarProducto } from "./Components/pages/productos/modificarProducto/ModificarProducto";
-import { ListadoCategorias } from "./Components/pages/categorias/listadocategorias/ListadoCategorias";
-import { RegistrarCategoria } from "./Components/pages/categorias/registrarCategoria/RegistrarCategoria";
-import { CategoriasLayout } from "./Components/pages/categorias/categoriaslayout/categoriaslayout";
-import { ActualizarCategoria } from "./Components/pages/categorias/actualizarcategorias/ActualizarCategoria";
-import { CategoriasDashboard } from "./Components/pages/categorias/categoriasDashBoard/CategoriasDashBoard";
-import { RegistrarProveedor } from "./Components/pages/Proveedores/registrarproveedor/RegistrarProveedor";
-import { ActualizarProveedor } from "./Components/pages/Proveedores/actualizarproveedores/ActualizarProveedor";
-import { ListadoProveedores } from "./Components/pages/Proveedores/listaproveedores/ListadoProveedores";
-import { Home } from "./Components/pages/home/Home";
+import { ProductosLayout } from "./components/pages/productos/productosLayout/ProductosLayout";
+import { RegistrarProducto } from "./components/pages/productos/registrarProducto/RegistrarProducto";
+import { ProductosDashboard } from "./components/pages/productos/productosDashboard/ProductosDashboard";
+import { ListaProductos } from "./components/pages/productos/listaProductos/ListaProductos";
+import { DetalleProducto } from "./components/pages/productos/detalleProducto/DetalleProducto";
+import { ModificarProducto } from "./components/pages/productos/modificarProducto/ModificarProducto";
+import { ListadoCategorias } from "./components/pages/categorias/listadocategorias/ListadoCategorias";
+import { RegistrarCategoria } from "./components/pages/categorias/registrarCategoria/RegistrarCategoria";
+import { CategoriasLayout } from "./components/pages/categorias/categoriaslayout/categoriaslayout";
+import { ActualizarCategoria } from "./components/pages/categorias/actualizarcategorias/ActualizarCategoria";
+import { CategoriasDashboard } from "./components/pages/categorias/categoriasDashBoard/CategoriasDashBoard";
+import { RegistrarProveedor } from "./components/pages/Proveedores/registrarproveedor/RegistrarProveedor";
+import { ActualizarProveedor } from "./components/pages/Proveedores/actualizarproveedores/ActualizarProveedor";
+import { ListadoProveedores } from "./components/pages/Proveedores/listaproveedores/ListadoProveedores";
+import { Home } from "./components/pages/home/Home";
 import { CssBaseline } from "@mui/material";
 
 function App() {

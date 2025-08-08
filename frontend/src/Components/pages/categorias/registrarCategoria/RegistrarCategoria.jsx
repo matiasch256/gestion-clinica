@@ -34,8 +34,8 @@ export const RegistrarCategoria = () => {
     }
 
     const url = editandoId
-      ? `http://localhost:3000/categorias/${editandoId}`
-      : "http://localhost:3000/categorias";
+      ? `http://localhost:3000/api/categorias/${editandoId}`
+      : "http://localhost:3000/api/categorias";
     const method = editandoId ? "PUT" : "POST";
 
     fetch(url, {

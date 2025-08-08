@@ -25,7 +25,7 @@ export const ListadoCategorias = () => {
   const handleEliminar = (id) => {
     if (!window.confirm("¿Estás seguro de eliminar esta categoría?")) return;
 
-    fetch(`http://localhost:3000/categorias/${id}`, {
+    fetch(`http://localhost:3000/api/categorias/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
