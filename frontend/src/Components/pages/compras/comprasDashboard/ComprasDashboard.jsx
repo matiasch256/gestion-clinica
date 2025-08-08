@@ -11,6 +11,7 @@ import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import InfoCard from "../../../common/InfoCard";
 
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
@@ -34,46 +35,22 @@ export const ComprasDashboard = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Órdenes Pendientes
-              </Typography>
-              <Typography variant="h5">5 órdenes sin aprobar</Typography>
-            </CardContent>
-          </Card>
+          <InfoCard
+            title="Órdenes Pendientes"
+            content="5 órdenes sin aprobar"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Facturas Recientes
-              </Typography>
-              <Typography variant="h5">3 nuevas esta semana</Typography>
-            </CardContent>
-          </Card>
+          <InfoCard title="Facturas Recientes" content="3 nuevas esta semana" />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Stock Crítico
-              </Typography>
-              <Typography variant="h5">
-                2 productos debajo del mínimo
-              </Typography>
-            </CardContent>
-          </Card>
+          <InfoCard
+            title="Stock Crítico"
+            content="2 productos debajo del mínimo"
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Total Comprado (Mes)
-              </Typography>
-              <Typography variant="h5">$248.000</Typography>
-            </CardContent>
-          </Card>
+          <InfoCard title="Total Comprado (Mes)" content="$248.000" />
         </Grid>
       </Grid>
 
