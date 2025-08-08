@@ -61,7 +61,7 @@ export const ComprasDashboard = () => {
             />
             <QuickActionButton
               icon={<VisibilityIcon />}
-              label="Ver Orden"
+              label="Ver Órdenes"
               onClick={() => navigate("/ordenes")}
             />
           </Box>
