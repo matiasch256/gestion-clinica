@@ -30,7 +30,7 @@ body {
 }
 
 .login-form-logo {
-  width: 180px; /* Un poco más pequeño */
+  width: 100%; /* Un poco más pequeño */
   margin-bottom: 30px; /* Reduce el margen inferior */
 }
 

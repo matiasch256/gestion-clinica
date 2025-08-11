@@ -1,5 +1,5 @@
 import "./Form.css";
-import Logo from "./Logo/Logo.png";
+import logo from "../../../assets/logo.png";
 import { Navbar } from "../../layouts/navbar/Navbar";
 
 import { useState } from "react";
@@ -30,7 +30,7 @@ export const Form = ({ formToggle, formTitle, submitButtonText }) => {
       <div className="container">
         <div className="login-form-container">
           <div className="login-form-logo">
-            <img src={Logo} alt="Logo de la empresa" />
+            <img src={logo} alt="Logo de la empresa" />
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
