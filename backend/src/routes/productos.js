@@ -36,7 +36,7 @@ router.post("/", async (req, res) => {
     const pool = await getPool();
     await pool.query`
       INSERT INTO productos (nombre, descripcion, unidadMedida, stock, stockMinimo)
-      VALUES (${nombre}, ${descripcion}, ${unidadMedida}, ${stock}, ${stockMinimo})
+      VALUES (${nombre?.trim()}, ${descripcion?.trim()}, ${unidadMedida?.trim()}, ${stock}, ${stockMinimo})
     `;
     res.status(201).json({ message: "Producto creado correctamente" });
   } catch (error) {
@@ -61,9 +61,9 @@ router.put("/:id", async (req, res) => {
     const pool = await getPool();
     const result = await pool.query`
       UPDATE productos
-      SET nombre = ${nombre}, descripcion = ${descripcion}, codigo = ${codigo},
-          unidadMedida = ${unidadMedida}, stock = ${stock}, stockMinimo = ${stockMinimo},
-          observaciones = ${observaciones}, activo = ${activo}
+      SET nombre = ${nombre?.trim()}, descripcion = ${descripcion?.trim()}, codigo = ${codigo?.trim()},
+          unidadMedida = ${unidadMedida?.trim()}, stock = ${stock}, stockMinimo = ${stockMinimo},
+          observaciones = ${observaciones?.trim()}, activo = ${activo}
       WHERE id = ${id}
     `;
     if (result.rowsAffected[0] > 0) {
