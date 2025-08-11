@@ -38,7 +38,7 @@ router.post("/", async (req, res) => {
     const pool = await getPool();
     const result = await pool.query`
       INSERT INTO proveedores (nombre, direccion, barrio, telefono)
-      VALUES (${nombre}, ${direccion}, ${barrio}, ${telefono})
+      VALUES (${nombre?.trim()}, ${direccion?.trim()}, ${barrio?.trim()}, ${telefono?.trim()})
     `;
     res.status(200).json({ message: "Proveedor registrado", result });
   } catch (err) {
@@ -72,7 +72,7 @@ router.put("/:id", async (req, res) => {
     const pool = await getPool();
     const result = await pool.query`
       UPDATE proveedores
-      SET nombre = ${nombre}, direccion = ${direccion}, barrio = ${barrio}, telefono = ${telefono}
+      SET nombre = ${nombre?.trim()}, direccion = ${direccion?.trim()}, barrio = ${barrio?.trim()}, telefono = ${telefono?.trim()}
       WHERE id = ${id}
     `;
     res.status(200).json({ message: "Proveedor actualizado", result });
