@@ -16,13 +16,13 @@ router.post("/", async (req, res) => {
     const compraResult = await pool.query`
       INSERT INTO Compras (proveedor, fecha)
       OUTPUT INSERTED.id
-      VALUES (${proveedor}, ${normalizedDate})
+      VALUES (${proveedor?.trim()}, ${normalizedDate})
     `;
     const compraId = compraResult.recordset[0].id;
     for (const p of productos) {
       await pool.query`
         INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
-        VALUES (${compraId}, ${p.nombre}, ${p.cantidad}, ${p.precio})
+        VALUES (${compraId}, ${p.nombre?.trim()}, ${p.cantidad}, ${p.precio})
       `;
     }
     res.status(200).json({ message: "Compra registrada correctamente" });
@@ -92,14 +92,14 @@ router.put("/:id", async (req, res) => {
     }
     await pool.query`
       UPDATE Compras
-      SET proveedor = ${proveedor}, fecha = ${normalizedDate}
+      SET proveedor = ${proveedor?.trim()}, fecha = ${normalizedDate}
       WHERE id = ${id}
     `;
     await pool.query`DELETE FROM DetalleCompra WHERE IdCompra = ${id}`;
     for (const p of productos) {
       await pool.query`
         INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
-        VALUES (${id}, ${p.NombreProducto}, ${p.Cantidad}, ${p.Precio})
+        VALUES (${id}, ${p.NombreProducto?.trim()}, ${p.Cantidad}, ${p.Precio})
       `;
     }
     res.status(200).json({ message: "Compra actualizada correctamente" });
