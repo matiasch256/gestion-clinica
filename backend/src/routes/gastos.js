@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     } else if (endYear) {
       whereClause = `WHERE YEAR(C.fecha) <= ${endYear}`;
     }
-    if (periodo === "mensual") {
+    if (periodo?.trim() === "mensual") {
       query = `
         SELECT 
           FORMAT(C.fecha, 'yyyy-MM') AS periodo,
@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
         GROUP BY FORMAT(C.fecha, 'yyyy-MM')
         ORDER BY periodo
       `;
-    } else if (periodo === "trimestral") {
+    } else if (periodo?.trim() === "trimestral") {
       query = `
         SELECT 
           CONCAT(YEAR(C.fecha), '-Q', DATEPART(QUARTER, C.fecha)) AS periodo,
@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
         GROUP BY YEAR(C.fecha), DATEPART(QUARTER, C.fecha)
         ORDER BY YEAR(C.fecha), DATEPART(QUARTER, C.fecha)
       `;
-    } else if (periodo === "anual") {
+    } else if (periodo?.trim() === "anual") {
       query = `
         SELECT 
           CAST(YEAR(C.fecha) AS NVARCHAR) AS periodo,
