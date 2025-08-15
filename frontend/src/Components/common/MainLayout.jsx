@@ -16,13 +16,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-// Iconos para el menú
-import HomeIcon from "@mui/icons-material/Home";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import AssessmentIcon from "@mui/icons-material/Assessment";
+import { Outlet, useNavigate } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 
@@ -30,7 +24,7 @@ const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar)({
   width: "100%",
-  backgroundColor: "#000000", // Color del AppBar
+  backgroundColor: "#000000",
 });
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -47,36 +41,7 @@ const Main = styled("main")(({ theme }) => ({
   width: "100%",
 }));
 
-// Opciones del menú
-const menuItems = [
-  {
-    text: "Home",
-    icon: <HomeIcon />,
-    path: "/home",
-  },
-  {
-    text: "Dashboard",
-    icon: <DashboardIcon />,
-    path: "/compras",
-  },
-  {
-    text: "Registrar Compra",
-    icon: <AddShoppingCartIcon />,
-    path: "/compras/registrar",
-  },
-  {
-    text: "Lista Compras",
-    icon: <ShoppingCartIcon />,
-    path: "/compras/listaCompras",
-  },
-  {
-    text: "Reportes",
-    icon: <AssessmentIcon />,
-    path: "/compras/reportes",
-  },
-];
-
-export const ComprasLayout = () => {
+export default function MainLayout({ title = "App", menuItems = [] }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
@@ -86,7 +51,7 @@ export const ComprasLayout = () => {
 
   const handleMenuClick = (path) => {
     navigate(path);
-    setOpen(false); // Cerrar drawer en móvil después de navegar
+    setOpen(false);
   };
 
   return (
@@ -94,33 +59,19 @@ export const ComprasLayout = () => {
       <CssBaseline />
       <AppBar position="fixed">
         <Toolbar>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <img src="/barrancas-logo.png" alt="Logo" style={{ height: 40 }} />
             <IconButton
               color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               edge="start"
-              sx={{
-                ml: 4,
-                "&:hover": {
-                  color: "#ffffff",
-                },
-              }}
+              sx={{ ml: 4, "&:hover": { color: "#ffffff" } }}
             >
               <MenuIcon />
             </IconButton>
           </Box>
-
-          {/* Spacer para empujar elementos a la derecha */}
           <Box sx={{ flexGrow: 1 }} />
-
-          {/* Información de sesión - Personaliza según tu implementación */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="body2" sx={{ mr: 2 }}>
               Bienvenida, Laura
@@ -139,10 +90,7 @@ export const ComprasLayout = () => {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
+          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
         }}
         variant="temporary"
         anchor="left"
@@ -162,10 +110,7 @@ export const ComprasLayout = () => {
             )}
           </IconButton>
         </DrawerHeader>
-
         <Divider />
-
-        {/* Sección de usuario en el drawer */}
         <Box sx={{ p: 2, textAlign: "center", backgroundColor: "grey.50" }}>
           <Typography variant="subtitle1" fontWeight="bold">
             Usuario Actual
@@ -174,9 +119,7 @@ export const ComprasLayout = () => {
             laura_barrancas@gmail.com
           </Typography>
         </Box>
-
         <Divider />
-
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
@@ -187,10 +130,7 @@ export const ComprasLayout = () => {
             </ListItem>
           ))}
         </List>
-
         <Divider />
-
-        {/* Sección de sesión */}
         <List>
           <ListItem disablePadding>
             <ListItemButton onClick={() => handleMenuClick("/perfil")}>
@@ -221,4 +161,4 @@ export const ComprasLayout = () => {
       </Main>
     </Box>
   );
-};
+}

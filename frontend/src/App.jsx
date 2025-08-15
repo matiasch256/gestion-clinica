@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { Form } from "./components/pages/form/Form";
+import MainLayout from "./components/common/MainLayout";
 
-import { ComprasLayout } from "./components/pages/compras/comprasLayout/ComprasLayout";
 import { ComprasDashboard } from "./components/pages/compras/comprasDashboard/ComprasDashboard";
 import { RegistrarCompras } from "./components/pages/compras/registrarCompras/RegistrarCompras";
 import { Proveedores } from "./components/pages/Proveedores/Proveedores";
@@ -32,6 +32,8 @@ import { ListadoProveedores } from "./components/pages/Proveedores/listaproveedo
 import { Home } from "./components/pages/home/Home";
 import { CssBaseline } from "@mui/material";
 
+import { comprasMenuItems } from "./components/pages/compras/comprasMenuItems";
+
 function App() {
   return (
     <>
@@ -55,7 +57,13 @@ function App() {
 
             <Route path="/usuarios" element={<Usuario />} />
             {/* COMPRAS */}
-            <Route path="/compras" element={<ComprasLayout />}>
+            {/* COMPRAS */}
+            <Route
+              path="/compras"
+              element={
+                <MainLayout title="Compras" menuItems={comprasMenuItems} />
+              }
+            >
               <Route index element={<ComprasDashboard />} />
               <Route path="registrar" element={<RegistrarCompras />} />
               <Route path="modificar/:idCompra" element={<ModificarCompra />} />

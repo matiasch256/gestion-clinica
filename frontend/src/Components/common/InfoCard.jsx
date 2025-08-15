@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, CardContent, Typography } from "@mui/material";
 
 const InfoCard = ({ title, content }) => {

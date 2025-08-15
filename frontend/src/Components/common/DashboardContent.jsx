@@ -1,7 +1,10 @@
-// DashboardLayout.jsx
 import { Box, Typography, Grid, Card, CardContent } from "@mui/material";
 
-export default function DashboardLayout({ title, cards, actions }) {
+export default function DashboardContent({
+  title = "Dashboard",
+  cards = [],
+  actions = [],
+}) {
   return (
     <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
       <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
@@ -10,18 +13,22 @@ export default function DashboardLayout({ title, cards, actions }) {
 
       {/* Tarjetas */}
       <Grid container spacing={2}>
-        {cards.map((card, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            {card}
-          </Grid>
-        ))}
+        {Array.isArray(cards) && cards.length > 0 ? (
+          cards.map((card, index) => (
+            <Grid key={index} item xs={12} sm={6} md={3}>
+              {card}
+            </Grid>
+          ))
+        ) : (
+          <Typography>No hay tarjetas disponibles</Typography>
+        )}
       </Grid>
 
       {/* Acciones rápidas */}
-      {actions.length > 0 && (
+      {Array.isArray(actions) && actions.length > 0 && (
         <Card elevation={3} sx={{ mt: 3 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" personallyBottom>
               Acciones Rápidas
             </Typography>
             <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
