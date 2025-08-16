@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ListadoCategorias.css";
+import {
+  Box,
+  Typography,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+} from "@mui/material";
 
 export const ListadoCategorias = () => {
   const [categorias, setCategorias] = useState([]);
-  const [filtro, setFiltro] = useState(""); // estado para filtro
+  const [filtro, setFiltro] = useState("");
   const navigate = useNavigate();
 
   const obtenerCategorias = () => {
@@ -35,44 +47,58 @@ export const ListadoCategorias = () => {
       .catch((err) => alert(err.message));
   };
 
-  // filtro aplicado sobre categorias
   const categoriasFiltradas = categorias.filter((c) =>
     c.nombre.toLowerCase().includes(filtro.toLowerCase())
   );
 
   return (
-    <div className="listado-categorias">
-      <h2>Listado de Categorías</h2>
-
-      <input
-        type="text"
-        placeholder="Buscar por nombre..."
+    <Box sx={{ p: 3, maxWidth: 1200, mx: "auto" }}>
+      <Typography variant="h4" component="h2" gutterBottom>
+        Listado de Categorías
+      </Typography>
+      <TextField
+        label="Buscar por nombre"
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}
-        style={{ marginBottom: "1rem", padding: "0.5rem", width: "100%" }}
+        fullWidth
+        sx={{ mb: 2 }}
       />
-
-      <table className="tabla-categorias">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categoriasFiltradas.map((c) => (
-            <tr key={c.id}>
-              <td>{c.nombre}</td>
-              <td>{c.descripcion}</td>
-              <td>
-                <button onClick={() => handleEditar(c)}>Editar</button>
-                <button onClick={() => handleEliminar(c.id)}>Eliminar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Descripción</TableCell>
+              <TableCell>Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {categoriasFiltradas.map((c) => (
+              <TableRow key={c.id}>
+                <TableCell>{c.nombre}</TableCell>
+                <TableCell>{c.descripcion}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => handleEditar(c)}
+                    sx={{ mr: 1 }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleEliminar(c.id)}
+                  >
+                    Eliminar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };

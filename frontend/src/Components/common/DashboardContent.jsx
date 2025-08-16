@@ -28,9 +28,7 @@ export default function DashboardContent({
       {Array.isArray(actions) && actions.length > 0 && (
         <Card elevation={3} sx={{ mt: 3 }}>
           <CardContent>
-            <Typography variant="h6" personallyBottom>
-              Acciones Rápidas
-            </Typography>
+            <Typography variant="h6">Acciones Rápidas</Typography>
             <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
               {actions.map((action, index) => (
                 <div key={index}>{action}</div>

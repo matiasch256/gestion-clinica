@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import "./ActualizarCategoria.css";
+import { Box, Typography, TextField, Button } from "@mui/material";
 
 export const ActualizarCategoria = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [cargando, setCargando] = useState(true);
@@ -31,7 +30,6 @@ export const ActualizarCategoria = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validaciones
     if (!nombre.trim() || !descripcion.trim()) {
       alert("Todos los campos son obligatorios.");
       return;
@@ -55,34 +53,44 @@ export const ActualizarCategoria = () => {
       .catch((err) => alert(err.message));
   };
 
-  if (cargando) return <p>Cargando datos de la categoría...</p>;
+  if (cargando) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="body1">
+          Cargando datos de la categoría...
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <div className="actualizar-categoria">
-      <h2>Actualizar Categoría</h2>
-      <form onSubmit={handleSubmit} className="form-categoria">
-        <div className="form-group">
-          <label>Nombre:</label>
-          <input
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Descripción:</label>
-          <input
-            type="text"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="actualizar-btn">
+    <Box sx={{ maxWidth: 600, mx: "auto", p: 3 }}>
+      <Typography variant="h4" component="h2" gutterBottom>
+        Actualizar Categoría
+      </Typography>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
+        <TextField
+          label="Nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+          fullWidth
+        />
+        <TextField
+          label="Descripción"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          required
+          fullWidth
+        />
+        <Button type="submit" variant="contained" color="primary">
           Actualizar Categoría
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Box>
+    </Box>
   );
 };

@@ -23,7 +23,6 @@ import { DetalleProducto } from "./components/pages/productos/detalleProducto/De
 import { ModificarProducto } from "./components/pages/productos/modificarProducto/ModificarProducto";
 import { ListadoCategorias } from "./components/pages/categorias/listadocategorias/ListadoCategorias";
 import { RegistrarCategoria } from "./components/pages/categorias/registrarCategoria/RegistrarCategoria";
-import { CategoriasLayout } from "./components/pages/categorias/categoriaslayout/categoriaslayout";
 import { ActualizarCategoria } from "./components/pages/categorias/actualizarcategorias/ActualizarCategoria";
 import { CategoriasDashboard } from "./components/pages/categorias/categoriasDashBoard/CategoriasDashBoard";
 import { RegistrarProveedor } from "./components/pages/Proveedores/registrarproveedor/RegistrarProveedor";
@@ -33,6 +32,7 @@ import { Home } from "./components/pages/home/Home";
 import { CssBaseline } from "@mui/material";
 
 import { comprasMenuItems } from "./components/pages/compras/comprasMenuItems";
+import { categoriasMenuItems } from "./components/pages/categorias/categoriasMenu";
 
 function App() {
   return (
@@ -87,7 +87,15 @@ function App() {
               />
               {/* CATEGORIAS */}
             </Route>
-            <Route path="/categorias" element={<CategoriasLayout />}>
+            <Route
+              path="/categorias"
+              element={
+                <MainLayout
+                  title="Categorías"
+                  menuItems={categoriasMenuItems}
+                />
+              }
+            >
               <Route index element={<CategoriasDashboard />} />
               <Route path="consultar" element={<ListadoCategorias />} />
               <Route path="registrar" element={<RegistrarCategoria />} />

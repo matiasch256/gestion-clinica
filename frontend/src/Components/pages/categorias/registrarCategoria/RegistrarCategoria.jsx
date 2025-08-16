@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./RegistrarCategoria.css";
+import { Box, Typography, TextField, Button } from "@mui/material";
 
 export const RegistrarCategoria = () => {
   const [nombre, setNombre] = useState("");
@@ -22,7 +22,6 @@ export const RegistrarCategoria = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validaciones
     if (!nombre.trim() || !descripcion.trim()) {
       alert("Todos los campos son obligatorios.");
       return;
@@ -58,31 +57,33 @@ export const RegistrarCategoria = () => {
   };
 
   return (
-    <div className="registro-categoria">
-      <h2>{editandoId ? "Editar" : "Registrar"} Categoría</h2>
-      <form onSubmit={handleSubmit} className="form-categoria">
-        <div className="form-group">
-          <label>Nombre:</label>
-          <input
-            type="text"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Descripción:</label>
-          <input
-            type="text"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" className="registrar-btn">
+    <Box sx={{ maxWidth: 600, mx: "auto", p: 3 }}>
+      <Typography variant="h4" component="h2" gutterBottom>
+        {editandoId ? "Editar Categoría" : "Registrar Categoría"}
+      </Typography>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
+        <TextField
+          label="Nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+          fullWidth
+        />
+        <TextField
+          label="Descripción"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          required
+          fullWidth
+        />
+        <Button type="submit" variant="contained" color="primary">
           {editandoId ? "Actualizar" : "Registrar"}
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Box>
+    </Box>
   );
 };
