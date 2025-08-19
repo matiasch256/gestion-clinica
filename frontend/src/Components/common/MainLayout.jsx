@@ -16,16 +16,17 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 const drawerWidth = 240;
 
-const AppBar = styled(MuiAppBar)({
+const AppBar = styled(MuiAppBar)(({ theme }) => ({
   width: "100%",
-  backgroundColor: "#000000",
-});
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+}));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -39,11 +40,14 @@ const Main = styled("main")(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   width: "100%",
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
 }));
 
 export default function MainLayout({ title = "App", menuItems = [] }) {
   const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ saber ruta actual
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => setOpen(true);
@@ -66,7 +70,10 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               edge="start"
-              sx={{ ml: 4, "&:hover": { color: "#ffffff" } }}
+              sx={{
+                ml: 4,
+                "&:hover": { color: theme.palette.sidebar.active },
+              }}
             >
               <MenuIcon />
             </IconButton>
@@ -78,7 +85,10 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
             </Typography>
             <IconButton
               color="inherit"
-              sx={{ mr: 2, "&:hover": { color: "#ffffff" } }}
+              sx={{
+                mr: 2,
+                "&:hover": { color: theme.palette.sidebar.active },
+              }}
             >
               <AccountCircleIcon />
             </IconButton>
@@ -90,7 +100,13 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.sidebar.background,
+            color: theme.palette.sidebar.text,
+            borderRight: `1px solid ${theme.palette.sidebar.border}`,
+          },
         }}
         variant="temporary"
         anchor="left"
@@ -111,7 +127,13 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <Box sx={{ p: 2, textAlign: "center", backgroundColor: "grey.50" }}>
+        <Box
+          sx={{
+            p: 2,
+            textAlign: "center",
+            backgroundColor: theme.palette.sidebar.hover,
+          }}
+        >
           <Typography variant="subtitle1" fontWeight="bold">
             Usuario Actual
           </Typography>
@@ -123,8 +145,25 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
-              <ListItemButton onClick={() => handleMenuClick(item.path)}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemButton
+                onClick={() => handleMenuClick(item.path)}
+                selected={location.pathname === item.path} // ✅ compara ruta
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.sidebar.hover,
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: theme.palette.sidebar.active,
+                    color: theme.palette.primary.contrastText,
+                    "& .MuiListItemIcon-root": {
+                      color: theme.palette.primary.contrastText,
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText primary={item.text} />
               </ListItemButton>
             </ListItem>
@@ -133,8 +172,20 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => handleMenuClick("/perfil")}>
-              <ListItemIcon>
+            <ListItemButton
+              onClick={() => handleMenuClick("/perfil")}
+              selected={location.pathname === "/perfil"} // ✅ también perfil
+              sx={{
+                "&:hover": {
+                  backgroundColor: theme.palette.sidebar.hover,
+                },
+                "&.Mui-selected": {
+                  backgroundColor: theme.palette.sidebar.active,
+                  color: theme.palette.primary.contrastText,
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                 <AccountCircleIcon />
               </ListItemIcon>
               <ListItemText primary="Mi Perfil" />
@@ -145,8 +196,17 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               onClick={() => {
                 /* Lógica de logout */
               }}
+              sx={{
+                "&:hover": {
+                  backgroundColor: theme.palette.error.main,
+                  color: theme.palette.error.contrastText,
+                  "& .MuiListItemIcon-root": {
+                    color: theme.palette.error.contrastText,
+                  },
+                },
+              }}
             >
-              <ListItemIcon>
+              <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
                 <LogoutIcon />
               </ListItemIcon>
               <ListItemText primary="Cerrar Sesión" />
