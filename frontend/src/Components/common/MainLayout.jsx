@@ -144,21 +144,45 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         <Box
           sx={{
             p: 2,
-            textAlign: "center",
+            textAlign: "left",
             backgroundColor: theme.palette.sidebar.hover,
+            display: "flex",
           }}
         >
-          <Typography variant="subtitle1" fontWeight="bold">
-            Usuario Actual
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            laura_barrancas@gmail.com
-          </Typography>
+          <AccountCircleIcon
+            sx={{
+              mr: 4,
+              alignSelf: "center",
+              bgcolor: "transparent !important",
+            }}
+          />
+
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold">
+              Laura Rodríguez
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Administrador
+            </Typography>
+          </Box>
         </Box>
         <Divider />
         <List>
           {menuItems.map((item) => (
-            <ListItem key={item.text} disablePadding>
+            <ListItem
+              key={item.text}
+              disablePadding
+              sx={{
+                "&:hover": {
+                  "& .MuiListItemIcon-root": {
+                    color: "primary.main", // Color del icono al hacer hover
+                  },
+                  "& .MuiListItemText-primary": {
+                    color: "primary.main", // Color del texto al hacer hover
+                  },
+                },
+              }}
+            >
               <ListItemButton
                 onClick={() => handleMenuClick(item.path)}
                 selected={location.pathname === item.path} // ✅ compara ruta
@@ -167,15 +191,19 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                     backgroundColor: theme.palette.sidebar.hover,
                   },
                   "&.Mui-selected": {
-                    backgroundColor: theme.palette.sidebar.active,
-                    color: theme.palette.primary.contrastText,
+                    backgroundColor: theme.palette.sidebar.hover,
+                    color: theme.palette.sidebar.active,
                     "& .MuiListItemIcon-root": {
-                      color: theme.palette.primary.contrastText,
+                      color: theme.palette.sidebar.active, // Cambia color del icono seleccionado
                     },
                   },
                 }}
               >
-                <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
+                <ListItemIcon
+                  sx={{
+                    color: theme.palette.text.secondary,
+                  }}
+                >
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText primary={item.text} />
@@ -185,7 +213,19 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         </List>
         <Divider />
         <List>
-          <ListItem disablePadding>
+          <ListItem
+            disablePadding
+            sx={{
+              "&:hover": {
+                "& .MuiListItemIcon-root": {
+                  color: "primary.main", // Color del icono al hacer hover
+                },
+                "& .MuiListItemText-primary": {
+                  color: "primary.main", // Color del texto al hacer hover
+                },
+              },
+            }}
+          >
             <ListItemButton
               onClick={() => handleMenuClick("/perfil")}
               selected={location.pathname === "/perfil"} // ✅ también perfil
