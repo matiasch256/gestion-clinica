@@ -24,7 +24,7 @@ const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   width: "100%",
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: theme.palette.primary.contrastText,
   color: theme.palette.primary.contrastText,
 }));
 
@@ -49,6 +49,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
   const navigate = useNavigate();
   const location = useLocation(); // ✅ saber ruta actual
   const [open, setOpen] = React.useState(false);
+  const [iconHover, setIconHover] = React.useState(theme.palette.error.main);
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -72,12 +73,18 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               edge="start"
               sx={{
                 ml: 4,
+                bgcolor: "transparent !important",
                 "&:hover": { color: theme.palette.sidebar.active },
               }}
             >
               <MenuIcon />
             </IconButton>
           </Box>
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={{ bgcolor: "divider.main" }}
+          />
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="body2" sx={{ mr: 2 }}>
@@ -87,6 +94,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               color="inherit"
               sx={{
                 mr: 2,
+                bgcolor: "transparent !important",
                 "&:hover": { color: theme.palette.sidebar.active },
               }}
             >
@@ -118,7 +126,13 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 2 }}>
             Menú
           </Typography>
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton
+            onClick={handleDrawerClose}
+            sx={{
+              bgcolor: "transparent !important",
+              "&:hover": { color: theme.palette.sidebar.active },
+            }}
+          >
             {theme.direction === "ltr" ? (
               <ChevronLeftIcon />
             ) : (
@@ -193,23 +207,20 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           </ListItem>
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => {
-                /* Lógica de logout */
-              }}
+              onMouseEnter={() =>
+                setIconHover(theme.palette.error.contrastText)
+              } // Cambia color en hover
+              onMouseLeave={() => setIconHover(theme.palette.error.main)} // Vuelve al color original
               sx={{
                 "&:hover": {
                   backgroundColor: theme.palette.error.main,
-                  color: theme.palette.error.contrastText,
-                  "& .MuiListItemIcon-root": {
-                    color: theme.palette.error.contrastText,
-                  },
                 },
               }}
             >
-              <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                <LogoutIcon />
+              <ListItemIcon>
+                <LogoutIcon sx={{ color: iconHover }} />
               </ListItemIcon>
-              <ListItemText primary="Cerrar Sesión" />
+              <ListItemText primary="Cerrar Sesión" sx={{ color: iconHover }} />
             </ListItemButton>
           </ListItem>
         </List>
