@@ -1,54 +1,56 @@
-import { Navbar } from "../../layouts/navbar/Navbar";
-import "./Home.css";
-import { Link } from "react-router-dom"; // Outlet is not directly used here but good to keep if you have nested routes
-
+import DashboardHeader from "../../../components/common/DashboardHeader";
+import SystemMetricsGrid from "../../../components/common/SystemMetricsGrid";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import PeopleIcon from "@mui/icons-material/People";
+import FolderIcon from "@mui/icons-material/Folder";
+import QuickActionsCard from "../../../components/common/QuickActionsCard";
+import quickActionsData from "../../../components/common/quickActionsData";
 export const Home = () => {
   return (
     <>
-      <Navbar />
-      <div className="home-container">
-        <h1 className="home-title">Bienvenido a la Gestión de Inventario</h1>
-        <p className="home-subtitle">Selecciona un módulo para comenzar:</p>
-
-        <div className="modules-grid">
-          {/* Módulo de Compras */}
-          <Link to="/compras" className="module-card">
-            <div className="module-icon">🛒</div> {/* Ícono de compra */}
-            <h2 className="module-title">Compras</h2>
-            <p className="module-description">
-              Gestiona tus órdenes de compra y recibos de mercancía.
-            </p>
-          </Link>
-
-          {/* Módulo de Proveedores */}
-          <Link to="/proveedores" className="module-card">
-            <div className="module-icon">🚚</div> {/* Ícono de proveedor */}
-            <h2 className="module-title">Proveedores</h2>
-            <p className="module-description">
-              Administra la información de tus proveedores.
-            </p>
-          </Link>
-
-          {/* Módulo de Productos */}
-          <Link to="/productos" className="module-card">
-            <div className="module-icon">📦</div> {/* Ícono de producto */}
-            <h2 className="module-title">Productos</h2>
-            <p className="module-description">
-              Controla tu catálogo de productos y existencias.
-            </p>
-          </Link>
-
-          {/* Módulo de Categorías */}
-          <Link to="/categorias" className="module-card">
-            <div className="module-icon">🗂️</div> {/* Ícono de categoría */}
-            <h2 className="module-title">Categorías</h2>
-            <p className="module-description">
-              Organiza tus productos por categorías.
-            </p>
-          </Link>
-        </div>
-      </div>
-      {/* <Outlet /> if you have nested routes that should render here */}
+      <DashboardHeader />
+      <SystemMetricsGrid
+        systemMetrics={[
+          {
+            title: "Órdenes Pendientes",
+            value: "12",
+            trending: "up",
+            change: "+3 desde ayer",
+            bgColor: "rgba(25, 118, 210, 0.1)",
+            color: "#1976d2",
+            icon: ShoppingCartIcon,
+          },
+          {
+            title: "Productos Activos",
+            value: "1,247",
+            trending: "up",
+            change: "+15 esta semana",
+            bgColor: "rgba(76, 175, 80, 0.1)",
+            color: "#4caf50",
+            icon: InventoryIcon,
+          },
+          {
+            title: "Proveedores",
+            value: "89",
+            trending: "up",
+            change: "+2 este mes",
+            bgColor: "rgba(186, 104, 200, 0.1)",
+            color: "#ba68c8",
+            icon: PeopleIcon,
+          },
+          {
+            title: "Categorías",
+            value: "24",
+            trending: null,
+            change: "Sin cambios",
+            bgColor: "rgba(255, 152, 0, 0.1)",
+            color: "#ff9800",
+            icon: FolderIcon,
+          },
+        ]}
+      />
+      <QuickActionsCard quickActions={quickActionsData} />
     </>
   );
 };

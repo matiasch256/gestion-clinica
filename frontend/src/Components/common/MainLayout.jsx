@@ -47,7 +47,7 @@ const Main = styled("main")(({ theme }) => ({
 export default function MainLayout({ title = "App", menuItems = [] }) {
   const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ saber ruta actual
+  const location = useLocation();
   const [open, setOpen] = React.useState(false);
   const [iconHover, setIconHover] = React.useState(theme.palette.error.main);
 
@@ -111,7 +111,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: theme.palette.sidebar.background,
+            backgroundColor: theme.palette.background.paper,
             color: theme.palette.sidebar.text,
             borderRight: `1px solid ${theme.palette.sidebar.border}`,
           },
@@ -175,17 +175,17 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               sx={{
                 "&:hover": {
                   "& .MuiListItemIcon-root": {
-                    color: "primary.main", // Color del icono al hacer hover
+                    color: "primary.main",
                   },
                   "& .MuiListItemText-primary": {
-                    color: "primary.main", // Color del texto al hacer hover
+                    color: "primary.main",
                   },
                 },
               }}
             >
               <ListItemButton
                 onClick={() => handleMenuClick(item.path)}
-                selected={location.pathname === item.path} // ✅ compara ruta
+                selected={location.pathname === item.path}
                 sx={{
                   "&:hover": {
                     backgroundColor: theme.palette.sidebar.hover,
@@ -194,7 +194,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                     backgroundColor: theme.palette.sidebar.hover,
                     color: theme.palette.sidebar.active,
                     "& .MuiListItemIcon-root": {
-                      color: theme.palette.sidebar.active, // Cambia color del icono seleccionado
+                      color: theme.palette.sidebar.active,
                     },
                   },
                 }}
@@ -218,17 +218,17 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
             sx={{
               "&:hover": {
                 "& .MuiListItemIcon-root": {
-                  color: "primary.main", // Color del icono al hacer hover
+                  color: "primary.main",
                 },
                 "& .MuiListItemText-primary": {
-                  color: "primary.main", // Color del texto al hacer hover
+                  color: "primary.main",
                 },
               },
             }}
           >
             <ListItemButton
               onClick={() => handleMenuClick("/perfil")}
-              selected={location.pathname === "/perfil"} // ✅ también perfil
+              selected={location.pathname === "/perfil"}
               sx={{
                 "&:hover": {
                   backgroundColor: theme.palette.sidebar.hover,
@@ -249,8 +249,8 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
             <ListItemButton
               onMouseEnter={() =>
                 setIconHover(theme.palette.error.contrastText)
-              } // Cambia color en hover
-              onMouseLeave={() => setIconHover(theme.palette.error.main)} // Vuelve al color original
+              }
+              onMouseLeave={() => setIconHover(theme.palette.error.main)}
               sx={{
                 "&:hover": {
                   backgroundColor: theme.palette.error.main,

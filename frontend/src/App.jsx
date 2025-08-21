@@ -44,7 +44,9 @@ function App() {
             <Route path="/" element={<Form />} />
 
             {/* HOME */}
-            <Route path="/home" element={<Home />} />
+            <Route path="/home" element={<MainLayout />}>
+              <Route index element={<Home />} />
+            </Route>
 
             {/* DASHBOARD */}
             {/* PROVEEDORES */}

@@ -1,7 +1,7 @@
 import { icons } from "../../../utils/icons.jsx";
 
 export const comprasMenuItems = [
-  { text: "Home", icon: icons.home, path: "/home" },
+  { text: "Inicio", icon: icons.home, path: "/home" },
   { text: "Dashboard", icon: icons.dashboard, path: "/compras" },
   {
     text: "Registrar Compra",
