@@ -6,6 +6,11 @@ import PeopleIcon from "@mui/icons-material/People";
 import FolderIcon from "@mui/icons-material/Folder";
 import QuickActionsCard from "../../../components/common/QuickActionsCard";
 import quickActionsData from "../../../components/common/quickActionsData";
+import RecentActivity from "../../../components/common/RecentActivity";
+import CategoryDistribution from "../../../components/common/CategoryDistribution";
+import SystemAlerts from "../../../components/common/SystemAlerts";
+import { Grid } from "@mui/material";
+
 export const Home = () => {
   return (
     <>
@@ -51,6 +56,21 @@ export const Home = () => {
         ]}
       />
       <QuickActionsCard quickActions={quickActionsData} />
+      <Grid container spacing={3} sx={{ mt: 3 }}>
+        <Grid size={{ xs: 12, lg: 8 }}>
+          <RecentActivity />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <CategoryDistribution />
+        </Grid>
+      </Grid>
+      <Grid container spacing={3} sx={{ mt: 3 }}>
+        <Grid size={{ xs: 12, lg: 12 }}>
+          <SystemAlerts
+            onNavigate={(page, section) => console.log(page, section)}
+          />
+        </Grid>
+      </Grid>
     </>
   );
 };
