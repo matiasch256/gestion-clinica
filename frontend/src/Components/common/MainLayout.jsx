@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -16,9 +16,12 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -48,8 +51,9 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = React.useState(false);
-  const [iconHover, setIconHover] = React.useState(theme.palette.error.main);
+  const [open, setOpen] = useState(false);
+  const [iconHover, setIconHover] = useState(theme.palette.error.main);
+  const [openMenu, setOpenMenu] = useState({});
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -57,6 +61,10 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
   const handleMenuClick = (path) => {
     navigate(path);
     setOpen(false);
+  };
+
+  const handleSubMenuClick = (text) => {
+    setOpenMenu((prev) => ({ ...prev, [text]: !prev[text] }));
   };
 
   return (
@@ -156,7 +164,6 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               bgcolor: "transparent !important",
             }}
           />
-
           <Box>
             <Typography variant="subtitle1" fontWeight="bold">
               Laura Rodríguez
@@ -168,47 +175,124 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         </Box>
         <Divider />
         <List>
-          {menuItems.map((item) => (
-            <ListItem
-              key={item.text}
-              disablePadding
-              sx={{
-                "&:hover": {
-                  "& .MuiListItemIcon-root": {
-                    color: "primary.main",
-                  },
-                  "& .MuiListItemText-primary": {
-                    color: "primary.main",
-                  },
-                },
-              }}
-            >
-              <ListItemButton
-                onClick={() => handleMenuClick(item.path)}
-                selected={location.pathname === item.path}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: theme.palette.sidebar.hover,
-                  },
-                  "&.Mui-selected": {
-                    backgroundColor: theme.palette.sidebar.hover,
-                    color: theme.palette.sidebar.active,
-                    "& .MuiListItemIcon-root": {
-                      color: theme.palette.sidebar.active,
-                    },
-                  },
-                }}
-              >
-                <ListItemIcon
+          {menuItems.map((item, index) => (
+            <React.Fragment key={index}>
+              {item.children ? (
+                <ListItem
+                  disablePadding
                   sx={{
-                    color: theme.palette.text.secondary,
+                    "&:hover": {
+                      "& .MuiListItemIcon-root": {
+                        color: "primary.main",
+                      },
+                      "& .MuiListItemText-primary": {
+                        color: "primary.main",
+                      },
+                    },
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
-            </ListItem>
+                  <ListItemButton
+                    onClick={() => handleSubMenuClick(item.text)}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: theme.palette.sidebar.hover,
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={item.text} />
+                    {openMenu[item.text] ? <ExpandLess /> : <ExpandMore />}
+                  </ListItemButton>
+                </ListItem>
+              ) : (
+                <ListItem
+                  disablePadding
+                  sx={{
+                    "&:hover": {
+                      "& .MuiListItemIcon-root": {
+                        color: "primary.main",
+                      },
+                      "& .MuiListItemText-primary": {
+                        color: "primary.main",
+                      },
+                    },
+                  }}
+                >
+                  <ListItemButton
+                    onClick={() => handleMenuClick(item.path)}
+                    selected={location.pathname === item.path}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: theme.palette.sidebar.hover,
+                      },
+                      "&.Mui-selected": {
+                        backgroundColor: theme.palette.sidebar.hover,
+                        color: theme.palette.sidebar.active,
+                        "& .MuiListItemIcon-root": {
+                          color: theme.palette.sidebar.active,
+                        },
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={item.text} />
+                  </ListItemButton>
+                </ListItem>
+              )}
+              {item.children && (
+                <Collapse in={openMenu[item.text]} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {item.children.map((child, i) => (
+                      <ListItem
+                        key={i}
+                        disablePadding
+                        sx={{
+                          "&:hover": {
+                            "& .MuiListItemIcon-root": {
+                              color: "primary.main",
+                            },
+                            "& .MuiListItemText-primary": {
+                              color: "primary.main",
+                            },
+                          },
+                        }}
+                      >
+                        <ListItemButton
+                          sx={{
+                            pl: 4,
+                            "&:hover": {
+                              backgroundColor: theme.palette.sidebar.hover,
+                            },
+                            "&.Mui-selected": {
+                              backgroundColor: theme.palette.sidebar.hover,
+                              color: theme.palette.sidebar.active,
+                              "& .MuiListItemIcon-root": {
+                                color: theme.palette.sidebar.active,
+                              },
+                            },
+                          }}
+                          selected={location.pathname === child.path}
+                          onClick={() => handleMenuClick(child.path)}
+                        >
+                          {child.icon && (
+                            <ListItemIcon
+                              sx={{ color: theme.palette.text.secondary }}
+                            >
+                              {child.icon}
+                            </ListItemIcon>
+                          )}
+                          <ListItemText primary={child.text} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
+              )}
+            </React.Fragment>
           ))}
         </List>
         <Divider />
@@ -234,8 +318,11 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                   backgroundColor: theme.palette.sidebar.hover,
                 },
                 "&.Mui-selected": {
-                  backgroundColor: theme.palette.sidebar.active,
-                  color: theme.palette.primary.contrastText,
+                  backgroundColor: theme.palette.sidebar.hover,
+                  color: theme.palette.sidebar.active,
+                  "& .MuiListItemIcon-root": {
+                    color: theme.palette.sidebar.active,
+                  },
                 },
               }}
             >

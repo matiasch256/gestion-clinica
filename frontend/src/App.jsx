@@ -5,7 +5,6 @@ import MainLayout from "./components/common/MainLayout";
 
 import { ComprasDashboard } from "./components/pages/compras/comprasDashboard/ComprasDashboard";
 import { RegistrarCompras } from "./components/pages/compras/registrarCompras/RegistrarCompras";
-import { Proveedores } from "./components/pages/Proveedores/Proveedores";
 
 import { ProveedoresDashBoard } from "./Components/pages/Proveedores/ProveedoresDashboard";
 import { Usuario } from "./components/pages/usuarios/Usuario";
@@ -15,7 +14,7 @@ import ListaCompras from "./components/pages/compras/listaCompras/ListaCompras";
 import DetalleCompra from "./components/pages/compras/detalleCompra/DetalleCompra";
 import ComprasReportes from "./components/pages/compras/comprasReportes/ComprasReportes";
 import { AuthProvider } from "./context/authContext";
-import { ProductosLayout } from "./components/pages/productos/productosLayout/ProductosLayout";
+
 import { RegistrarProducto } from "./components/pages/productos/registrarProducto/RegistrarProducto";
 import { ProductosDashboard } from "./components/pages/productos/productosDashboard/ProductosDashboard";
 import { ListaProductos } from "./components/pages/productos/listaProductos/ListaProductos";
@@ -31,8 +30,7 @@ import { ListadoProveedores } from "./components/pages/Proveedores/listaproveedo
 import { Home } from "./components/pages/home/Home";
 import { CssBaseline } from "@mui/material";
 
-import { comprasMenuItems } from "./components/pages/compras/comprasMenuItems";
-import { categoriasMenuItems } from "./components/pages/categorias/categoriasMenu";
+import { homeMenuItems } from "./components/pages/home/homeMenuItems";
 
 function App() {
   return (
@@ -44,13 +42,19 @@ function App() {
             <Route path="/" element={<Form />} />
 
             {/* HOME */}
-            <Route path="/home" element={<MainLayout />}>
+            <Route
+              path="/home"
+              element={<MainLayout menuItems={homeMenuItems} />}
+            >
               <Route index element={<Home />} />
             </Route>
 
             {/* DASHBOARD */}
             {/* PROVEEDORES */}
-            <Route path="/Proveedores" element={<Proveedores />}>
+            <Route
+              path="/proveedores"
+              element={<MainLayout menuItems={homeMenuItems} />}
+            >
               <Route index element={<ProveedoresDashBoard />} />
               <Route path="registrar" element={<RegistrarProveedor />} />
               <Route path="actualizar/:id" element={<ActualizarProveedor />} />
@@ -62,9 +66,10 @@ function App() {
             {/* COMPRAS */}
             <Route
               path="/compras"
-              element={
-                <MainLayout title="Compras" menuItems={comprasMenuItems} />
-              }
+              // element={
+              //   <MainLayout title="Compras" menuItems={comprasMenuItems} />
+              // }
+              element={<MainLayout menuItems={homeMenuItems} />}
             >
               <Route index element={<ComprasDashboard />} />
               <Route path="registrar" element={<RegistrarCompras />} />
@@ -75,7 +80,10 @@ function App() {
             </Route>
             {/* PRODUCTOS */}
 
-            <Route path="/productos" element={<ProductosLayout />}>
+            <Route
+              path="/productos"
+              element={<MainLayout menuItems={homeMenuItems} />}
+            >
               <Route index element={<ProductosDashboard />} />
               <Route path="registrar" element={<RegistrarProducto />} />
               <Route path="lista" element={<ListaProductos />} />
@@ -87,16 +95,18 @@ function App() {
                 path="/productos/modificar/:idProducto"
                 element={<ModificarProducto />}
               />
-              {/* CATEGORIAS */}
             </Route>
+
+            {/* CATEGORIAS */}
             <Route
               path="/categorias"
-              element={
-                <MainLayout
-                  title="Categorías"
-                  menuItems={categoriasMenuItems}
-                />
-              }
+              // element={
+              //   <MainLayout
+              //     title="Categorías"
+              //     menuItems={categoriasMenuItems}
+              //   />
+              // }
+              element={<MainLayout menuItems={homeMenuItems} />}
             >
               <Route index element={<CategoriasDashboard />} />
               <Route path="consultar" element={<ListadoCategorias />} />
