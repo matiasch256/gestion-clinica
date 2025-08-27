@@ -24,7 +24,7 @@ const SystemMetricsGrid = ({ systemMetrics }) => {
               >
                 <Box display="flex" flexDirection="column" gap={1}>
                   {" "}
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.primary">
                     {metric.title}
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
@@ -55,6 +55,9 @@ const SystemMetricsGrid = ({ systemMetrics }) => {
                   <metric.icon sx={{ fontSize: "20px", color: metric.color }} />{" "}
                 </Box>
               </Box>
+              <Typography variant="body2" color="text.secondary">
+                {metric.description ? metric.description : ""}
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
