@@ -28,8 +28,7 @@ const DashboardHeader = ({ currentUser }) => {
           Bienvenido, {currentUser?.name || "Usuario"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Aquí tienes un resumen de la actividad del sistema de gestión del
-          Instituto Barrancas
+          Aquí tienes un resumen de la actividad del sistema.
         </Typography>
       </Box>
       <Box

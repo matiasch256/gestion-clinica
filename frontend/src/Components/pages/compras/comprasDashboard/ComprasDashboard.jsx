@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -14,6 +13,9 @@ import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import QuickActionsCard from "../../../common/QuickActionsCard";
 import { quickActionsCompras } from "../../../common/quickActionsData";
+import RecentActivityCompras from "../../../common/RecenActivityCompras";
+import CategoryDistribution from "../../../common/CategoryDistribution";
+import { Grid } from "@mui/material";
 
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
@@ -88,6 +90,10 @@ export const ComprasDashboard = () => {
         ]}
       />
       <QuickActionsCard quickActions={quickActionsCompras} />
+      <Grid container spacing={4} sx={{ mt: 3 }}></Grid>
+      <Grid item xs={12} lg={8}>
+        <RecentActivityCompras />
+      </Grid>
     </>
   );
 };
