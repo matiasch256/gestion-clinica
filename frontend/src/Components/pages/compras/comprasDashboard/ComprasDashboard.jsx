@@ -7,12 +7,13 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import InfoCard from "../../../common/InfoCard";
 import QuickActionButton from "../../../common/QuickActionButton";
-// import DashboardContent from "../../../common/DashboardContent";
 import DashboardHeader from "../../../common/DashboardHeader";
 import SystemMetricsGrid from "../../../common/SystemMetricsGrid";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
+import QuickActionsCard from "../../../common/QuickActionsCard";
+import { quickActionsCompras } from "../../../common/quickActionsData";
 
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
@@ -48,11 +49,6 @@ export const ComprasDashboard = () => {
   ];
 
   return (
-    // <DashboardContent
-    //   title="Dashboard de Compras"
-    //   cards={cards}
-    //   actions={actions}
-    // />
     <>
       <DashboardHeader />
       <SystemMetricsGrid
@@ -91,6 +87,7 @@ export const ComprasDashboard = () => {
           },
         ]}
       />
+      <QuickActionsCard quickActions={quickActionsCompras} />
     </>
   );
 };

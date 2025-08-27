@@ -5,7 +5,7 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import PeopleIcon from "@mui/icons-material/People";
 import FolderIcon from "@mui/icons-material/Folder";
 import QuickActionsCard from "../../../components/common/QuickActionsCard";
-import quickActionsData from "../../../components/common/quickActionsData";
+import { quickActionsHome } from "../../../components/common/quickActionsData";
 import RecentActivity from "../../../components/common/RecentActivity";
 import CategoryDistribution from "../../../components/common/CategoryDistribution";
 import SystemAlerts from "../../../components/common/SystemAlerts";
@@ -55,7 +55,7 @@ export const Home = () => {
           },
         ]}
       />
-      <QuickActionsCard quickActions={quickActionsData} />
+      <QuickActionsCard quickActions={quickActionsHome} />
       <Grid container spacing={3} sx={{ mt: 3 }}>
         <Grid size={{ xs: 12, lg: 8 }}>
           <RecentActivity />
