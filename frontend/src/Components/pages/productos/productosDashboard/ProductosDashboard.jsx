@@ -498,8 +498,8 @@ export function ProductosDashboard({ onNavigate }) {
         {/* Distribución por categorías */}
         <TabPanel value={selectedTab} index={0}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <Card>
+            <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="h6">Productos por Categoría</Typography>
                   <Typography variant="body2" sx={{ color: "#6B7280" }}>
@@ -527,9 +527,14 @@ export function ProductosDashboard({ onNavigate }) {
                   </Box>
                   <Grid container spacing={1} sx={{ mt: 2 }}>
                     {productosPorCategoria.map((categoria, index) => (
-                      <Grid item xs={6} key={index}>
+                      <Grid item size={{ xs: 6 }} key={index}>
                         <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            ml: 18,
+                          }}
                         >
                           <Box
                             sx={{
@@ -539,7 +544,10 @@ export function ProductosDashboard({ onNavigate }) {
                               backgroundColor: categoria.color,
                             }}
                           />
-                          <Typography variant="body2" sx={{ color: "#6B7280" }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "#6B7280 !important" }}
+                          >
                             {categoria.name}: {categoria.value}
                           </Typography>
                         </Box>
@@ -551,8 +559,8 @@ export function ProductosDashboard({ onNavigate }) {
             </Grid>
 
             {/* Productos con stock bajo */}
-            <Grid item xs={12} md={6}>
-              <Card>
+            <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <WarningAmberIcon sx={{ color: "#F59E0B" }} />
@@ -610,9 +618,13 @@ export function ProductosDashboard({ onNavigate }) {
                     fullWidth
                     sx={{
                       mt: 2,
-                      borderColor: "#D1D5DB",
-                      color: "#374151",
-                      "&:hover": { borderColor: "#9CA3AF" },
+                      borderColor: "#D1D5DB !important",
+                      backgroundColor: "#2563EB !important",
+                      color: "#FFFFFF !important",
+                      "&:hover": {
+                        borderColor: "#9CA3AF !important",
+                        backgroundColor: "#2563EB!important",
+                      },
                     }}
                     onClick={() => onNavigate("productos", "stock-bajo")}
                   >
