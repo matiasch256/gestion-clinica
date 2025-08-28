@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react"; // <-- 1. Importar useRef y useEffect
 import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
@@ -24,15 +24,48 @@ export function Form() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [loginError, setLoginError] = useState(""); // <-- Para errores generales de login (ej: credenciales)
+
+  // <-- 2. Estado unificado para errores de validación
+  const [errors, setErrors] = useState({});
+
+  // <-- 3. Refs para hacer foco en los inputs
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
   const navigate = useNavigate();
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.email) {
+      newErrors.email = "El correo electrónico es obligatorio.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      // <-- Validación de formato más robusta
+      newErrors.email = "El formato del correo no es válido.";
+    }
+    if (!formData.password) {
+      newErrors.password = "La contraseña es obligatoria.";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres.";
+    }
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setLoginError("");
 
-    if (!formData.email || !formData.password) {
-      setError("Por favor, complete todos los campos");
+    // <-- 4. Lógica de validación mejorada
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+
+      // <-- 5. Lógica de foco
+      if (validationErrors.email) {
+        emailRef.current.focus();
+      } else if (validationErrors.password) {
+        passwordRef.current.focus();
+      }
       return;
     }
 
@@ -43,19 +76,29 @@ export function Form() {
         formData.email === "matias32@gmail.com" &&
         formData.password === "admin123matias"
       ) {
-        console.log("Login exitoso, redirigiendo a /home");
         navigate("/home");
       } else {
-        setError("Credenciales incorrectas.");
-        console.log("Credenciales incorrectas");
+        setLoginError("Las credenciales son incorrectas."); // <-- Error específico para credenciales
       }
+
       setIsLoading(false);
-    }, 100); // Reducido para pruebas rápidas
+    }, 500);
   };
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (error) setError("");
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+
+    // <-- 6. Limpiar error del campo al modificarlo
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
+    }
   };
 
   return (
@@ -70,14 +113,9 @@ export function Form() {
       }}
     >
       <Container maxWidth="sm">
+        {/* ... (tu código del logo y título no cambia) ... */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              mb: 2,
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
             <Box
               sx={{
                 width: 64,
@@ -93,25 +131,28 @@ export function Form() {
               <img
                 src="/favicon.png"
                 alt="Logo"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                }}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </Box>
           </Box>
           <Typography variant="h5" color="text.primary" fontWeight="bold">
-            Instituto Medico
+            {" "}
+            Instituto Medico{" "}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Sistema de Gestión
+            {" "}
+            Sistema de Gestión{" "}
           </Typography>
         </Box>
 
         <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
           <CardContent sx={{ p: 4 }}>
-            <Typography variant="h6" align="center" gutterBottom>
+            <Typography
+              variant="h5"
+              sx={{ fontWeight: "bold" }}
+              align="center"
+              gutterBottom
+            >
               Iniciar Sesión
             </Typography>
             <Typography
@@ -131,25 +172,31 @@ export function Form() {
                 alignItems: "center",
                 gap: "16px",
               }}
+              noValidate // <-- Desactiva la validación HTML por defecto
             >
-              {error && (
+              {loginError && (
                 <Alert
                   severity="error"
                   sx={{ width: "100%", maxWidth: "400px" }}
                 >
-                  {error}
+                  {loginError}
                 </Alert>
               )}
 
+              {/* Email */}
               <TextField
                 id="email"
+                name="email" // <-- Añadir name para el handler genérico
                 label="Correo electrónico"
                 type="email"
                 fullWidth
-                placeholder="usuario@institutobarrancas.edu"
+                placeholder="usuario@gmail.com"
                 value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
+                onChange={handleInputChange} // <-- Usar el handler genérico
                 disabled={isLoading}
+                inputRef={emailRef} // <-- 7. Asignar la ref al input
+                error={!!errors.email} // <-- 8. Marcar error si existe en el estado
+                helperText={errors.email || ""} // <-- 9. Mostrar el mensaje de error
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -161,15 +208,20 @@ export function Form() {
                 sx={{ maxWidth: "400px" }}
               />
 
+              {/* Password */}
               <TextField
                 id="password"
+                name="password" // <-- Añadir name
                 label="Contraseña"
                 type={showPassword ? "text" : "password"}
                 fullWidth
                 placeholder="••••••••"
                 value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
+                onChange={handleInputChange} // <-- Usar el handler genérico
                 disabled={isLoading}
+                inputRef={passwordRef} // <-- Asignar la ref
+                error={!!errors.password} // <-- Marcar error
+                helperText={errors.password || ""} // <-- Mostrar error
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -201,10 +253,9 @@ export function Form() {
                   control={
                     <Checkbox
                       id="remember"
+                      name="rememberMe" // <-- Añadir name
                       checked={formData.rememberMe}
-                      onChange={(e) =>
-                        handleInputChange("rememberMe", e.target.checked)
-                      }
+                      onChange={handleInputChange} // <-- Usar el handler genérico
                       disabled={isLoading}
                     />
                   }
@@ -217,10 +268,7 @@ export function Form() {
                 variant="contained"
                 disabled={isLoading}
                 fullWidth
-                sx={{
-                  py: 1.5,
-                  maxWidth: "400px",
-                }}
+                sx={{ py: 1.5, maxWidth: "400px" /* ... */ }}
               >
                 {isLoading ? (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -232,20 +280,22 @@ export function Form() {
                 )}
               </Button>
             </form>
+
+            {/* ... (tu código del footer no cambia) ... */}
             <Box sx={{ mt: 2, textAlign: "center" }}>
-              <Button variant="text" sx={{ fontSize: "0.875rem" }}>
+              <Typography
+                variant="body2"
+                color="primary"
+                sx={{ cursor: "pointer", textDecoration: "underline" }}
+              >
                 ¿Olvidó su contraseña?
-              </Button>
+              </Typography>
             </Box>
           </CardContent>
         </Card>
-
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="caption" color="text.secondary">
-            © 2025 MC Solution. Todos los derechos reservados.
-          </Typography>
-          <Typography variant="caption" color="text.secondary" component="p">
-            Sistema de Gestión v1.0
+            © 2025 MC Solution | Todos los derechos reservados
           </Typography>
         </Box>
       </Container>

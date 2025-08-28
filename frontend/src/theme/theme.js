@@ -8,6 +8,6 @@ export const getTheme = () =>
       ...palette, // Usamos directamente la paleta
     },
     typography: {
-      fontFamily: "'Roboto', sans-serif",
+      fontFamily: "'Roboto', sans-serif !important",
     },
   });
