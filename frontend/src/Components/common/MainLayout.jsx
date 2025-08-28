@@ -166,7 +166,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           />
           <Box>
             <Typography variant="subtitle1" fontWeight="bold">
-              Laura Rodríguez
+              Matias Chalave
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Administrador

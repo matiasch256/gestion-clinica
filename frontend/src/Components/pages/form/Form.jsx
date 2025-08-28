@@ -86,14 +86,19 @@ export function Form() {
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "50%",
-                bgcolor: "primary.main",
-                color: "primary.contrastText",
+                overflow: "hidden",
                 boxShadow: 3,
               }}
             >
-              <Typography variant="h5" fontWeight="bold">
-                IB
-              </Typography>
+              <img
+                src="/favicon.png"
+                alt="Logo"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
             </Box>
           </Box>
           <Typography variant="h5" color="text.primary" fontWeight="bold">
