@@ -25,7 +25,8 @@ const DashboardHeader = ({ currentUser }) => {
     >
       <Box>
         <Typography variant="h5" sx={{ mb: "8px" }}>
-          Bienvenido, {currentUser?.name || "Usuario"}
+          {/* Bienvenido, {currentUser?.name || "Usuario"} */}
+          Bienvenido, Matias
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Aquí tienes un resumen de la actividad del sistema.

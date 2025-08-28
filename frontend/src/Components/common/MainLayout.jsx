@@ -73,7 +73,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
       <AppBar position="fixed">
         <Toolbar>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <img src="/barrancas-logo.png" alt="Logo" style={{ height: 40 }} />
+            <img src="/logo.jpg" alt="Logo" style={{ height: 40, zoom: 1.5 }} />
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -96,7 +96,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Typography variant="body2" sx={{ mr: 2 }}>
-              Bienvenida, Laura
+              Bienvenido, Matias
             </Typography>
             <IconButton
               color="inherit"
@@ -197,6 +197,14 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                       "&:hover": {
                         backgroundColor: theme.palette.sidebar.hover,
                       },
+                      ...(openMenu[item.text] && {
+                        "& .MuiListItemIcon-root": {
+                          color: theme.palette.sidebar.active,
+                        },
+                        "& .MuiListItemText-primary": {
+                          color: theme.palette.sidebar.active,
+                        },
+                      }),
                     }}
                   >
                     <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
@@ -280,7 +288,11 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                         >
                           {child.icon && (
                             <ListItemIcon
-                              sx={{ color: theme.palette.text.secondary }}
+                              sx={{
+                                color: openMenu[item.text]
+                                  ? theme.palette.sidebar.active
+                                  : theme.palette.text.secondary,
+                              }}
                             >
                               {child.icon}
                             </ListItemIcon>
