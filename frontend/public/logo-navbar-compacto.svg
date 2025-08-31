@@ -1,0 +1,25 @@
+<svg width="220" height="60" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grupo para el ícono circular -->
+  <g>
+    <!-- Círculo de fondo azul -->
+    <circle cx="30" cy="30" r="28" fill="#1976D2"/>
+    <!-- Texto "MC" -->
+    <text x="30" y="32" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="bold">
+      MC
+    </text>
+  </g>
+
+
+  <text
+    x="70" 
+    y="32"
+    dominant-baseline="middle"
+    text-anchor="start"
+    fill="#1E293B"
+    font-size="24"
+    font-family="Arial, Helvetica, sans-serif"
+    font-weight="bold"
+    letter-spacing="1">
+    MC Solutions
+  </text>
+</svg>

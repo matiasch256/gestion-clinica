@@ -14,7 +14,7 @@ import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import QuickActionsCard from "../../../common/QuickActionsCard";
 import { quickActionsCompras } from "../../../common/quickActionsData";
 import RecentActivityCompras from "../../../common/RecenActivityCompras";
-import CategoryDistribution from "../../../common/CategoryDistribution";
+
 import { Grid } from "@mui/material";
 
 export const ComprasDashboard = () => {

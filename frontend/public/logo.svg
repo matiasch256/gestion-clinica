@@ -1,0 +1,31 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Círculo de fondo azul -->
+  <circle cx="100" cy="100" r="98" fill="#1976D2" stroke="#FFFFFF" stroke-width="4"/>
+
+  <!-- Texto "MC" -->
+  <text
+    x="50%"
+    y="48%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    fill="white"
+    font-size="60"
+    font-family="Arial, Helvetica, sans-serif"
+    font-weight="bold">
+    MC
+  </text>
+
+  <!-- Texto "SOLUTIONS" -->
+  <text
+    x="50%"
+    y="70%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    fill="white"
+    font-size="20"
+    font-family="Arial, Helvetica, sans-serif"
+    font-weight="normal"
+    letter-spacing="2">
+    SOLUTIONS
+  </text>
+</svg>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"; // <-- 1. Importar useRef y useEffect
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
@@ -24,12 +24,9 @@ export function Form() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState(""); // <-- Para errores generales de login (ej: credenciales)
-
-  // <-- 2. Estado unificado para errores de validación
+  const [loginError, setLoginError] = useState("");
   const [errors, setErrors] = useState({});
 
-  // <-- 3. Refs para hacer foco en los inputs
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
@@ -40,7 +37,6 @@ export function Form() {
     if (!formData.email) {
       newErrors.email = "El correo electrónico es obligatorio.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      // <-- Validación de formato más robusta
       newErrors.email = "El formato del correo no es válido.";
     }
     if (!formData.password) {
@@ -55,12 +51,10 @@ export function Form() {
     e.preventDefault();
     setLoginError("");
 
-    // <-- 4. Lógica de validación mejorada
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
 
-      // <-- 5. Lógica de foco
       if (validationErrors.email) {
         emailRef.current.focus();
       } else if (validationErrors.password) {
@@ -78,7 +72,7 @@ export function Form() {
       ) {
         navigate("/home");
       } else {
-        setLoginError("Las credenciales son incorrectas."); // <-- Error específico para credenciales
+        setLoginError("Las credenciales son incorrectas.");
       }
 
       setIsLoading(false);
@@ -92,7 +86,6 @@ export function Form() {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // <-- 6. Limpiar error del campo al modificarlo
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -108,44 +101,47 @@ export function Form() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#e3f2fd",
+        // Aquí aplicamos el degradado
+        background: "linear-gradient(to bottom, #e0f2f7 0%, #ffffff 100%)", // Degradado azul claro a blanco
         p: 2,
       }}
     >
       <Container maxWidth="sm">
-        {/* ... (tu código del logo y título no cambia) ... */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
             <Box
               sx={{
-                width: 64,
-                height: 64,
+                bgcolor: "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRadius: "50%",
-                overflow: "hidden",
-                boxShadow: 3,
               }}
             >
               <img
-                src="/favicon.png"
-                alt="Logo"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                src="/logo.svg" // Usa el nuevo logo que generé o el que crees
+                alt="MC Solutions Logo"
+                style={{
+                  width: "100px", // Ajusta el tamaño como necesites
+                  height: "100px",
+                }}
               />
             </Box>
           </Box>
           <Typography variant="h5" color="text.primary" fontWeight="bold">
-            {" "}
-            Instituto Medico{" "}
+            Plataforma de Gestión Clínica
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {" "}
-            Sistema de Gestión{" "}
+            Sistema de Gestión
           </Typography>
         </Box>
 
-        <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+        <Card
+          sx={{
+            // Sombra más sutil
+            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+            borderRadius: 2,
+          }}
+        >
           <CardContent sx={{ p: 4 }}>
             <Typography
               variant="h5"
@@ -159,7 +155,7 @@ export function Form() {
               variant="body2"
               color="text.secondary"
               align="center"
-              sx={{ mb: 3 }}
+              sx={{ mb: 3, fontWeight: 300 }}
             >
               Ingrese sus credenciales para acceder al sistema
             </Typography>
@@ -172,7 +168,7 @@ export function Form() {
                 alignItems: "center",
                 gap: "16px",
               }}
-              noValidate // <-- Desactiva la validación HTML por defecto
+              noValidate
             >
               {loginError && (
                 <Alert
@@ -186,17 +182,17 @@ export function Form() {
               {/* Email */}
               <TextField
                 id="email"
-                name="email" // <-- Añadir name para el handler genérico
+                name="email"
                 label="Correo electrónico"
                 type="email"
                 fullWidth
                 placeholder="usuario@gmail.com"
                 value={formData.email}
-                onChange={handleInputChange} // <-- Usar el handler genérico
+                onChange={handleInputChange}
                 disabled={isLoading}
-                inputRef={emailRef} // <-- 7. Asignar la ref al input
-                error={!!errors.email} // <-- 8. Marcar error si existe en el estado
-                helperText={errors.email || ""} // <-- 9. Mostrar el mensaje de error
+                inputRef={emailRef}
+                error={!!errors.email}
+                helperText={errors.email || ""}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -211,17 +207,17 @@ export function Form() {
               {/* Password */}
               <TextField
                 id="password"
-                name="password" // <-- Añadir name
+                name="password"
                 label="Contraseña"
                 type={showPassword ? "text" : "password"}
                 fullWidth
                 placeholder="••••••••"
                 value={formData.password}
-                onChange={handleInputChange} // <-- Usar el handler genérico
+                onChange={handleInputChange}
                 disabled={isLoading}
-                inputRef={passwordRef} // <-- Asignar la ref
-                error={!!errors.password} // <-- Marcar error
-                helperText={errors.password || ""} // <-- Mostrar error
+                inputRef={passwordRef}
+                error={!!errors.password}
+                helperText={errors.password || ""}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -253,9 +249,9 @@ export function Form() {
                   control={
                     <Checkbox
                       id="remember"
-                      name="rememberMe" // <-- Añadir name
+                      name="rememberMe"
                       checked={formData.rememberMe}
-                      onChange={handleInputChange} // <-- Usar el handler genérico
+                      onChange={handleInputChange}
                       disabled={isLoading}
                     />
                   }
@@ -268,7 +264,12 @@ export function Form() {
                 variant="contained"
                 disabled={isLoading}
                 fullWidth
-                sx={{ py: 1.5, maxWidth: "400px" /* ... */ }}
+                sx={{
+                  py: 1.5,
+                  maxWidth: "400px",
+                  "&:hover": { bgcolor: "#0d47a1" },
+                  "&:active": { bgcolor: "#0b3c91" },
+                }}
               >
                 {isLoading ? (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -281,7 +282,6 @@ export function Form() {
               </Button>
             </form>
 
-            {/* ... (tu código del footer no cambia) ... */}
             <Box sx={{ mt: 2, textAlign: "center" }}>
               <Typography
                 variant="body2"

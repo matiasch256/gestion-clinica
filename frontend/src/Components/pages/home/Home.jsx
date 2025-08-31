@@ -48,7 +48,7 @@ export const Home = () => {
             title: "Categorías",
             value: "24",
             trending: null,
-            change: "Sin cambios",
+            change: "+0 este mes",
             bgColor: "rgba(255, 152, 0, 0.1)",
             color: "#ff9800",
             icon: FolderIcon,

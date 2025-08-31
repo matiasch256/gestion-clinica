@@ -8,8 +8,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -22,13 +20,15 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
 
-const drawerWidth = 240;
+const drawerWidth = 262;
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   width: "100%",
-  backgroundColor: theme.palette.primary.contrastText,
-  color: theme.palette.primary.contrastText,
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.1) !important",
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -36,31 +36,22 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
-}));
-
-const Main = styled("main")(({ theme }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(3),
-  width: "100%",
-  backgroundColor: theme.palette.background.default,
-  color: theme.palette.text.primary,
+  justifyContent: "flex-start",
 }));
 
 export default function MainLayout({ title = "App", menuItems = [] }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [iconHover, setIconHover] = useState(theme.palette.error.main);
   const [openMenu, setOpenMenu] = useState({});
 
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
-
+  const handleDrawerToggle = () => {
+    setOpen(!open);
+  };
   const handleMenuClick = (path) => {
     navigate(path);
-    setOpen(false);
   };
 
   const handleSubMenuClick = (text) => {
@@ -70,14 +61,21 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed">
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <img src="/logo.jpg" alt="Logo" style={{ height: 40, zoom: 1.5 }} />
+            <img
+              src="/logo-navbar-compacto.svg"
+              alt="Logo MC Solutions"
+              style={{ height: 45 }}
+            />
             <IconButton
               color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
+              aria-label="toggle drawer"
+              onClick={handleDrawerToggle}
               edge="start"
               sx={{
                 ml: 4,
@@ -95,18 +93,17 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           />
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="body2" sx={{ mr: 2 }}>
+            <Typography
+              variant="body2"
+              sx={{ mr: 2, color: theme.palette.text.primary }}
+            >
               Bienvenido, Matias
             </Typography>
-            <IconButton
-              color="inherit"
-              sx={{
-                mr: 2,
-                bgcolor: "transparent !important",
-                "&:hover": { color: theme.palette.sidebar.active },
-              }}
-            >
-              <AccountCircleIcon />
+
+            <IconButton color="inherit" sx={{ p: 0 }}>
+              <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
+                M
+              </Avatar>
             </IconButton>
           </Box>
         </Toolbar>
@@ -119,51 +116,35 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
+            mt: "64px",
+            height: "calc(100% - 64px)",
+            borderRight: `1px solid ${theme.palette.divider}`,
             backgroundColor: theme.palette.background.paper,
-            color: theme.palette.sidebar.text,
-            borderRight: `1px solid ${theme.palette.sidebar.border}`,
           },
         }}
-        variant="temporary"
+        variant="persistent"
         anchor="left"
         open={open}
-        onClose={handleDrawerClose}
-        ModalProps={{ keepMounted: true }}
       >
         <DrawerHeader>
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 2 }}>
             Menú
           </Typography>
-          <IconButton
-            onClick={handleDrawerClose}
-            sx={{
-              bgcolor: "transparent !important",
-              "&:hover": { color: theme.palette.sidebar.active },
-            }}
-          >
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
         </DrawerHeader>
         <Divider />
         <Box
           sx={{
             p: 2,
             textAlign: "left",
-            backgroundColor: theme.palette.sidebar.hover,
             display: "flex",
+            alignItems: "center",
           }}
         >
-          <AccountCircleIcon
-            sx={{
-              mr: 4,
-              alignSelf: "center",
-              bgcolor: "transparent !important",
-            }}
-          />
+          <Avatar
+            sx={{ width: 32, height: 32, mr: 2, bgcolor: "primary.main" }}
+          >
+            M
+          </Avatar>
           <Box>
             <Typography variant="subtitle1" fontWeight="bold">
               Matias Chalave
@@ -174,6 +155,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           </Box>
         </Box>
         <Divider />
+
         <List>
           {menuItems.map((item, index) => (
             <React.Fragment key={index}>
@@ -339,7 +321,13 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               }}
             >
               <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                <AccountCircleIcon />
+                <IconButton color="inherit" sx={{ p: 0 }}>
+                  <Avatar
+                    sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
+                  >
+                    M
+                  </Avatar>
+                </IconButton>
               </ListItemIcon>
               <ListItemText primary="Mi Perfil" />
             </ListItemButton>
@@ -364,11 +352,29 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           </ListItem>
         </List>
       </Drawer>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
 
-      <Main>
-        <DrawerHeader />
+          transition: theme.transitions.create("margin", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+          marginLeft: `-${drawerWidth}px`,
+          ...(open && {
+            transition: theme.transitions.create("margin", {
+              easing: theme.transitions.easing.easeOut,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
+            marginLeft: 0,
+          }),
+        }}
+      >
+        <Toolbar />
         <Outlet />
-      </Main>
+      </Box>
     </Box>
   );
 }

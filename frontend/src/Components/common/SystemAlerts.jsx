@@ -62,13 +62,13 @@ const SystemAlerts = ({ onNavigate }) => {
               size="small"
               onClick={() => onNavigate("productos", "stock")}
               sx={{
-                "&.MuiButton-root": {
-                  borderColor: "#ca8a04",
-                  backgroundColor: "#ffff",
-                },
+                // Directamente aplicas los estilos al botón
+                borderColor: "#ca8a04 !important", // Borde amarillo/dorado
+                color: "#ca8a04 !important", // Texto del mismo color para cohesión
+                backgroundColor: "#ffff !important",
                 "&:hover": {
-                  borderColor: "#ca8a04",
-                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                  borderColor: "#ca8a04 !important", // Mantiene el color del borde en hover
+                  backgroundColor: "rgba(202, 138, 4, 0.08) !important", // Un fondo suave del mismo color
                 },
               }}
             >
@@ -102,13 +102,12 @@ const SystemAlerts = ({ onNavigate }) => {
               size="small"
               onClick={() => onNavigate("compras", "ordenes")}
               sx={{
-                "&.MuiButton-root": {
-                  borderColor: "#1e3a8a",
-                  backgroundColor: "#ffff",
-                },
+                borderColor: "#1e3a8a !important", // Borde azul
+                color: "#1e3a8a !important", // Texto del mismo color para cohesión
+                backgroundColor: "#ffff !important",
                 "&:hover": {
-                  borderColor: "#1e3a8a",
-                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+                  borderColor: "#1e3a8a !important", // Mantiene el color del borde en hover
+                  backgroundColor: "rgba(30, 58, 138, 0.08) !important", // Un fondo suave del mismo color
                 },
               }}
             >
