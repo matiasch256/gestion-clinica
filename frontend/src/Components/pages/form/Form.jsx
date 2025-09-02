@@ -50,33 +50,59 @@ export function Form() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
+    setErrors({}); // Limpia errores de validación anteriores
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
-      if (validationErrors.email) {
-        emailRef.current.focus();
-      } else if (validationErrors.password) {
-        passwordRef.current.focus();
-      }
+      // ... (la lógica del foco sigue igual)
       return;
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (
-        formData.email === "matias32@gmail.com" &&
-        formData.password === "admin123matias"
-      ) {
-        navigate("/home");
-      } else {
-        setLoginError("Las credenciales son incorrectas.");
-      }
+    try {
+      // --- AQUÍ EMPIEZA EL CAMBIO ---
+      // 1. Prepara los datos que enviarás al backend
+      const loginData = {
+        email: formData.email,
+        password: formData.password,
+      };
 
+      // 2. Llama a tu API (ejemplo con fetch)
+      // La URL 'https://api.tusistema.com/auth/login' es un ejemplo
+      const response = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      // 3. Procesa la respuesta del backend
+      if (!response.ok) {
+        // Si el servidor responde con un error (ej. 401 Unauthorized)
+        const errorData = await response.json(); // El backend puede enviar un mensaje específico
+        // Muestra el mensaje de error que viene del backend
+        setLoginError(errorData.message || "Las credenciales son incorrectas.");
+      } else {
+        // Si el login es exitoso
+        const userData = await response.json(); // Aquí recibes { user, token }
+        console.log("Login exitoso:", userData); // Lo ves en la consola
+
+        // AÑADIR ESTA LÍNEA AHORA:
+        localStorage.setItem("authToken", userData.token);
+        navigate("/home");
+      }
+      // --- AQUÍ TERMINA EL CAMBIO ---
+    } catch (error) {
+      // Error de red o si el servidor está caído
+      console.error("Error de conexión:", error);
+      setLoginError("No se pudo conectar con el servidor. Intente más tarde.");
+    } finally {
+      // Esto se ejecuta siempre, tanto si hubo éxito como si hubo error
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const handleInputChange = (e) => {
