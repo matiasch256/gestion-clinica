@@ -29,7 +29,6 @@ export function Form() {
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-
   const navigate = useNavigate();
 
   const validate = () => {
@@ -47,60 +46,70 @@ export function Form() {
     return newErrors;
   };
 
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+
+    // Si el campo está vacío al salir, no mostramos error.
+    // Dejamos esa responsabilidad al botón de submit.
+    if (!value) {
+      const newErrors = { ...errors };
+      delete newErrors[name];
+      setErrors(newErrors);
+      return;
+    }
+
+    // Si hay valor, validamos solo ese campo
+    const validationErrors = validate();
+    if (validationErrors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: validationErrors[name] }));
+    } else {
+      const newErrors = { ...errors };
+      delete newErrors[name];
+      setErrors(newErrors);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
-    setErrors({}); // Limpia errores de validación anteriores
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      // ... (la lógica del foco sigue igual)
+      if (validationErrors.email) {
+        emailRef.current.focus();
+      } else if (validationErrors.password) {
+        passwordRef.current.focus();
+      }
       return;
     }
 
+    setErrors({});
     setIsLoading(true);
 
     try {
-      // --- AQUÍ EMPIEZA EL CAMBIO ---
-      // 1. Prepara los datos que enviarás al backend
       const loginData = {
         email: formData.email,
         password: formData.password,
       };
-
-      // 2. Llama a tu API (ejemplo con fetch)
-      // La URL 'https://api.tusistema.com/auth/login' es un ejemplo
       const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
       });
 
-      // 3. Procesa la respuesta del backend
       if (!response.ok) {
-        // Si el servidor responde con un error (ej. 401 Unauthorized)
-        const errorData = await response.json(); // El backend puede enviar un mensaje específico
-        // Muestra el mensaje de error que viene del backend
+        const errorData = await response.json();
         setLoginError(errorData.message || "Las credenciales son incorrectas.");
       } else {
-        // Si el login es exitoso
-        const userData = await response.json(); // Aquí recibes { user, token }
-        console.log("Login exitoso:", userData); // Lo ves en la consola
-
-        // AÑADIR ESTA LÍNEA AHORA:
+        const userData = await response.json();
         localStorage.setItem("authToken", userData.token);
         navigate("/home");
       }
-      // --- AQUÍ TERMINA EL CAMBIO ---
     } catch (error) {
-      // Error de red o si el servidor está caído
       console.error("Error de conexión:", error);
       setLoginError("No se pudo conectar con el servidor. Intente más tarde.");
     } finally {
-      // Esto se ejecuta siempre, tanto si hubo éxito como si hubo error
       setIsLoading(false);
     }
   };
@@ -112,12 +121,8 @@ export function Form() {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
+    // Limpia TODOS los errores en cuanto el usuario empieza a escribir
+    setErrors({});
   };
 
   return (
@@ -127,8 +132,7 @@ export function Form() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // Aquí aplicamos el degradado
-        background: "linear-gradient(to bottom, #e0f2f7 0%, #ffffff 100%)", // Degradado azul claro a blanco
+        background: "linear-gradient(to bottom, #e0f2f7 0%, #ffffff 100%)",
         p: 2,
       }}
     >
@@ -144,10 +148,10 @@ export function Form() {
               }}
             >
               <img
-                src="/logo.svg" // Usa el nuevo logo que generé o el que crees
+                src="/logo.svg"
                 alt="MC Solutions Logo"
                 style={{
-                  width: "100px", // Ajusta el tamaño como necesites
+                  width: "100px",
                   height: "100px",
                 }}
               />
@@ -163,7 +167,6 @@ export function Form() {
 
         <Card
           sx={{
-            // Sombra más sutil
             boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
             borderRadius: 2,
           }}
@@ -192,20 +195,15 @@ export function Form() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "16px",
               }}
               noValidate
             >
               {loginError && (
-                <Alert
-                  severity="error"
-                  sx={{ width: "100%", maxWidth: "400px" }}
-                >
+                <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
                   {loginError}
                 </Alert>
               )}
 
-              {/* Email */}
               <TextField
                 id="email"
                 name="email"
@@ -215,6 +213,7 @@ export function Form() {
                 placeholder="usuario@gmail.com"
                 value={formData.email}
                 onChange={handleInputChange}
+                onBlur={handleBlur}
                 disabled={isLoading}
                 inputRef={emailRef}
                 error={!!errors.email}
@@ -227,10 +226,9 @@ export function Form() {
                   ),
                 }}
                 variant="outlined"
-                sx={{ maxWidth: "400px" }}
+                sx={{ mb: 2, width: "100%" }}
               />
 
-              {/* Password */}
               <TextField
                 id="password"
                 name="password"
@@ -240,6 +238,7 @@ export function Form() {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleInputChange}
+                onBlur={handleBlur}
                 disabled={isLoading}
                 inputRef={passwordRef}
                 error={!!errors.password}
@@ -267,10 +266,10 @@ export function Form() {
                   ),
                 }}
                 variant="outlined"
-                sx={{ maxWidth: "400px" }}
+                sx={{ width: "100%" }}
               />
 
-              <Box sx={{ width: "100%", maxWidth: "400px" }}>
+              <Box sx={{ width: "100%", mt: 1 }}>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -292,7 +291,7 @@ export function Form() {
                 fullWidth
                 sx={{
                   py: 1.5,
-                  maxWidth: "400px",
+                  mt: 2,
                   "&:hover": { bgcolor: "#0d47a1" },
                   "&:active": { bgcolor: "#0b3c91" },
                 }}

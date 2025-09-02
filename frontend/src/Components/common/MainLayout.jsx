@@ -57,6 +57,14 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
     setOpenMenu((prev) => ({ ...prev, [text]: !prev[text] }));
   };
 
+  const handleLogout = () => {
+    // Paso 1: Borrar el token de autenticación del almacenamiento local
+    localStorage.removeItem("authToken");
+
+    // Paso 2: Redirigir al usuario a la página de login
+    navigate("/");
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -337,6 +345,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                 setIconHover(theme.palette.error.contrastText)
               }
               onMouseLeave={() => setIconHover(theme.palette.error.main)}
+              onClick={handleLogout}
               sx={{
                 "&:hover": {
                   backgroundColor: theme.palette.error.main,
