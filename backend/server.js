@@ -9,6 +9,7 @@ import productosRoutes from "./src/routes/productos.js";
 import categoriasRoutes from "./src/routes/categorias.js";
 import usuariosRoutes from "./src/routes/usuarios.js";
 import gastosRoutes from "./src/routes/gastos.js";
+import authRoutes from "./src/routes/auth.js"; // Importa la nueva ruta
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/auth", authRoutes);
 app.use("/proveedores", proveedoresRoutes);
 app.use("/api/compras", comprasRoutes);
 app.use("/api/productos", productosRoutes);
