@@ -9,7 +9,8 @@ import productosRoutes from "./src/routes/productos.js";
 import categoriasRoutes from "./src/routes/categorias.js";
 import usuariosRoutes from "./src/routes/usuarios.js";
 import gastosRoutes from "./src/routes/gastos.js";
-import authRoutes from "./src/routes/auth.js"; // Importa la nueva ruta
+import dashboardRoutes from "./src/routes/dashboard.js";
+import authRoutes from "./src/routes/auth.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/productos", productosRoutes);
 app.use("/api/categorias", categoriasRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/gastos", gastosRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.listen(3000, () => {
   console.log("Servidor corriendo en http://localhost:3000");

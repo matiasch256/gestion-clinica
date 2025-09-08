@@ -14,10 +14,11 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Formato de fecha inválido" });
     }
     const compraResult = await pool.query`
-      INSERT INTO Compras (proveedor, fecha)
-      OUTPUT INSERTED.id
-      VALUES (${proveedor?.trim()}, ${normalizedDate})
-    `;
+  INSERT INTO Compras (proveedor, fecha)
+  OUTPUT INSERTED.id
+  
+  VALUES (${proveedor}, ${normalizedDate})
+`;
     const compraId = compraResult.recordset[0].id;
     for (const p of productos) {
       await pool.query`
@@ -27,7 +28,11 @@ router.post("/", async (req, res) => {
     }
     res.status(200).json({ message: "Compra registrada correctamente" });
   } catch (error) {
-    res.status(500).json({ error: "Error al registrar la compra" });
+    console.error("Error en POST /api/compras:", error); // <-- Buena práctica para loguear en el servidor
+    res.status(500).json({
+      error: "Error al registrar la compra",
+      details: error.message,
+    });
   }
 });
 

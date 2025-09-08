@@ -141,6 +141,7 @@ export const RegistrarCompras = () => {
         setFecha("");
       })
       .catch((error) => {
+        console.error("Detalle del error al registrar:", error);
         alert("Hubo un error al intentar registrar la compra");
       });
   };

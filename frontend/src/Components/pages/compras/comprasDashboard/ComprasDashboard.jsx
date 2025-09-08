@@ -1,55 +1,71 @@
+// ComprasDashboard.js
+import { useState, useEffect } from "react"; // <-- Importa hooks
 import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
+import { Grid, Skeleton } from "@mui/material"; // <-- Importa Skeleton
+
+// ... (importaciones de íconos y otros componentes)
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import InventoryIcon from "@mui/icons-material/Inventory";
-import ReceiptIcon from "@mui/icons-material/Receipt";
-import InfoCard from "../../../common/InfoCard";
-import QuickActionButton from "../../../common/QuickActionButton";
-import DashboardHeader from "../../../common/DashboardHeader";
-import SystemMetricsGrid from "../../../common/SystemMetricsGrid";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
+import DashboardHeader from "../../../common/DashboardHeader";
+import SystemMetricsGrid from "../../../common/SystemMetricsGrid";
 import QuickActionsCard from "../../../common/QuickActionsCard";
 import { quickActionsCompras } from "../../../common/quickActionsData";
 import RecentActivityCompras from "../../../common/RecenActivityCompras";
 
-import { Grid } from "@mui/material";
-
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
 
-  const cards = [
-    <InfoCard title="Órdenes Pendientes" content="5 órdenes sin aprobar" />,
-    <InfoCard title="Facturas Recientes" content="3 nuevas esta semana" />,
-    <InfoCard title="Stock Crítico" content="2 productos debajo del mínimo" />,
-    <InfoCard title="Total Comprado (Mes)" content="$248.000" />,
-  ];
+  // 1. Definir estados para los datos y la carga
+  const [dashboardData, setDashboardData] = useState({
+    ordenesPendientes: 0,
+    facturasRecientes: 0,
+    stockCritico: 0,
+    totalCompradoMes: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const actions = [
-    <QuickActionButton
-      icon={<AddIcon />}
-      label="Registrar Compra"
-      onClick={() => navigate("/compras/registrar")}
-    />,
-    <QuickActionButton
-      icon={<ReceiptIcon />}
-      label="Ver Facturas"
-      onClick={() => navigate("/compras/lista")}
-    />,
-    <QuickActionButton
-      icon={<InventoryIcon />}
-      label="Consultar Stock"
-      onClick={() => navigate("/stock")}
-    />,
-    <QuickActionButton
-      icon={<VisibilityIcon />}
-      label="Ver Órdenes"
-      onClick={() => navigate("/ordenes")}
-    />,
-  ];
+  // 2. Usar useEffect para hacer la llamada a la API
+  useEffect(() => {
+    fetch("http://localhost:3000/api/dashboard/compras-metrics")
+      .then((res) => res.json())
+      .then((data) => {
+        setDashboardData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error al cargar datos del dashboard:", err);
+        setLoading(false); // También detener la carga en caso de error
+      });
+  }, []); // El array vacío asegura que se ejecute solo una vez
 
+  // Función para formatear el dinero
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+    }).format(value);
+  };
+
+  // 3. Renderizado condicional
+  if (loading) {
+    return (
+      <>
+        <DashboardHeader />
+        {/* Mostramos 4 esqueletos mientras carga */}
+        <Grid container spacing={4}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <Skeleton variant="rectangular" height={120} />
+            </Grid>
+          ))}
+        </Grid>
+      </>
+    );
+  }
+
+  // 4. Usar los datos del estado en el componente
   return (
     <>
       <DashboardHeader />
@@ -57,7 +73,7 @@ export const ComprasDashboard = () => {
         systemMetrics={[
           {
             title: "Órdenes Pendientes",
-            value: "5",
+            value: dashboardData.ordenesPendientes.toString(),
             description: "órdenes sin aprobar",
             icon: ShoppingCartOutlinedIcon,
             color: "warning.main",
@@ -65,7 +81,7 @@ export const ComprasDashboard = () => {
           },
           {
             title: "Facturas Recientes",
-            value: "3",
+            value: dashboardData.facturasRecientes.toString(),
             description: "nuevas esta semana",
             icon: ReceiptLongRoundedIcon,
             color: "info.main",
@@ -73,7 +89,7 @@ export const ComprasDashboard = () => {
           },
           {
             title: "Stock Crítico",
-            value: "2",
+            value: dashboardData.stockCritico.toString(),
             description: "productos debajo del mínimo",
             icon: ReportProblemOutlinedIcon,
             color: "error.main",
@@ -81,7 +97,7 @@ export const ComprasDashboard = () => {
           },
           {
             title: "Total Comprado (Mes)",
-            value: "$248,000",
+            value: formatCurrency(dashboardData.totalCompradoMes), // <-- Dato dinámico
             description: "monto total del mes",
             icon: AttachMoneyOutlinedIcon,
             color: "success.main",
