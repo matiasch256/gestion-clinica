@@ -52,6 +52,52 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Error al obtener las compras" });
   }
 });
+router.get("/cantidad-compras", async (req, res) => {
+  try {
+    const topN = parseInt(req.query.topN) ?? 10;
+    const periodo = req.query.periodo ?? "anual";
+    if (![5, 10].includes(topN)) {
+      return res.status(400).json({ error: "topN debe ser 5 o 10" });
+    }
+    let startDate;
+    const currentDate = new Date();
+    if (periodo === "mensual") {
+      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+    } else if (periodo === "trimestral") {
+      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
+    } else if (periodo === "semestral") {
+      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
+    } else if (periodo === "anual") {
+      startDate = new Date(
+        currentDate.setFullYear(currentDate.getFullYear() - 1)
+      );
+    } else {
+      return res.status(400).json({ error: "Período inválido" });
+    }
+    const pool = await getPool();
+    const request = pool.request();
+    request.input("topN", topN);
+    request.input("startDate", startDate);
+    const result = await request.query(`
+      SELECT TOP (@topN) d.NombreProducto, SUM(d.Cantidad) AS TotalCantidad
+      FROM DetalleCompra d
+      INNER JOIN Compras c ON d.IdCompra = c.id
+      WHERE c.fecha >= @startDate
+      GROUP BY d.NombreProducto
+      ORDER BY SUM(d.Cantidad) DESC
+    `);
+    res.status(200).json(result.recordset);
+  } catch (error) {
+    console.error("Error en la consulta:", error.message, error.stack);
+    res.status(500).json({
+      error: "Error en la consulta",
+      details: error.message,
+      sqlMessage: error.originalError
+        ? error.originalError.info.message
+        : "No SQL message",
+    });
+  }
+});
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -123,53 +169,6 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     console.error("Error al eliminar la compra:", error);
     res.status(500).json({ error: "Error al eliminar la compra" });
-  }
-});
-
-router.get("/cantidad-compras", async (req, res) => {
-  try {
-    const topN = parseInt(req.query.topN) ?? 10;
-    const periodo = req.query.periodo ?? "anual";
-    if (![5, 10].includes(topN)) {
-      return res.status(400).json({ error: "topN debe ser 5 o 10" });
-    }
-    let startDate;
-    const currentDate = new Date();
-    if (periodo === "mensual") {
-      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
-    } else if (periodo === "trimestral") {
-      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 3));
-    } else if (periodo === "semestral") {
-      startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
-    } else if (periodo === "anual") {
-      startDate = new Date(
-        currentDate.setFullYear(currentDate.getFullYear() - 1)
-      );
-    } else {
-      return res.status(400).json({ error: "Período inválido" });
-    }
-    const pool = await getPool();
-    const request = pool.request();
-    request.input("topN", topN);
-    request.input("startDate", startDate);
-    const result = await request.query(`
-      SELECT TOP (@topN) d.NombreProducto, SUM(d.Cantidad) AS TotalCantidad
-      FROM DetalleCompra d
-      INNER JOIN Compras c ON d.IdCompra = c.id
-      WHERE c.fecha >= @startDate
-      GROUP BY d.NombreProducto
-      ORDER BY SUM(d.Cantidad) DESC
-    `);
-    res.status(200).json(result.recordset);
-  } catch (error) {
-    console.error("Error en la consulta:", error.message, error.stack);
-    res.status(500).json({
-      error: "Error en la consulta",
-      details: error.message,
-      sqlMessage: error.originalError
-        ? error.originalError.info.message
-        : "No SQL message",
-    });
   }
 });
 

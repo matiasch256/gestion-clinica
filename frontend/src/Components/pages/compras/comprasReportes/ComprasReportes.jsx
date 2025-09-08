@@ -87,7 +87,7 @@ const ComprasReportes = () => {
     setProductLabels([]);
     setProductValues([]);
     fetch(
-      `http://localhost:3000/api/cantidad-compras?topN=${topN}&periodo=${productPeriod}`
+      `http://localhost:3000/api/compras/cantidad-compras?topN=${topN}&periodo=${productPeriod}`
     )
       .then((res) => res.json())
       .then((data) => {
