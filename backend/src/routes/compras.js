@@ -40,7 +40,12 @@ router.get("/", async (req, res) => {
   try {
     const pool = await getPool();
     const comprasResult = await pool.query(`
-      SELECT C.id, C.proveedor, CONVERT(VARCHAR, C.fecha, 23) AS fecha, P.nombre AS proveedorNombre
+      SELECT 
+        C.id, 
+        C.proveedor, 
+        CONVERT(VARCHAR, C.fecha, 23) AS fecha, 
+        P.nombre AS proveedorNombre,
+        C.estado -- <-- ¡AÑADIR ESTA LÍNEA!
       FROM Compras C
       JOIN Proveedores P ON C.proveedor = P.id
     `);
@@ -156,6 +161,41 @@ router.put("/:id", async (req, res) => {
     res.status(200).json({ message: "Compra actualizada correctamente" });
   } catch (error) {
     res.status(500).json({ error: "Error al actualizar la compra" });
+  }
+});
+
+router.put("/:id/estado", async (req, res) => {
+  const { id } = req.params;
+  const { nuevoEstado } = req.body; // El frontend enviará el nuevo estado aquí
+
+  // Opcional: Validar que el nuevoEstado sea uno de los permitidos
+  const estadosValidos = [
+    "Pendiente",
+    "Aprobada",
+    "Pedido",
+    "Recibida",
+    "Completada",
+    "Cancelada",
+  ];
+  if (!estadosValidos.includes(nuevoEstado)) {
+    return res.status(400).json({ error: "Estado no válido" });
+  }
+
+  try {
+    const pool = await getPool();
+    await pool.query`
+      UPDATE Compras
+      SET estado = ${nuevoEstado}
+      WHERE id = ${id}
+    `;
+    res
+      .status(200)
+      .json({ message: `Compra actualizada al estado: ${nuevoEstado}` });
+  } catch (error) {
+    console.error("Error al actualizar estado de la compra:", error);
+    res
+      .status(500)
+      .json({ error: "Error en el servidor", details: error.message });
   }
 });
 
