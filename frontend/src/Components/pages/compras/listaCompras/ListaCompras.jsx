@@ -23,6 +23,11 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,10 +42,13 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ReplayIcon from "@mui/icons-material/Replay";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 const estadosDeCompra = [
   "Pendiente",
   "Aprobada",
@@ -68,6 +76,13 @@ export default function ListaCompras() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedCompraId, setSelectedCompraId] = useState(null);
 
+  const [dialog, setDialog] = useState({
+    open: false,
+    title: "",
+    message: "",
+    isError: false,
+  });
+
   const navigate = useNavigate();
 
   const handleMenuClick = (event, compraId) => {
@@ -78,6 +93,10 @@ export default function ListaCompras() {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedCompraId(null);
+  };
+
+  const handleCloseDialog = () => {
+    setDialog({ ...dialog, open: false });
   };
 
   const fetchCompras = () => {
@@ -123,22 +142,38 @@ export default function ListaCompras() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, compras]);
 
-  const handleEliminar = async (id) => {
-    if (!window.confirm("¿Estás seguro de que querés eliminar esta compra?"))
-      return;
-    try {
-      const res = await fetch(`http://localhost:3000/api/compras/${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        alert("Compra eliminada correctamente");
-        setCompras((prev) => prev.filter((c) => c.id !== id));
-      } else {
-        alert("Error al eliminar la compra");
+  const handleEliminar = (id) => {
+    handleOpenConfirmationDialog(
+      "Confirmar Eliminación",
+      "¿Estás seguro de que querés eliminar esta compra? Esta acción no se puede deshacer.",
+      async () => {
+        // Esta es la función que se ejecutará si el usuario confirma
+        try {
+          const res = await fetch(`http://localhost:3000/api/compras/${id}`, {
+            method: "DELETE",
+          });
+          if (res.ok) {
+            setNotificationDialog({
+              open: true,
+              title: "Éxito",
+              message: "La compra ha sido eliminada.",
+              isError: false,
+            });
+            setCompras((prev) => prev.filter((c) => c.id !== id));
+          } else {
+            const errorData = await res.json();
+            throw new Error(errorData.details || "No se pudo eliminar.");
+          }
+        } catch (err) {
+          setNotificationDialog({
+            open: true,
+            title: "Error",
+            message: err.message,
+            isError: true,
+          });
+        }
       }
-    } catch (err) {
-      alert("Error en el servidor");
-    }
+    );
   };
 
   const handleTempFilterChange = (e) => {
@@ -167,6 +202,20 @@ export default function ListaCompras() {
     setPage(0);
   };
 
+  const [notificationDialog, setNotificationDialog] = useState({
+    open: false,
+    title: "",
+    message: "",
+    isError: false,
+  });
+
+  // --- NUEVO ESTADO PARA EL DIÁLOGO DE CONFIRMACIÓN ---
+  const [confirmationDialog, setConfirmationDialog] = useState({
+    open: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+  });
   const getStatusChip = (estado) => {
     let color;
     switch (estado) {
@@ -191,43 +240,46 @@ export default function ListaCompras() {
     return <Chip label={estado || "N/A"} color={color} size="small" />;
   };
 
-  const handleChangeStatus = async (id, nuevoEstado) => {
-    if (
-      !window.confirm(
-        `¿Estás seguro de que querés cambiar el estado a "${nuevoEstado}"?`
-      )
-    ) {
-      handleMenuClose();
-      return;
-    }
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/compras/${id}/estado`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nuevoEstado }),
-        }
-      );
-      if (res.ok) {
-        alert(`Compra actualizada a "${nuevoEstado}"`);
-        setCompras((prevCompras) =>
-          prevCompras.map((compra) =>
-            compra.id === id ? { ...compra, estado: nuevoEstado } : compra
-          )
-        );
-      } else {
-        const errorData = await res.json();
-        alert(
-          `Error al actualizar el estado: ${
-            errorData.details || "Error desconocido"
-          }`
-        );
-      }
-    } catch (err) {
-      alert("Error en el servidor");
-    }
+  const handleChangeStatus = (id, nuevoEstado) => {
     handleMenuClose();
+    handleOpenConfirmationDialog(
+      "Confirmar Cambio de Estado",
+      `¿Estás seguro de que querés cambiar el estado a "${nuevoEstado}"?`,
+      async () => {
+        // La función a ejecutar en la confirmación
+        try {
+          const res = await fetch(
+            `http://localhost:3000/api/compras/${id}/estado`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ nuevoEstado }),
+            }
+          );
+          if (res.ok) {
+            setNotificationDialog({
+              open: true,
+              title: "Estado Actualizado",
+              message: `La compra ahora es: ${nuevoEstado}`,
+              isError: false,
+            });
+            setCompras((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, estado: nuevoEstado } : c))
+            );
+          } else {
+            const errorData = await res.json();
+            throw new Error(errorData.details || "No se pudo actualizar.");
+          }
+        } catch (err) {
+          setNotificationDialog({
+            open: true,
+            title: "Error",
+            message: err.message,
+            isError: true,
+          });
+        }
+      }
+    );
   };
 
   const getPaginatedCompras = () => {
@@ -281,6 +333,25 @@ export default function ListaCompras() {
       startY: 20,
     });
     doc.save("Lista_de_Compras.pdf");
+  };
+
+  const handleOpenConfirmationDialog = (title, message, onConfirm) => {
+    setConfirmationDialog({ open: true, title, message, onConfirm });
+  };
+
+  const handleCloseConfirmationDialog = () => {
+    setConfirmationDialog({ ...confirmationDialog, open: false });
+  };
+
+  const handleConfirmAction = () => {
+    if (confirmationDialog.onConfirm) {
+      confirmationDialog.onConfirm();
+    }
+    handleCloseConfirmationDialog();
+  };
+
+  const handleCloseNotificationDialog = () => {
+    setNotificationDialog({ ...notificationDialog, open: false });
   };
 
   const selectedCompra = compras.find((c) => c.id === selectedCompraId);
@@ -580,6 +651,47 @@ export default function ListaCompras() {
           </MenuItem>
         )}
       </Menu>
+      <Dialog
+        open={notificationDialog.open}
+        onClose={handleCloseNotificationDialog}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
+          {notificationDialog.isError ? (
+            <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
+          ) : (
+            <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+          )}
+          {notificationDialog.title}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>{notificationDialog.message}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseNotificationDialog} autoFocus>
+            Aceptar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* --- NUEVO DIÁLOGO DE CONFIRMACIÓN --- */}
+      <Dialog
+        open={confirmationDialog.open}
+        onClose={handleCloseConfirmationDialog}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
+          <HelpOutlineIcon color="primary" sx={{ mr: 1 }} />
+          {confirmationDialog.title}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>{confirmationDialog.message}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmationDialog}>Cancelar</Button>
+          <Button onClick={handleConfirmAction} variant="contained" autoFocus>
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
