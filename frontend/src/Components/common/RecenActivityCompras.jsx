@@ -1,36 +1,57 @@
-import { Card, CardContent, CardHeader } from "@mui/material";
-import { Button, Typography, Box, Grid, Chip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Button,
+  Typography,
+  Box,
+  Grid,
+  Chip,
+} from "@mui/material";
 
-export default function RecentActivityCompras() {
+const RecentActivityCompras = ({ ordenes, productos }) => {
+  const navigate = useNavigate();
+
+  // Helper para dar formato de moneda
+  const formatCurrency = (value) => {
+    if (value === null || value === undefined) return "$0.00";
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+    }).format(value);
+  };
+
+  // Helper para los colores del Chip de estado
+  const getStatusChipColor = (estado) => {
+    switch (estado) {
+      case "Pendiente":
+        return { bgColor: "#FFF8E1", textColor: "warning.main" };
+      case "Aprobada":
+        return { bgColor: "#E3F2FD", textColor: "info.main" };
+      case "Pedido":
+        return { bgColor: "#E8EAF6", textColor: "primary.main" };
+      case "Recibida":
+      case "Completada":
+        return { bgColor: "#E8F5E9", textColor: "success.main" };
+      case "Cancelada":
+        return { bgColor: "#FFEBEE", textColor: "error.main" };
+      default:
+        return { bgColor: "#F5F5F5", textColor: "text.primary" };
+    }
+  };
+
   return (
     <Grid container spacing={4}>
+      {/* --- Tarjeta de Órdenes Recientes --- */}
       <Grid size={{ xs: 12, lg: 6 }}>
-        <Card>
+        <Card elevation={3} sx={{ height: "100%" }}>
           <CardHeader
             title={<Typography variant="h6">Órdenes Recientes</Typography>}
           />
           <CardContent>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {[
-                {
-                  id: "ORD-001",
-                  proveedor: "Proveedor ABC",
-                  monto: "$45,200",
-                  estado: "Pendiente",
-                },
-                {
-                  id: "ORD-002",
-                  proveedor: "Distribuidora XYZ",
-                  monto: "$32,100",
-                  estado: "Aprobada",
-                },
-                {
-                  id: "ORD-003",
-                  proveedor: "Suministros DEF",
-                  monto: "$18,900",
-                  estado: "En proceso",
-                },
-              ].map((orden) => (
+              {ordenes?.map((orden) => (
                 <Box
                   key={orden.id}
                   sx={{
@@ -45,32 +66,23 @@ export default function RecentActivityCompras() {
                 >
                   <Box>
                     <Typography variant="body1" fontWeight="medium">
-                      {orden.id}
+                      ORD-{orden.id}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {orden.proveedor}
+                      {orden.proveedorNombre}
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: "right" }}>
                     <Typography variant="body1" fontWeight="medium">
-                      {orden.monto}
+                      {formatCurrency(orden.total)}
                     </Typography>
                     <Chip
                       label={orden.estado}
                       size="small"
                       sx={{
-                        backgroundColor:
-                          orden.estado === "Pendiente"
-                            ? "#FFF8E1"
-                            : orden.estado === "Aprobada"
-                            ? "#E8F5E9"
-                            : "#E3F2FD",
-                        color:
-                          orden.estado === "Pendiente"
-                            ? "warning.main"
-                            : orden.estado === "Aprobada"
-                            ? "success.main"
-                            : "info.main",
+                        backgroundColor: getStatusChipColor(orden.estado)
+                          .bgColor,
+                        color: getStatusChipColor(orden.estado).textColor,
                       }}
                     />
                   </Box>
@@ -81,8 +93,9 @@ export default function RecentActivityCompras() {
         </Card>
       </Grid>
 
+      {/* --- Tarjeta de Productos con Stock Bajo --- */}
       <Grid size={{ xs: 12, lg: 6 }}>
-        <Card>
+        <Card elevation={3} sx={{ height: "100%" }}>
           <CardHeader
             title={
               <Typography variant="h6">Productos con Stock Bajo</Typography>
@@ -90,26 +103,7 @@ export default function RecentActivityCompras() {
           />
           <CardContent>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {[
-                {
-                  nombre: "Papel A4",
-                  stock: 15,
-                  minimo: 50,
-                  unidad: "paquetes",
-                },
-                {
-                  nombre: "Tóner HP LaserJet",
-                  stock: 2,
-                  minimo: 10,
-                  unidad: "unidades",
-                },
-                {
-                  nombre: "Cuadernos Universitarios",
-                  stock: 8,
-                  minimo: 25,
-                  unidad: "unidades",
-                },
-              ].map((producto, index) => (
+              {productos?.map((producto, index) => (
                 <Box
                   key={index}
                   sx={{
@@ -127,7 +121,7 @@ export default function RecentActivityCompras() {
                       {producto.nombre}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Mínimo: {producto.minimo} {producto.unidad}
+                      Stock actual
                     </Typography>
                   </Box>
                   <Box sx={{ textAlign: "right" }}>
@@ -136,7 +130,7 @@ export default function RecentActivityCompras() {
                       color="error.main"
                       fontWeight="medium"
                     >
-                      {producto.stock} {producto.unidad}
+                      {producto.stock} unidades
                     </Typography>
                     <Chip
                       label="Stock crítico"
@@ -152,4 +146,6 @@ export default function RecentActivityCompras() {
       </Grid>
     </Grid>
   );
-}
+};
+
+export default RecentActivityCompras;

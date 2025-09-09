@@ -20,6 +20,9 @@ import {
   IconButton,
   ListItemIcon,
   ListItemText,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,6 +40,14 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import ReplayIcon from "@mui/icons-material/Replay";
+const estadosDeCompra = [
+  "Pendiente",
+  "Aprobada",
+  "Pedido",
+  "Completada",
+  "Cancelada",
+];
 
 export default function ListaCompras() {
   const [compras, setCompras] = useState([]);
@@ -87,6 +98,7 @@ export default function ListaCompras() {
 
   useEffect(() => {
     let result = compras;
+
     if (filters.fecha) {
       result = result.filter(
         (compra) => compra.fecha && compra.fecha.startsWith(filters.fecha)
@@ -99,9 +111,14 @@ export default function ListaCompras() {
           .includes(filters.proveedor.toLowerCase())
       );
     }
+
+    // LÓGICA DE FILTRO POR ESTADO (CORREGIDA)
+    // Si se selecciona un estado, filtra por ese estado exacto.
+    // Si el filtro de estado está vacío ("Todos"), no se aplica este filtro.
     if (filters.estado) {
       result = result.filter((compra) => compra.estado === filters.estado);
     }
+
     setFilteredCompras(result);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, compras]);
@@ -162,7 +179,6 @@ export default function ListaCompras() {
       case "Pedido":
         color = "primary";
         break;
-      case "Recibida":
       case "Completada":
         color = "success";
         break;
@@ -275,6 +291,7 @@ export default function ListaCompras() {
         Lista de Compras
       </Typography>
 
+      {/* --- SECCIÓN DE FILTROS Y EXPORTACIÓN (SIN CAMBIOS) --- */}
       <Box>
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -308,6 +325,25 @@ export default function ListaCompras() {
                   sx={{ minWidth: 200 }}
                   variant="outlined"
                 />
+                {/* FILTRO POR ESTADO (AHORA ACTIVADO Y CORRECTO) */}
+                <FormControl sx={{ minWidth: 200 }}>
+                  <InputLabel>Estado</InputLabel>
+                  <Select
+                    name="estado"
+                    value={tempFilters.estado}
+                    onChange={handleTempFilterChange}
+                    label="Estado"
+                  >
+                    <MenuItem value="">
+                      <em>Todos</em>
+                    </MenuItem>
+                    {estadosDeCompra.map((estado) => (
+                      <MenuItem key={estado} value={estado}>
+                        {estado}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Box>
               <Box
                 sx={{
@@ -353,6 +389,7 @@ export default function ListaCompras() {
         </Button>
       </Box>
 
+      {/* --- TABLA DE COMPRAS CON LÓGICA FINAL --- */}
       <TableContainer component={Paper} elevation={3}>
         <Table>
           <TableHead>
@@ -378,7 +415,18 @@ export default function ListaCompras() {
               getPaginatedCompras().map((compra) => (
                 <TableRow key={compra.id}>
                   <TableCell>
-                    {new Date(compra.fecha).toLocaleDateString()}
+                    {(() => {
+                      // La fecha viene como "YYYY-MM-DD"
+                      const parts = compra.fecha.split("-");
+                      // Creamos la fecha en UTC para evitar que el navegador la ajuste a la zona horaria local
+                      const date = new Date(
+                        Date.UTC(parts[0], parts[1] - 1, parts[2])
+                      );
+                      // La mostramos en formato local pero basado en la fecha UTC
+                      return date.toLocaleDateString("es-AR", {
+                        timeZone: "UTC",
+                      });
+                    })()}
                   </TableCell>
                   <TableCell>{compra.id}</TableCell>
                   <TableCell>{compra.proveedorNombre}</TableCell>
@@ -402,31 +450,28 @@ export default function ListaCompras() {
                       >
                         Ver
                       </Button>
+
                       <Button
                         variant="outlined"
                         color="error"
                         size="small"
                         startIcon={<DeleteIcon />}
-                        disabled={[
-                          "Completada",
-                          "Recibida",
-                          "Cancelada",
-                        ].includes(compra.estado)}
+                        disabled={["Completada", "Cancelada"].includes(
+                          compra.estado
+                        )}
                         onClick={() => handleEliminar(compra.id)}
                       >
                         Eliminar
                       </Button>
-                      {["Pendiente", "Aprobada", "Pedido"].includes(
-                        compra.estado
-                      ) && (
-                        <IconButton
-                          aria-label="más opciones"
-                          onClick={(e) => handleMenuClick(e, compra.id)}
-                          size="small"
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                      )}
+
+                      {/* AHORA EL IconButton SIEMPRE SE RENDERIZA */}
+                      <IconButton
+                        aria-label="más opciones"
+                        onClick={(e) => handleMenuClick(e, compra.id)}
+                        size="small"
+                      >
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -452,6 +497,7 @@ export default function ListaCompras() {
         />
       </TableContainer>
 
+      {/* --- MENÚ ÚNICO Y COMPARTIDO (CON LÓGICA FINAL) --- */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -489,6 +535,7 @@ export default function ListaCompras() {
             <ListItemText>Cancelar</ListItemText>
           </MenuItem>,
         ]}
+
         {selectedCompra?.estado === "Aprobada" && [
           <MenuItem
             key="order"
@@ -509,14 +556,27 @@ export default function ListaCompras() {
             <ListItemText>Cancelar</ListItemText>
           </MenuItem>,
         ]}
+
         {selectedCompra?.estado === "Pedido" && (
           <MenuItem
-            onClick={() => handleChangeStatus(selectedCompra.id, "Recibida")}
+            onClick={() => handleChangeStatus(selectedCompra.id, "Completada")}
           >
             <ListItemIcon>
               <CheckCircleIcon fontSize="small" color="success" />
             </ListItemIcon>
-            <ListItemText>Marcar Recibida</ListItemText>
+            <ListItemText>Marcar Completada</ListItemText>
+          </MenuItem>
+        )}
+
+        {(selectedCompra?.estado === "Completada" ||
+          selectedCompra?.estado === "Cancelada") && (
+          <MenuItem
+            onClick={() => handleChangeStatus(selectedCompra.id, "Pendiente")}
+          >
+            <ListItemIcon>
+              <ReplayIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Reabrir Compra</ListItemText>
           </MenuItem>
         )}
       </Menu>

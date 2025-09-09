@@ -17,9 +17,16 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; // Icono para éxito
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 export const RegistrarCompras = () => {
   const [productos, setProductos] = useState([
@@ -30,6 +37,12 @@ export const RegistrarCompras = () => {
   const [proveedores, setProveedores] = useState([]);
   const [productosDisponibles, setProductosDisponibles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dialog, setDialog] = useState({
+    open: false,
+    title: "",
+    message: "",
+    isError: false,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,6 +99,14 @@ export const RegistrarCompras = () => {
       .toFixed(2);
   };
 
+  const handleCloseDialog = () => {
+    const success = !dialog.isError; // Verificamos si fue un éxito
+    setDialog({ ...dialog, open: false }); // Cerramos el diálogo
+    if (success) {
+      navigate("/compras/listaCompras"); // Navegamos a la lista SÓLO si fue exitoso
+    }
+  };
+
   const registrarCompraEnBackend = () => {
     if (!proveedor || !fecha) {
       alert("Debes seleccionar un proveedor y una fecha.");
@@ -123,26 +144,36 @@ export const RegistrarCompras = () => {
 
     fetch("http://localhost:3000/api/compras", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datosCompra),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorData = await response.json();
+          throw new Error(
+            errorData.details || `HTTP error! status: ${response.status}`
+          );
         }
         return response.json();
       })
       .then((data) => {
-        alert("Compra registrada exitosamente");
-        setProductos([{ id: Date.now(), nombre: "", cantidad: 0, precio: 0 }]);
-        setProveedor("");
-        setFecha("");
+        // Mostramos el diálogo de éxito
+        setDialog({
+          open: true,
+          title: "¡Compra Registrada!",
+          message: "La compra se ha guardado exitosamente en el sistema.",
+          isError: false,
+        });
       })
       .catch((error) => {
+        // Mostramos el diálogo de error
         console.error("Detalle del error al registrar:", error);
-        alert("Hubo un error al intentar registrar la compra");
+        setDialog({
+          open: true,
+          title: "Error de Registro",
+          message: error.message,
+          isError: true,
+        });
       });
   };
 
@@ -397,6 +428,31 @@ export const RegistrarCompras = () => {
           </Button>
         </Box>
       </Box>
+      <Dialog open={dialog.open} onClose={handleCloseDialog}>
+        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
+          {dialog.isError ? (
+            <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
+          ) : (
+            <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+          )}
+          {dialog.title}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>{dialog.message}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseDialog}
+            autoFocus
+            sx={{
+              color: "#1976d2 !important",
+              bgcolor: "transparent !important",
+            }}
+          >
+            Aceptar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

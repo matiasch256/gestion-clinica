@@ -1,36 +1,63 @@
 import express from "express";
 import { getPool } from "../config/database.js";
 import { normalizeDate } from "../utils/dateUtils.js";
+import sql from "mssql";
 
 const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { proveedor, fecha, productos } = req.body;
+
+  const pool = await getPool();
+  const transaction = pool.transaction();
+
   try {
-    const pool = await getPool();
+    await transaction.begin();
 
     const normalizedDate = normalizeDate(fecha);
     if (!normalizedDate) {
-      return res.status(400).json({ error: "Formato de fecha inválido" });
+      throw new Error("Formato de fecha inválido");
     }
-    const compraResult = await pool.query`
-  INSERT INTO Compras (proveedor, fecha)
-  OUTPUT INSERTED.id
-  
-  VALUES (${proveedor}, ${normalizedDate})
-`;
+
+    let request = transaction.request();
+
+    // 1. Insertar en la tabla 'Compras' especificando el tipo de dato para la fecha
+    const compraResult = await request
+      .input("proveedor", proveedor)
+      // --- LÍNEA CORREGIDA ---
+      // Le decimos explícitamente a la base de datos que esto es una FECHA, no una fecha y hora.
+      .input("fecha", sql.Date, normalizedDate).query(`
+        INSERT INTO Compras (proveedor, fecha)
+        OUTPUT INSERTED.id
+        VALUES (@proveedor, @fecha)
+      `);
+
     const compraId = compraResult.recordset[0].id;
+
+    // 2. Iterar e insertar los detalles de la compra (sin cambios aquí)
     for (const p of productos) {
-      await pool.query`
-        INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
-        VALUES (${compraId}, ${p.nombre?.trim()}, ${p.cantidad}, ${p.precio})
-      `;
+      request = transaction.request();
+      await request
+        .input("compraId", compraId)
+        .input("nombre", p.nombre)
+        .input("cantidad", p.cantidad)
+        .input("precio", p.precio).query(`
+          INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
+          VALUES (@compraId, @nombre, @cantidad, @precio)
+        `);
     }
+
+    // 3. Confirmar la transacción
+    await transaction.commit();
+
     res.status(200).json({ message: "Compra registrada correctamente" });
   } catch (error) {
-    console.error("Error en POST /api/compras:", error); // <-- Buena práctica para loguear en el servidor
+    // 4. Si algo falla, revertir todo
+    await transaction.rollback();
+
+    console.error("Error al registrar la compra:", error);
     res.status(500).json({
-      error: "Error al registrar la compra",
+      error: "Error al registrar la compra en el servidor.",
       details: error.message,
     });
   }
@@ -45,10 +72,14 @@ router.get("/", async (req, res) => {
         C.proveedor, 
         CONVERT(VARCHAR, C.fecha, 23) AS fecha, 
         P.nombre AS proveedorNombre,
-        C.estado -- <-- ¡AÑADIR ESTA LÍNEA!
+        C.estado
       FROM Compras C
       JOIN Proveedores P ON C.proveedor = P.id
+      -- LÍNEA MODIFICADA --
+      ORDER BY C.fecha DESC, C.id DESC 
     `);
+
+    // El resto de la función se queda exactamente igual...
     const compras = comprasResult.recordset;
     for (let compra of compras) {
       const detallesResult = await pool.query`
@@ -59,7 +90,10 @@ router.get("/", async (req, res) => {
 
     res.status(200).json(compras);
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener las compras" });
+    console.error("Error al obtener las compras:", error);
+    res
+      .status(500)
+      .json({ error: "Error al obtener las compras", details: error.message });
   }
 });
 router.get("/cantidad-compras", async (req, res) => {
@@ -173,7 +207,6 @@ router.put("/:id/estado", async (req, res) => {
     "Pendiente",
     "Aprobada",
     "Pedido",
-    "Recibida",
     "Completada",
     "Cancelada",
   ];

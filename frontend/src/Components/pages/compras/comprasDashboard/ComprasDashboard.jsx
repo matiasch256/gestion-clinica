@@ -1,9 +1,6 @@
-// ComprasDashboard.js
-import { useState, useEffect } from "react"; // <-- Importa hooks
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Grid, Skeleton } from "@mui/material"; // <-- Importa Skeleton
-
-// ... (importaciones de íconos y otros componentes)
+import { Grid, Skeleton, Box } from "@mui/material";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
@@ -12,7 +9,7 @@ import DashboardHeader from "../../../common/DashboardHeader";
 import SystemMetricsGrid from "../../../common/SystemMetricsGrid";
 import QuickActionsCard from "../../../common/QuickActionsCard";
 import { quickActionsCompras } from "../../../common/quickActionsData";
-import RecentActivityCompras from "../../../common/RecenActivityCompras";
+import RecentActivityCompras from "./../../../common/RecenActivityCompras";
 
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
@@ -23,6 +20,8 @@ export const ComprasDashboard = () => {
     facturasRecientes: 0,
     stockCritico: 0,
     totalCompradoMes: 0,
+    listaOrdenesRecientes: [], // <-- NUEVO
+    listaStockCritico: [], // <-- NUEVO
   });
   const [loading, setLoading] = useState(true);
 
@@ -36,11 +35,10 @@ export const ComprasDashboard = () => {
       })
       .catch((err) => {
         console.error("Error al cargar datos del dashboard:", err);
-        setLoading(false); // También detener la carga en caso de error
+        setLoading(false);
       });
-  }, []); // El array vacío asegura que se ejecute solo una vez
+  }, []);
 
-  // Función para formatear el dinero
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -53,13 +51,15 @@ export const ComprasDashboard = () => {
     return (
       <>
         <DashboardHeader />
-        {/* Mostramos 4 esqueletos mientras carga */}
         <Grid container spacing={4}>
           {Array.from({ length: 4 }).map((_, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Skeleton variant="rectangular" height={120} />
             </Grid>
           ))}
+          <Grid item xs={12}>
+            <Skeleton variant="rectangular" height={200} />
+          </Grid>
         </Grid>
       </>
     );
@@ -74,7 +74,7 @@ export const ComprasDashboard = () => {
           {
             title: "Órdenes Pendientes",
             value: dashboardData.ordenesPendientes.toString(),
-            description: "órdenes sin aprobar",
+            description: "órdenes en estado pendiente", // Descripción actualizada
             icon: ShoppingCartOutlinedIcon,
             color: "warning.main",
             bgColor: "#FFF8E1",
@@ -97,7 +97,7 @@ export const ComprasDashboard = () => {
           },
           {
             title: "Total Comprado (Mes)",
-            value: formatCurrency(dashboardData.totalCompradoMes), // <-- Dato dinámico
+            value: formatCurrency(dashboardData.totalCompradoMes),
             description: "monto total del mes",
             icon: AttachMoneyOutlinedIcon,
             color: "success.main",
@@ -105,11 +105,15 @@ export const ComprasDashboard = () => {
           },
         ]}
       />
-      <QuickActionsCard quickActions={quickActionsCompras} />
-      <Grid container spacing={4} sx={{ mt: 3 }}></Grid>
-      <Grid item xs={12} lg={8}>
-        <RecentActivityCompras />
-      </Grid>
+      <Box sx={{ mt: 4 }}>
+        <QuickActionsCard quickActions={quickActionsCompras} />
+      </Box>
+      <Box sx={{ mt: 4 }}>
+        <RecentActivityCompras
+          ordenes={dashboardData.listaOrdenesRecientes}
+          productos={dashboardData.listaStockCritico}
+        />
+      </Box>
     </>
   );
 };
