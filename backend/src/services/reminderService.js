@@ -66,11 +66,6 @@ const tareaRecordatorio = async () => {
 };
 
 export const iniciarTareaRecordatorios = () => {
-  // Ejecutar la tarea cada hora.
-  // Para producción, usar:
-  // cron.schedule("0 * * * *", tareaRecordatorio);
-  /* ---------------------------------- */
-  // Para pruebas, ejecutar cada minuto:
   cron.schedule("* * * * *", tareaRecordatorio);
   console.log(
     "🕒 Tarea de recordatorios de turnos programada para ejecutarse cada hora."
