@@ -52,9 +52,8 @@ function TabPanel(props) {
 
 export function ProductosDashboard({ onNavigate }) {
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState("30"); // Not used in current code, but kept for potential
+  const [selectedPeriod, setSelectedPeriod] = useState("30");
 
-  // Datos mock para métricas
   const metricas = {
     totalProductos: 1247,
     stockBajo: 23,
@@ -64,7 +63,6 @@ export function ProductosDashboard({ onNavigate }) {
     productosMasVendidos: 45,
   };
 
-  // Datos para gráfico de productos por categoría
   const productosPorCategoria = [
     { name: "Oficina", value: 324, color: "#007bff" },
     { name: "Tecnología", value: 256, color: "#28a745" },
@@ -74,7 +72,6 @@ export function ProductosDashboard({ onNavigate }) {
     { name: "Otros", value: 166, color: "#fd7e14" },
   ];
 
-  // Datos para gráfico de stock
   const stockPorMes = [
     { mes: "Ene", entradas: 145, salidas: 98, stock: 1180 },
     { mes: "Feb", entradas: 167, salidas: 134, stock: 1213 },
@@ -84,7 +81,6 @@ export function ProductosDashboard({ onNavigate }) {
     { mes: "Jun", entradas: 178, salidas: 134, stock: 1246 },
   ];
 
-  // Productos con stock bajo
   const productosStockBajo = [
     { nombre: "Papel A4 Resma", stock: 5, minimo: 20, categoria: "Papelería" },
     {
@@ -107,7 +103,6 @@ export function ProductosDashboard({ onNavigate }) {
     },
   ];
 
-  // Productos más vendidos
   const productosMasVendidos = [
     { nombre: "Computadora Dell Inspiron", ventas: 34, revenue: 425600 },
     { nombre: "Monitor LG 24''", ventas: 28, revenue: 168000 },
@@ -131,7 +126,6 @@ export function ProductosDashboard({ onNavigate }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      {/* Header con acciones rápidas */}
       <Box
         sx={{
           display: "flex",
@@ -144,8 +138,6 @@ export function ProductosDashboard({ onNavigate }) {
         <Box>
           <Typography variant="h5">Dashboard de Productos</Typography>
           <Typography variant="body2" sx={{ color: "#6B7280" }}>
-            {" "}
-            {/* text-muted-foreground */}
             Gestiona tu inventario y monitorea el rendimiento de productos
           </Typography>
         </Box>
@@ -206,7 +198,6 @@ export function ProductosDashboard({ onNavigate }) {
         </Box>
       </Box>
 
-      {/* Métricas principales */}
       <Grid container spacing={2}>
         <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
           <Card>
@@ -358,7 +349,6 @@ export function ProductosDashboard({ onNavigate }) {
         </Grid>
       </Grid>
 
-      {/* Contenido principal con tabs */}
       <Box sx={{ pb: 2 }} size="100%">
         <Box
           sx={{
@@ -383,9 +373,9 @@ export function ProductosDashboard({ onNavigate }) {
               display: "flex",
               alignItems: "center",
 
-              height: 36, // h-9
-              width: "fit-content", // w-fit
-              borderRadius: 12, // rounded-xl
+              height: 36,
+              width: "fit-content",
+              borderRadius: 12,
               padding: 3,
               "& .MuiTabs-flexContainer": {
                 gap: 2,
@@ -401,7 +391,7 @@ export function ProductosDashboard({ onNavigate }) {
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 6, // 1.5 * 4px
+                gap: 6,
                 height: 20,
                 minHeight: "unset",
                 borderRadius: 12,
@@ -438,7 +428,7 @@ export function ProductosDashboard({ onNavigate }) {
                 flex: 1,
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 6 / 4, // 1.5 → 6px
+                gap: 6 / 4,
                 height: 20,
                 minHeight: "unset",
                 borderRadius: 12,
@@ -469,7 +459,7 @@ export function ProductosDashboard({ onNavigate }) {
                 flex: 1,
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 6 / 4, // 1.5 → 6px
+                gap: 6 / 4,
                 height: 20,
                 minHeight: "unset",
                 borderRadius: 12,
@@ -495,7 +485,7 @@ export function ProductosDashboard({ onNavigate }) {
             />
           </Tabs>
         </Box>
-        {/* Distribución por categorías */}
+
         <TabPanel value={selectedTab} index={0}>
           <Grid container spacing={2}>
             <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
@@ -558,7 +548,6 @@ export function ProductosDashboard({ onNavigate }) {
               </Card>
             </Grid>
 
-            {/* Productos con stock bajo */}
             <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
               <Card sx={{ height: "100%" }}>
                 <CardContent>

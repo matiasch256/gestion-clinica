@@ -1,34 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Button,
-  Container,
-  Paper,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  // --- IMPORTS PARA EL FORMULARIO CORREGIDO ---
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-} from "@mui/material";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useTheme } from "@mui/material/styles";
+import { Box, Typography, TextField, Button, Paper, Grid } from "@mui/material";
+
+import CheckIcon from "@mui/icons-material/Check";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export const RegistrarCategoria = () => {
+  const theme = useTheme();
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [editandoId, setEditandoId] = useState(null);
-  const [dialog, setDialog] = useState({
-    open: false,
-    title: "",
-    message: "",
-    isError: false,
-  });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,33 +24,16 @@ export const RegistrarCategoria = () => {
     }
   }, [location]);
 
-  const handleCloseDialog = () => {
-    const success = !dialog.isError;
-    setDialog({ ...dialog, open: false });
-    if (success) {
-      navigate("/categorias/consultar"); // Ajusta esta ruta si es necesario
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!nombre.trim() || !descripcion.trim()) {
-      setDialog({
-        open: true,
-        title: "Campos Incompletos",
-        message: "Todos los campos son obligatorios.",
-        isError: true,
-      });
+      alert("Todos los campos son obligatorios.");
       return;
     }
+
     if (!isNaN(nombre)) {
-      setDialog({
-        open: true,
-        title: "Dato Inválido",
-        message: "El nombre no puede ser un número.",
-        isError: true,
-      });
+      alert("El nombre no puede ser un número.");
       return;
     }
 
@@ -82,94 +47,132 @@ export const RegistrarCategoria = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nombre, descripcion }),
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.details || "Error al guardar la categoría");
-        }
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al guardar categoría");
         return res.json();
       })
       .then(() => {
-        const message = editandoId
-          ? "Categoría actualizada correctamente."
-          : "Categoría registrada correctamente.";
-        setDialog({ open: true, title: "¡Éxito!", message, isError: false });
+        setNombre("");
+        setDescripcion("");
+        setEditandoId(null);
+        alert("Categoría guardada correctamente");
+        navigate("/categorias/consultar");
       })
-      .catch((err) => {
-        setDialog({
-          open: true,
-          title: "Error",
-          message: err.message,
-          isError: true,
-        });
-      });
+      .catch((err) => alert(err.message));
+  };
+
+  const handleCancelar = () => {
+    navigate("/categorias/consultar");
   };
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
       <Paper
-        elevation={4}
+        elevation={0}
         sx={{
-          marginTop: 8,
-          padding: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          p: 4,
+          borderRadius: 3,
+          bgcolor: theme.palette.background.default,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
+          maxWidth: 800,
+          margin: "0 auto",
         }}
       >
-        <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            mb: 4,
+            fontWeight: "700",
+            color: theme.palette.text.primary,
+            borderLeft: `5px solid ${theme.palette.primary.main}`,
+            paddingLeft: 2,
+          }}
+        >
           {editandoId ? "Editar Categoría" : "Registrar Categoría"}
         </Typography>
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          noValidate
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 3, // Aumentamos un poco el espacio para que respire mejor
-          }}
-        >
-          {/* --- CAMPO "NOMBRE" CORREGIDO --- */}
-          <FormControl variant="outlined" fullWidth required>
-            <InputLabel htmlFor="nombre">Nombre de la Categoría</InputLabel>
-            <OutlinedInput
-              id="nombre"
-              name="nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              label="Nombre de la Categoría"
-              autoComplete="off"
-            />
-          </FormControl>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 12 }}>
+              <TextField
+                label="Nombre de la Categoría"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                required
+                fullWidth
+                variant="outlined"
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ bgcolor: theme.palette.background.default }}
+              />
+            </Grid>
 
-          {/* --- CAMPO "DESCRIPCIÓN" CORREGIDO --- */}
-          <FormControl variant="outlined" fullWidth required>
-            <InputLabel htmlFor="descripcion">Descripción</InputLabel>
-            <OutlinedInput
-              id="descripcion"
-              name="descripcion"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-              label="Descripción"
-              multiline
-              rows={4}
-              autoComplete="off"
-            />
-          </FormControl>
+            <Grid size={{ xs: 12, md: 12 }}>
+              <TextField
+                label="Descripción"
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
+                required
+                fullWidth
+                multiline
+                rows={4}
+                variant="outlined"
+                placeholder="Breve descripción de la categoría..."
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ bgcolor: theme.palette.background.default }}
+              />
+            </Grid>
 
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>
-            {editandoId ? "Actualizar Categoría" : "Registrar Categoría"}
-          </Button>
+            <Grid
+              size={{ xs: 12 }}
+              sx={{
+                mt: 2,
+                display: "flex",
+                gap: 2,
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<CancelIcon />}
+                onClick={handleCancelar}
+                sx={{
+                  color: theme.palette.text.secondary,
+                  borderColor: theme.palette.divider,
+                  backgroundColor: theme.palette.background.trasparent,
+                  "&:hover": {
+                    borderColor: theme.palette.text.primary,
+                    backgroundColor: theme.palette.background.trasparent,
+                  },
+                }}
+              >
+                Cancelar
+              </Button>
+
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<CheckIcon />}
+                sx={{
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  fontWeight: "bold",
+                  boxShadow: "none",
+                  "&:hover": {
+                    bgcolor:
+                      theme.palette.primary.hover || theme.palette.primary.dark,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                {editandoId ? "Actualizar" : "Guardar"}
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
       </Paper>
-
-      {/* --- Diálogo de Notificación --- */}
-      <Dialog open={dialog.open} onClose={handleCloseDialog}>
-        {/* ... Tu código del Dialog se mantiene igual ... */}
-      </Dialog>
-    </Container>
+    </Box>
   );
 };

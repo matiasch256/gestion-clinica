@@ -21,38 +21,43 @@ router.post("/", async (req, res) => {
 
     let request = transaction.request();
 
-    // 1. Insertar en la tabla 'Compras' especificando el tipo de dato para la fecha
     const compraResult = await request
-      .input("proveedor", proveedor)
-      // --- LÍNEA CORREGIDA ---
-      // Le decimos explícitamente a la base de datos que esto es una FECHA, no una fecha y hora.
+      .input("proveedor", sql.Int, proveedor)
       .input("fecha", sql.Date, normalizedDate).query(`
-        INSERT INTO Compras (proveedor, fecha)
-        OUTPUT INSERTED.id
-        VALUES (@proveedor, @fecha)
-      `);
+        INSERT INTO Compras (proveedor, fecha)
+        OUTPUT INSERTED.id
+        VALUES (@proveedor, @fecha)
+      `);
 
     const compraId = compraResult.recordset[0].id;
 
-    // 2. Iterar e insertar los detalles de la compra (sin cambios aquí)
     for (const p of productos) {
       request = transaction.request();
       await request
-        .input("compraId", compraId)
-        .input("nombre", p.nombre)
-        .input("cantidad", p.cantidad)
-        .input("precio", p.precio).query(`
-          INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
-          VALUES (@compraId, @nombre, @cantidad, @precio)
+        .input("compraId", sql.Int, compraId)
+        .input("nombre", sql.NVarChar, p.nombre)
+        .input("cantidad", sql.Int, p.cantidad)
+        .input("precio", sql.Decimal(10, 2), p.precio).query(`
+          INSERT INTO DetalleCompra (IdCompra, NombreProducto, Cantidad, Precio)
+          VALUES (@compraId, @nombre, @cantidad, @precio)
+        `);
+
+      request = transaction.request();
+      await request
+        .input("cantidad", sql.Int, p.cantidad)
+        .input("nombre", sql.NVarChar, p.nombre).query(`
+          UPDATE productos
+          SET stock = stock + @cantidad
+          WHERE nombre = @nombre
         `);
     }
 
-    // 3. Confirmar la transacción
     await transaction.commit();
 
-    res.status(200).json({ message: "Compra registrada correctamente" });
+    res
+      .status(200)
+      .json({ message: "Compra registrada y stock actualizado correctamente" });
   } catch (error) {
-    // 4. Si algo falla, revertir todo
     await transaction.rollback();
 
     console.error("Error al registrar la compra:", error);
@@ -67,19 +72,18 @@ router.get("/", async (req, res) => {
   try {
     const pool = await getPool();
     const comprasResult = await pool.query(`
-      SELECT 
-        C.id, 
-        C.proveedor, 
-        CONVERT(VARCHAR, C.fecha, 23) AS fecha, 
+      SELECT
+        C.id,
+        C.proveedor,
+        CONVERT(VARCHAR, C.fecha, 23) AS fecha,
         P.nombre AS proveedorNombre,
         C.estado
       FROM Compras C
       JOIN Proveedores P ON C.proveedor = P.id
       -- LÍNEA MODIFICADA --
-      ORDER BY C.fecha DESC, C.id DESC 
+      ORDER BY C.fecha DESC, C.id DESC
     `);
 
-    // El resto de la función se queda exactamente igual...
     const compras = comprasResult.recordset;
     for (let compra of compras) {
       const detallesResult = await pool.query`
@@ -200,9 +204,8 @@ router.put("/:id", async (req, res) => {
 
 router.put("/:id/estado", async (req, res) => {
   const { id } = req.params;
-  const { nuevoEstado } = req.body; // El frontend enviará el nuevo estado aquí
+  const { nuevoEstado } = req.body;
 
-  // Opcional: Validar que el nuevoEstado sea uno de los permitidos
   const estadosValidos = [
     "Pendiente",
     "Aprobada",

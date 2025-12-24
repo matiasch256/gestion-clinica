@@ -14,18 +14,16 @@ import RecentActivityCompras from "./../../../common/RecenActivityCompras";
 export const ComprasDashboard = () => {
   const navigate = useNavigate();
 
-  // 1. Definir estados para los datos y la carga
   const [dashboardData, setDashboardData] = useState({
     ordenesPendientes: 0,
     facturasRecientes: 0,
     stockCritico: 0,
     totalCompradoMes: 0,
-    listaOrdenesRecientes: [], // <-- NUEVO
-    listaStockCritico: [], // <-- NUEVO
+    listaOrdenesRecientes: [],
+    listaStockCritico: [],
   });
   const [loading, setLoading] = useState(true);
 
-  // 2. Usar useEffect para hacer la llamada a la API
   useEffect(() => {
     fetch("http://localhost:3000/api/dashboard/compras-metrics")
       .then((res) => res.json())
@@ -46,7 +44,6 @@ export const ComprasDashboard = () => {
     }).format(value);
   };
 
-  // 3. Renderizado condicional
   if (loading) {
     return (
       <>
@@ -65,7 +62,6 @@ export const ComprasDashboard = () => {
     );
   }
 
-  // 4. Usar los datos del estado en el componente
   return (
     <>
       <DashboardHeader />
@@ -74,7 +70,7 @@ export const ComprasDashboard = () => {
           {
             title: "Órdenes Pendientes",
             value: dashboardData.ordenesPendientes.toString(),
-            description: "órdenes en estado pendiente", // Descripción actualizada
+            description: "órdenes en estado pendiente",
             icon: ShoppingCartOutlinedIcon,
             color: "warning.main",
             bgColor: "#FFF8E1",

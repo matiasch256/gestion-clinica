@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -20,8 +20,10 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
+import { useAuth } from "../../context/authContext";
+import { ROLES } from "../../utils/roles";
 
-const drawerWidth = 262;
+const drawerWidth = 279;
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   width: "100%",
@@ -45,6 +47,30 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
   const [open, setOpen] = useState(true);
   const [iconHover, setIconHover] = useState(theme.palette.error.main);
   const [openMenu, setOpenMenu] = useState({});
+  const { user, logout } = useAuth();
+
+  const filteredMenuItems = useMemo(() => {
+    if (!user || !user.Rol) return [];
+
+    return menuItems
+      .filter((item) => {
+        if (!item.roles) return true;
+        return item.roles.includes(user.Rol);
+      })
+      .map((item) => {
+        if (!item.children) return item;
+
+        const visibleChildren = item.children.filter((child) => {
+          if (!child.roles) return true;
+
+          return child.roles.includes(user.Rol);
+        });
+
+        return { ...item, children: visibleChildren };
+      })
+
+      .filter((item) => !item.children || item.children.length > 0);
+  }, [menuItems, user]);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -58,64 +84,101 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
   };
 
   const handleLogout = () => {
-    // Paso 1: Borrar el token de autenticación del almacenamiento local
-    localStorage.removeItem("authToken");
-
-    // Paso 2: Redirigir al usuario a la página de login
-    navigate("/");
+    logout();
   };
 
+  const getAvatarInitial = () => {
+    if (!user || !user.Nombre) return "?";
+    const names = user.Nombre.split(" ");
+    if (names.length > 1 && names[1].length > 0) {
+      return `${names[0][0]}${names[1][0]}`.toUpperCase();
+    }
+    return user.Nombre[0].toUpperCase();
+  };
+
+  const getGreeting = () => {
+    if (!user) return "";
+
+    let greeting = "Bienvenido/a";
+
+    if (user.Genero === "Femenino") {
+      greeting = "Bienvenida";
+    } else if (user.Genero === "Masculino") {
+      greeting = "Bienvenido";
+    }
+
+    return `${greeting}, ${user.Nombre}`;
+  };
   return (
     <Box sx={{ display: "flex" }}>
-      <CssBaseline />
+            <CssBaseline />     
       <AppBar
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
+               
         <Toolbar>
+                   
           <Box sx={{ display: "flex", alignItems: "center" }}>
+                       
             <img
-              src="/logo-navbar-compacto.svg"
-              alt="Logo MC Solutions"
-              style={{ height: 45 }}
+              src="./icono.png"
+              alt="Logo Mc Solutions"
+              style={{ height: 45, marginRight: 10 }}
             />
+                       
             <IconButton
               color="inherit"
               aria-label="toggle drawer"
               onClick={handleDrawerToggle}
               edge="start"
               sx={{
-                ml: 4,
+                ml: 16,
                 bgcolor: "transparent !important",
                 "&:hover": { color: theme.palette.sidebar.active },
               }}
             >
-              <MenuIcon />
+              <MenuIcon sx={{ width: 24, height: 24 }} />           
             </IconButton>
+                     
           </Box>
+                   
           <Divider
             orientation="vertical"
             flexItem
-            sx={{ bgcolor: "divider.main" }}
+            sx={{ bgcolor: "divider.main", mx: 3.8 }}
           />
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ flexGrow: 1 }} />         
+          <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
+                       
             <Typography
-              variant="body2"
-              sx={{ mr: 2, color: theme.palette.text.primary }}
+              variant="subtitle2"
+              sx={{
+                mr: 2,
+                color: theme.palette.text.primary,
+                whiteSpace: "nowrap",
+              }}
             >
-              Bienvenido, Matias
+                            {getGreeting()}           
             </Typography>
-
-            <IconButton color="inherit" sx={{ p: 0 }}>
+                       
+            <IconButton
+              color="inherit"
+              sx={{ p: 0, bgcolor: "transparent !important" }}
+            >
+                           
               <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-                M
+                                {getAvatarInitial()}             
               </Avatar>
+                         
             </IconButton>
+                     
           </Box>
+                 
         </Toolbar>
+             
       </AppBar>
-
+           
       <Drawer
         sx={{
           width: drawerWidth,
@@ -124,6 +187,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
             width: drawerWidth,
             boxSizing: "border-box",
             mt: "64px",
+
             height: "calc(100% - 64px)",
             borderRight: `1px solid ${theme.palette.divider}`,
             backgroundColor: theme.palette.background.paper,
@@ -133,12 +197,15 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
         anchor="left"
         open={open}
       >
+               
         <DrawerHeader>
+                   
           <Typography variant="h6" sx={{ flexGrow: 1, ml: 2 }}>
-            Menú
+                        Menú          
           </Typography>
+                 
         </DrawerHeader>
-        <Divider />
+                <Divider />       
         <Box
           sx={{
             p: 2,
@@ -147,25 +214,32 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
             alignItems: "center",
           }}
         >
+                   
           <Avatar
             sx={{ width: 32, height: 32, mr: 2, bgcolor: "primary.main" }}
           >
-            M
+                        {getAvatarInitial()}         
           </Avatar>
+                   
           <Box>
+                       
             <Typography variant="subtitle1" fontWeight="bold">
-              Matias Chalave
+                            {user ? user.Nombre : "Cargando..."}           
             </Typography>
+                       
             <Typography variant="body2" color="text.secondary">
-              Administrador
+                            {user ? user.Rol : ""}           
             </Typography>
+                     
           </Box>
+                 
         </Box>
-        <Divider />
-
+                <Divider />       
         <List>
-          {menuItems.map((item, index) => (
+                   
+          {filteredMenuItems.map((item, index) => (
             <React.Fragment key={index}>
+                           
               {item.children ? (
                 <ListItem
                   disablePadding
@@ -180,6 +254,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                     },
                   }}
                 >
+                                   
                   <ListItemButton
                     onClick={() => handleSubMenuClick(item.text)}
                     sx={{
@@ -196,12 +271,14 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                       }),
                     }}
                   >
+                       
                     <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                      {item.icon}
+                          {item.icon}   
                     </ListItemIcon>
-                    <ListItemText primary={item.text} />
-                    {openMenu[item.text] ? <ExpandLess /> : <ExpandMore />}
+                        <ListItemText primary={item.text} />   
+                    {openMenu[item.text] ? <ExpandLess /> : <ExpandMore />}   
                   </ListItemButton>
+                     
                 </ListItem>
               ) : (
                 <ListItem
@@ -217,6 +294,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                     },
                   }}
                 >
+                     
                   <ListItemButton
                     onClick={() => handleMenuClick(item.path)}
                     selected={location.pathname === item.path}
@@ -233,16 +311,21 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                       },
                     }}
                   >
+                       
                     <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                      {item.icon}
+                          {item.icon}   
                     </ListItemIcon>
-                    <ListItemText primary={item.text} />
+                        <ListItemText primary={item.text} />   
                   </ListItemButton>
+                     
                 </ListItem>
               )}
+                 
               {item.children && (
                 <Collapse in={openMenu[item.text]} timeout="auto" unmountOnExit>
+                     
                   <List component="div" disablePadding>
+                       
                     {item.children.map((child, i) => (
                       <ListItem
                         key={i}
@@ -258,6 +341,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                           },
                         }}
                       >
+                           
                         <ListItemButton
                           sx={{
                             pl: 4,
@@ -275,6 +359,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                           selected={location.pathname === child.path}
                           onClick={() => handleMenuClick(child.path)}
                         >
+                             
                           {child.icon && (
                             <ListItemIcon
                               sx={{
@@ -283,21 +368,27 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                                   : theme.palette.text.secondary,
                               }}
                             >
-                              {child.icon}
+                                  {child.icon}   
                             </ListItemIcon>
                           )}
-                          <ListItemText primary={child.text} />
+                              <ListItemText primary={child.text} />   
                         </ListItemButton>
+                           
                       </ListItem>
                     ))}
+                       
                   </List>
+                     
                 </Collapse>
               )}
+                 
             </React.Fragment>
           ))}
+           
         </List>
-        <Divider />
+          <Divider /> 
         <List>
+             
           <ListItem
             disablePadding
             sx={{
@@ -311,6 +402,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
               },
             }}
           >
+               
             <ListItemButton
               onClick={() => handleMenuClick("/perfil")}
               selected={location.pathname === "/perfil"}
@@ -327,19 +419,27 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                 },
               }}
             >
+                 
               <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
+                   
                 <IconButton color="inherit" sx={{ p: 0 }}>
+                     
                   <Avatar
                     sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
                   >
-                    M
+                        {getAvatarInitial()}   
                   </Avatar>
+                     
                 </IconButton>
+                   
               </ListItemIcon>
-              <ListItemText primary="Mi Perfil" />
+                  <ListItemText primary="Mi Perfil" />   
             </ListItemButton>
+               
           </ListItem>
+             
           <ListItem disablePadding>
+               
             <ListItemButton
               onMouseEnter={() =>
                 setIconHover(theme.palette.error.contrastText)
@@ -352,20 +452,26 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
                 },
               }}
             >
+                 
               <ListItemIcon>
-                <LogoutIcon sx={{ color: iconHover }} />
+                    <LogoutIcon sx={{ color: iconHover }} />   
               </ListItemIcon>
+                 
               <ListItemText primary="Cerrar Sesión" sx={{ color: iconHover }} />
+                 
             </ListItemButton>
+             
           </ListItem>
+           
         </List>
+         
       </Drawer>
+       
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-
           transition: theme.transitions.create("margin", {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -380,9 +486,10 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           }),
         }}
       >
-        <Toolbar />
-        <Outlet />
+            <Toolbar />
+            <Outlet /> 
       </Box>
+       
     </Box>
   );
 }

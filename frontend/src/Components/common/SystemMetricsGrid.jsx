@@ -5,10 +5,8 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 const SystemMetricsGrid = ({ systemMetrics }) => {
   return (
     <Grid container spacing={2} sx={{ pt: 3 }}>
-      {" "}
       {systemMetrics.map((metric, index) => (
         <Grid key={index} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-          {" "}
           <Card
             sx={{
               transition: "box-shadow 0.3s ease-in-out",
@@ -16,14 +14,12 @@ const SystemMetricsGrid = ({ systemMetrics }) => {
             }}
           >
             <CardContent sx={{ p: 3 }}>
-              {" "}
               <Box
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
               >
                 <Box display="flex" flexDirection="column" gap={1}>
-                  {" "}
                   <Typography variant="body2" color="text.primary">
                     {metric.title}
                   </Typography>
@@ -31,7 +27,6 @@ const SystemMetricsGrid = ({ systemMetrics }) => {
                     {metric.value}
                   </Typography>
                   <Box display="flex" alignItems="center" gap={0.5}>
-                    {" "}
                     {metric.trending === "up" && (
                       <TrendingUpIcon
                         sx={{ fontSize: "12px", color: "#4caf50" }}
@@ -52,7 +47,7 @@ const SystemMetricsGrid = ({ systemMetrics }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <metric.icon sx={{ fontSize: "20px", color: metric.color }} />{" "}
+                  <metric.icon sx={{ fontSize: "20px", color: metric.color }} />
                 </Box>
               </Box>
               <Typography variant="body2" color="text.secondary">

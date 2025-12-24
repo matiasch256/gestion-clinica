@@ -17,18 +17,16 @@ import { useNavigate } from "react-router-dom";
 const StockAlertWidget = ({ productos, showActionButton = false }) => {
   const navigate = useNavigate();
 
-  // Calcular el estado de cada producto
   const getStockStatus = (stock, stockMinimo) => {
     if (stock <= stockMinimo) {
-      return { color: "#d32f2f", label: "Bajo" }; // Rojo
+      return { color: "#d32f2f", label: "Bajo" };
     } else if (stock <= stockMinimo * 1.1) {
-      return { color: "#f57c00", label: "Cercano al límite" }; // Naranja
+      return { color: "#f57c00", label: "Cercano al límite" };
     } else {
-      return { color: "#2e7d32", label: "OK" }; // Verde
+      return { color: "#2e7d32", label: "OK" };
     }
   };
 
-  // Contar productos por estado
   const stockSummary = productos.reduce(
     (acc, producto) => {
       const status = getStockStatus(producto.stock, producto.stockMinimo);
@@ -40,7 +38,6 @@ const StockAlertWidget = ({ productos, showActionButton = false }) => {
     { verde: 0, naranja: 0, rojo: 0 }
   );
 
-  // Filtrar productos en riesgo (naranja y rojo)
   const productosEnRiesgo = productos.filter(
     (producto) =>
       getStockStatus(producto.stock, producto.stockMinimo).label !== "OK"

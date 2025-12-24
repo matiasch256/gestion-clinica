@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 import {
   Table,
   TableBody,
-  TableHead,
   TableRow,
   TableCell,
   TableContainer,
@@ -14,50 +14,35 @@ import {
   Skeleton,
   TextField,
   TablePagination,
+  Grid,
+  InputAdornment,
   Chip,
-  Menu,
-  MenuItem,
   IconButton,
-  ListItemIcon,
-  ListItemText,
-  FormControl,
-  InputLabel,
-  Select,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
+  Tooltip,
+  TableHead,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import FilterListIcon from "@mui/icons-material/FilterList";
+
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import ReplayIcon from "@mui/icons-material/Replay";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-const estadosDeCompra = [
-  "Pendiente",
-  "Aprobada",
-  "Pedido",
-  "Completada",
-  "Cancelada",
-];
 
 export default function ListaCompras() {
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const [compras, setCompras] = useState([]);
   const [filteredCompras, setFilteredCompras] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,57 +56,70 @@ export default function ListaCompras() {
     proveedor: "",
     estado: "",
   });
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedCompraId, setSelectedCompraId] = useState(null);
 
-  const [dialog, setDialog] = useState({
-    open: false,
-    title: "",
-    message: "",
-    isError: false,
-  });
-
-  const navigate = useNavigate();
-
-  const handleMenuClick = (event, compraId) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedCompraId(compraId);
+  const convertirFechaArgentinaAISO = (fechaArgentina) => {
+    if (!fechaArgentina) return "";
+    const partes = fechaArgentina.split("-");
+    if (partes.length === 3) {
+      const [dia, mes, año] = partes;
+      return `${año}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+    }
+    return "";
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedCompraId(null);
+  const convertirFechaISOAArgentina = (fechaISO) => {
+    if (!fechaISO) return "";
+    const partes = fechaISO.split("-");
+    if (partes.length === 3) {
+      const [año, mes, dia] = partes;
+      return `${dia}-${mes}-${año}`;
+    }
+    return "";
   };
 
-  const handleCloseDialog = () => {
-    setDialog({ ...dialog, open: false });
+  const getStatusColor = (estado) => {
+    if (!estado) return "default";
+    const status = estado.toLowerCase();
+    if (status === "aprobada" || status === "activo" || status === "completada")
+      return "success";
+    if (status === "pendiente") return "warning";
+    if (
+      status === "cancelada" ||
+      status === "inactivo" ||
+      status === "eliminada"
+    )
+      return "error";
+    return "default";
   };
 
-  const fetchCompras = () => {
-    setLoading(true);
+  useEffect(() => {
     fetch("http://localhost:3000/api/compras")
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         setCompras(data);
         setFilteredCompras(data);
+        setLoading(false);
       })
-      .catch((err) => console.error("Error al cargar compras:", err))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchCompras();
+      .catch((err) => {
+        console.error("Error al cargar compras:", err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
-    let result = compras;
-
+    let result = [...compras];
     if (filters.fecha) {
-      result = result.filter(
-        (compra) => compra.fecha && compra.fecha.startsWith(filters.fecha)
-      );
+      result = result.filter((compra) => {
+        if (!compra.fecha) return false;
+        const fechaCompraISO = convertirFechaArgentinaAISO(compra.fecha);
+        return fechaCompraISO === convertirFechaArgentinaAISO(filters.fecha);
+      });
     }
     if (filters.proveedor) {
       result = result.filter((compra) =>
@@ -130,50 +128,31 @@ export default function ListaCompras() {
           .includes(filters.proveedor.toLowerCase())
       );
     }
-
-    // LÓGICA DE FILTRO POR ESTADO (CORREGIDA)
-    // Si se selecciona un estado, filtra por ese estado exacto.
-    // Si el filtro de estado está vacío ("Todos"), no se aplica este filtro.
     if (filters.estado) {
-      result = result.filter((compra) => compra.estado === filters.estado);
+      result = result.filter(
+        (compra) =>
+          compra.estado?.toLowerCase() === filters.estado.toLowerCase()
+      );
     }
-
     setFilteredCompras(result);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, compras]);
 
-  const handleEliminar = (id) => {
-    handleOpenConfirmationDialog(
-      "Confirmar Eliminación",
-      "¿Estás seguro de que querés eliminar esta compra? Esta acción no se puede deshacer.",
-      async () => {
-        // Esta es la función que se ejecutará si el usuario confirma
-        try {
-          const res = await fetch(`http://localhost:3000/api/compras/${id}`, {
-            method: "DELETE",
-          });
-          if (res.ok) {
-            setNotificationDialog({
-              open: true,
-              title: "Éxito",
-              message: "La compra ha sido eliminada.",
-              isError: false,
-            });
-            setCompras((prev) => prev.filter((c) => c.id !== id));
-          } else {
-            const errorData = await res.json();
-            throw new Error(errorData.details || "No se pudo eliminar.");
-          }
-        } catch (err) {
-          setNotificationDialog({
-            open: true,
-            title: "Error",
-            message: err.message,
-            isError: true,
-          });
-        }
+  const handleEliminar = async (id) => {
+    if (!window.confirm("¿Estás seguro de que querés eliminar esta compra?"))
+      return;
+    try {
+      const res = await fetch(`http://localhost:3000/api/compras/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        alert("Compra eliminada correctamente");
+        setCompras((prev) => prev.filter((c) => c.id !== id));
+      } else {
+        alert("Error al eliminar la compra");
       }
-    );
+    } catch (err) {
+      alert("Error en el servidor");
+    }
   };
 
   const handleTempFilterChange = (e) => {
@@ -186,512 +165,470 @@ export default function ListaCompras() {
     setPage(0);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const limpiarFiltros = () => {
+    const emptyFilters = { fecha: "", proveedor: "", estado: "" };
+    setTempFilters(emptyFilters);
+    setFilters(emptyFilters);
+    setPage(0);
   };
 
+  const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const limpiarFiltros = () => {
-    const initialFilters = { fecha: "", proveedor: "", estado: "" };
-    setTempFilters(initialFilters);
-    setFilters(initialFilters);
-    setPage(0);
-  };
-
-  const [notificationDialog, setNotificationDialog] = useState({
-    open: false,
-    title: "",
-    message: "",
-    isError: false,
-  });
-
-  // --- NUEVO ESTADO PARA EL DIÁLOGO DE CONFIRMACIÓN ---
-  const [confirmationDialog, setConfirmationDialog] = useState({
-    open: false,
-    title: "",
-    message: "",
-    onConfirm: () => {},
-  });
-  const getStatusChip = (estado) => {
-    let color;
-    switch (estado) {
-      case "Pendiente":
-        color = "warning";
-        break;
-      case "Aprobada":
-        color = "info";
-        break;
-      case "Pedido":
-        color = "primary";
-        break;
-      case "Completada":
-        color = "success";
-        break;
-      case "Cancelada":
-        color = "error";
-        break;
-      default:
-        color = "default";
-    }
-    return <Chip label={estado || "N/A"} color={color} size="small" />;
-  };
-
-  const handleChangeStatus = (id, nuevoEstado) => {
-    handleMenuClose();
-    handleOpenConfirmationDialog(
-      "Confirmar Cambio de Estado",
-      `¿Estás seguro de que querés cambiar el estado a "${nuevoEstado}"?`,
-      async () => {
-        // La función a ejecutar en la confirmación
-        try {
-          const res = await fetch(
-            `http://localhost:3000/api/compras/${id}/estado`,
-            {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ nuevoEstado }),
-            }
-          );
-          if (res.ok) {
-            setNotificationDialog({
-              open: true,
-              title: "Estado Actualizado",
-              message: `La compra ahora es: ${nuevoEstado}`,
-              isError: false,
-            });
-            setCompras((prev) =>
-              prev.map((c) => (c.id === id ? { ...c, estado: nuevoEstado } : c))
-            );
-          } else {
-            const errorData = await res.json();
-            throw new Error(errorData.details || "No se pudo actualizar.");
-          }
-        } catch (err) {
-          setNotificationDialog({
-            open: true,
-            title: "Error",
-            message: err.message,
-            isError: true,
-          });
-        }
-      }
-    );
-  };
-
   const getPaginatedCompras = () => {
     const startIndex = page * rowsPerPage;
-    return filteredCompras.slice(startIndex, startIndex + rowsPerPage);
+    const endIndex = startIndex + rowsPerPage;
+    return filteredCompras.slice(startIndex, endIndex);
   };
 
   const exportToExcel = () => {
     const worksheetData = filteredCompras.map((compra) => ({
-      Fecha: new Date(compra.fecha).toLocaleDateString(),
+      Fecha: convertirFechaISOAArgentina(compra.fecha),
       "Nro Compra": compra.id,
       Proveedor: compra.proveedorNombre,
-      Total: compra.productos.reduce(
-        (acc, p) => acc + p.Cantidad * p.Precio,
-        0
-      ),
-      Estado: compra.estado,
+      Total: `$${compra.productos
+        .reduce((acc, p) => acc + p.Cantidad * p.Precio, 0)
+        .toFixed(2)}`,
+      Estado: compra.estado || "activo",
     }));
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-
-    // Asignar formato de moneda a la columna Total (D)
-    Object.keys(worksheet).forEach((cell) => {
-      if (cell.startsWith("D") && cell !== "D1") {
-        // D1 es el encabezado
-        worksheet[cell].t = "n"; // tipo numérico
-        worksheet[cell].z = "$#,##0.00"; // formato de moneda
-      }
-    });
-
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Lista de Compras");
     XLSX.writeFile(workbook, "Lista_de_Compras.xlsx");
   };
+
   const exportToPDF = () => {
     const doc = new jsPDF();
     const tableColumn = ["Fecha", "Nro Compra", "Proveedor", "Total", "Estado"];
     const tableRows = filteredCompras.map((compra) => [
-      new Date(compra.fecha).toLocaleDateString(),
+      convertirFechaISOAArgentina(compra.fecha),
       compra.id,
       compra.proveedorNombre,
       `$${compra.productos
         .reduce((acc, p) => acc + p.Cantidad * p.Precio, 0)
         .toFixed(2)}`,
-      compra.estado,
+      compra.estado || "activo",
     ]);
-
     doc.text("Lista de Compras", 14, 15);
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
-    });
+    autoTable(doc, { head: [tableColumn], body: tableRows, startY: 20 });
     doc.save("Lista_de_Compras.pdf");
   };
 
-  const handleOpenConfirmationDialog = (title, message, onConfirm) => {
-    setConfirmationDialog({ open: true, title, message, onConfirm });
-  };
-
-  const handleCloseConfirmationDialog = () => {
-    setConfirmationDialog({ ...confirmationDialog, open: false });
-  };
-
-  const handleConfirmAction = () => {
-    if (confirmationDialog.onConfirm) {
-      confirmationDialog.onConfirm();
-    }
-    handleCloseConfirmationDialog();
-  };
-
-  const handleCloseNotificationDialog = () => {
-    setNotificationDialog({ ...notificationDialog, open: false });
-  };
-
-  const selectedCompra = compras.find((c) => c.id === selectedCompraId);
-
   return (
-    <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
-      <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-        Lista de Compras
-      </Typography>
-
-      {/* --- SECCIÓN DE FILTROS Y EXPORTACIÓN (SIN CAMBIOS) --- */}
-      <Box>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography component="span">Filtros</Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ mt: 3 }}>
-            <Paper elevation={0} sx={{ p: 2, mb: 1 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 4,
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                }}
-              >
-                <TextField
-                  label="Fecha"
-                  type="date"
-                  name="fecha"
-                  value={tempFilters.fecha}
-                  onChange={handleTempFilterChange}
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ minWidth: 200 }}
-                />
-                <TextField
-                  type="input"
-                  label="Proveedor"
-                  name="proveedor"
-                  value={tempFilters.proveedor}
-                  onChange={handleTempFilterChange}
-                  sx={{ minWidth: 200 }}
-                  variant="outlined"
-                />
-                {/* FILTRO POR ESTADO (AHORA ACTIVADO Y CORRECTO) */}
-                <FormControl sx={{ minWidth: 200 }}>
-                  <InputLabel>Estado</InputLabel>
-                  <Select
-                    name="estado"
-                    value={tempFilters.estado}
-                    onChange={handleTempFilterChange}
-                    label="Estado"
-                  >
-                    <MenuItem value="">
-                      <em>Todos</em>
-                    </MenuItem>
-                    {estadosDeCompra.map((estado) => (
-                      <MenuItem key={estado} value={estado}>
-                        {estado}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box
-                sx={{
-                  mt: 3,
-                  display: "flex",
-                  gap: 2,
-                  justifyContent: "flex-end",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<SearchIcon />}
-                  onClick={aplicarFiltros}
-                >
-                  Buscar
-                </Button>
-                <Button variant="outlined" onClick={limpiarFiltros}>
-                  Limpiar Filtros
-                </Button>
-              </Box>
-            </Paper>
-          </AccordionDetails>
-        </Accordion>
-      </Box>
-
-      <Box
+    <Box sx={{ padding: 3, width: "100%" }}>
+      <Paper
+        elevation={0}
         sx={{
-          display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
-          alignItems: "center",
-          mb: 2,
-          mt: 2,
+          p: 4,
+          borderRadius: 3,
+          bgcolor: theme.palette.background.default,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
         }}
       >
-        <Box sx={{ flexGrow: 1 }} />
-        <Button variant="outlined" color="primary" onClick={exportToExcel}>
-          Exportar a Excel
-        </Button>
-        <Button variant="outlined" color="secondary" onClick={exportToPDF}>
-          Exportar a PDF
-        </Button>
-      </Box>
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            mb: 4,
+            fontWeight: "700",
+            color: theme.palette.text.primary,
+            borderLeft: `5px solid ${theme.palette.primary.main}`,
+            paddingLeft: 2,
+          }}
+        >
+          Lista de Compras
+        </Typography>
 
-      {/* --- TABLA DE COMPRAS CON LÓGICA FINAL --- */}
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Fecha</TableCell>
-              <TableCell>Nro Compra</TableCell>
-              <TableCell>Proveedor</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell sx={{ minWidth: 180 }}>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: rowsPerPage }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell colSpan={6}>
-                    <Skeleton variant="text" />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : getPaginatedCompras().length > 0 ? (
-              getPaginatedCompras().map((compra) => (
-                <TableRow key={compra.id}>
-                  <TableCell>
-                    {(() => {
-                      // La fecha viene como "YYYY-MM-DD"
-                      const parts = compra.fecha.split("-");
-                      // Creamos la fecha en UTC para evitar que el navegador la ajuste a la zona horaria local
-                      const date = new Date(
-                        Date.UTC(parts[0], parts[1] - 1, parts[2])
-                      );
-                      // La mostramos en formato local pero basado en la fecha UTC
-                      return date.toLocaleDateString("es-AR", {
-                        timeZone: "UTC",
-                      });
-                    })()}
-                  </TableCell>
-                  <TableCell>{compra.id}</TableCell>
-                  <TableCell>{compra.proveedorNombre}</TableCell>
-                  <TableCell>
-                    $
-                    {compra.productos
-                      .reduce((acc, p) => acc + p.Cantidad * p.Precio, 0)
-                      .toFixed(2)}
-                  </TableCell>
-                  <TableCell>{getStatusChip(compra.estado)}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        startIcon={<VisibilityIcon />}
-                        onClick={() =>
-                          navigate(`/compras/detalle/${compra.id}`)
-                        }
-                      >
-                        Ver
-                      </Button>
+        <Box
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 2,
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1 }}>
+            <FilterListIcon color="action" />
+            <Typography
+              variant="subtitle2"
+              fontWeight="bold"
+              color="text.secondary"
+            >
+              Filtros de Búsqueda
+            </Typography>
+          </Box>
 
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        startIcon={<DeleteIcon />}
-                        disabled={["Completada", "Cancelada"].includes(
-                          compra.estado
-                        )}
-                        onClick={() => handleEliminar(compra.id)}
-                      >
-                        Eliminar
-                      </Button>
+          <Grid container spacing={3} alignItems="center">
+            <Grid size={{ xs: 12, md: 3 }}>
+              <TextField
+                label="Fecha"
+                type="date"
+                name="fecha"
+                fullWidth
+                size="small"
+                value={tempFilters.fecha}
+                onChange={handleTempFilterChange}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ bgcolor: theme.palette.background.default }}
+              />
+            </Grid>
 
-                      {/* AHORA EL IconButton SIEMPRE SE RENDERIZA */}
-                      <IconButton
-                        aria-label="más opciones"
-                        onClick={(e) => handleMenuClick(e, compra.id)}
-                        size="small"
-                      >
-                        <MoreVertIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  No se encontraron compras.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          component="div"
-          count={filteredCompras.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Filas por página:"
-        />
-      </TableContainer>
+            <Grid size={{ xs: 12, md: 5 }}>
+              <TextField
+                type="text"
+                label="Buscar Proveedor"
+                name="proveedor"
+                fullWidth
+                size="small"
+                value={tempFilters.proveedor}
+                onChange={handleTempFilterChange}
+                sx={{
+                  bgcolor: theme.palette.background.default,
 
-      {/* --- MENÚ ÚNICO Y COMPARTIDO (CON LÓGICA FINAL) --- */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        {selectedCompra?.estado === "Pendiente" && [
-          <MenuItem
-            key="approve"
-            onClick={() => handleChangeStatus(selectedCompra.id, "Aprobada")}
-          >
-            <ListItemIcon>
-              <ThumbUpIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Aprobar</ListItemText>
-          </MenuItem>,
-          <MenuItem
-            key="edit"
-            onClick={() => {
-              navigate(`/compras/modificar/${selectedCompra.id}`);
-              handleMenuClose();
+                  "& .MuiOutlinedInput-root": {
+                    paddingLeft: "8px",
+                    "& input": {
+                      paddingLeft: "8px",
+                      borderLeft: "none !important",
+                    },
+                  },
+                }}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start" sx={{ mr: 0 }}>
+                        <SearchIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid
+              size={{ xs: 12, md: 4 }}
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: { xs: "flex-start", md: "flex-end" },
+              }}
+            >
+              <Button
+                variant="contained"
+                startIcon={<SearchIcon />}
+                onClick={aplicarFiltros}
+                sx={{
+                  color: theme.palette.primary.contrastText,
+                  bgcolor: theme.palette.primary.main,
+
+                  fontWeight: "bold",
+                  boxShadow: "none",
+                  "&:hover": {
+                    bgcolor: theme.palette.primary.main.hover,
+                    boxShadow: "none",
+                  },
+                }}
+              >
+                Buscar
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<FilterAltOffIcon />}
+                onClick={limpiarFiltros}
+                sx={{
+                  color: theme.palette.text.secondary,
+                  borderColor: theme.palette.divider,
+                  bgcolor: theme.palette.background.default,
+                  "&:hover": {
+                    borderColor: theme.palette.text.primary,
+                    bgcolor: "rgba(0, 0, 0, 0.04)",
+                  },
+                }}
+              >
+                Limpiar
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Box
+          sx={{ display: "flex", gap: 2, mb: 3, justifyContent: "flex-end" }}
+        >
+          <Button
+            variant="outlined"
+            startIcon={<DescriptionIcon />}
+            onClick={exportToExcel}
+            sx={{
+              color: theme.palette.accent.green,
+              borderColor: theme.palette.accent.green,
+              bgcolor: theme.palette.background.default,
+              fontWeight: "bold",
+              "&:hover": {
+                bgcolor: `${theme.palette.accent.green}10`,
+                borderColor: theme.palette.accent.green,
+              },
             }}
           >
-            <ListItemIcon>
-              <EditIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Editar</ListItemText>
-          </MenuItem>,
-          <MenuItem
-            key="cancel"
-            onClick={() => handleChangeStatus(selectedCompra.id, "Cancelada")}
-          >
-            <ListItemIcon>
-              <CancelIcon fontSize="small" color="error" />
-            </ListItemIcon>
-            <ListItemText>Cancelar</ListItemText>
-          </MenuItem>,
-        ]}
-
-        {selectedCompra?.estado === "Aprobada" && [
-          <MenuItem
-            key="order"
-            onClick={() => handleChangeStatus(selectedCompra.id, "Pedido")}
-          >
-            <ListItemIcon>
-              <LocalShippingIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Ordenar</ListItemText>
-          </MenuItem>,
-          <MenuItem
-            key="cancel"
-            onClick={() => handleChangeStatus(selectedCompra.id, "Cancelada")}
-          >
-            <ListItemIcon>
-              <CancelIcon fontSize="small" color="error" />
-            </ListItemIcon>
-            <ListItemText>Cancelar</ListItemText>
-          </MenuItem>,
-        ]}
-
-        {selectedCompra?.estado === "Pedido" && (
-          <MenuItem
-            onClick={() => handleChangeStatus(selectedCompra.id, "Completada")}
-          >
-            <ListItemIcon>
-              <CheckCircleIcon fontSize="small" color="success" />
-            </ListItemIcon>
-            <ListItemText>Marcar Completada</ListItemText>
-          </MenuItem>
-        )}
-
-        {(selectedCompra?.estado === "Completada" ||
-          selectedCompra?.estado === "Cancelada") && (
-          <MenuItem
-            onClick={() => handleChangeStatus(selectedCompra.id, "Pendiente")}
-          >
-            <ListItemIcon>
-              <ReplayIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Reabrir Compra</ListItemText>
-          </MenuItem>
-        )}
-      </Menu>
-      <Dialog
-        open={notificationDialog.open}
-        onClose={handleCloseNotificationDialog}
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          {notificationDialog.isError ? (
-            <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
-          ) : (
-            <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
-          )}
-          {notificationDialog.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>{notificationDialog.message}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseNotificationDialog} autoFocus>
-            Aceptar
+            Exportar Excel
           </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* --- NUEVO DIÁLOGO DE CONFIRMACIÓN --- */}
-      <Dialog
-        open={confirmationDialog.open}
-        onClose={handleCloseConfirmationDialog}
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          <HelpOutlineIcon color="primary" sx={{ mr: 1 }} />
-          {confirmationDialog.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>{confirmationDialog.message}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirmationDialog}>Cancelar</Button>
-          <Button onClick={handleConfirmAction} variant="contained" autoFocus>
-            Confirmar
+          <Button
+            variant="outlined"
+            startIcon={<PictureAsPdfIcon />}
+            onClick={exportToPDF}
+            sx={{
+              color: theme.palette.error.main,
+              borderColor: theme.palette.error.main,
+              bgcolor: theme.palette.background.default,
+              fontWeight: "bold",
+              "&:hover": {
+                bgcolor: theme.palette.background.redlighter,
+                borderColor: theme.palette.error.main,
+              },
+            }}
+          >
+            Exportar PDF
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 2,
+            overflowX: "auto",
+          }}
+        >
+          <Table>
+            <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
+              <TableRow>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  Fecha
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  Nro Compra
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  Proveedor
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  Total
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  Estado
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    color: theme.palette.text.secondary,
+                    textAlign: "center",
+                  }}
+                >
+                  Acciones
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                Array.from({ length: rowsPerPage }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton variant="text" width="80%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="60%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="90%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="70%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="60%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="rectangular" width={100} height={36} />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : getPaginatedCompras().length > 0 ? (
+                getPaginatedCompras().map((compra) => {
+                  const total = compra.productos.reduce(
+                    (acc, p) => acc + p.Cantidad * p.Precio,
+                    0
+                  );
+
+                  return (
+                    <TableRow key={compra.id} hover>
+                      <TableCell>
+                        {convertirFechaISOAArgentina(compra.fecha)}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        #{compra.id}
+                      </TableCell>
+                      <TableCell>{compra.proveedorNombre}</TableCell>
+                      <TableCell
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        ${total.toFixed(2)}
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <Chip
+                          label={compra.estado || "Activo"}
+                          color={getStatusColor(compra.estado || "Activo")}
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                            fontWeight: "bold",
+                            minWidth: "80px",
+                            bgcolor: theme.palette.background.default,
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: 1,
+                          }}
+                        >
+                          <Tooltip title="Ver Detalle">
+                            <IconButton
+                              onClick={() =>
+                                navigate(`/compras/detalle/${compra.id}`)
+                              }
+                              sx={{
+                                color: theme.palette.primary.main,
+                                backgroundColor:
+                                  theme.palette.background.trasparent,
+
+                                "&:hover": {
+                                  backgroundColor:
+                                    theme.palette.background.trasparent,
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title="Editar">
+                            <IconButton
+                              onClick={() =>
+                                navigate(`/compras/modificar/${compra.id}`)
+                              }
+                              sx={{
+                                color: theme.palette.accent.orange || "#fd7e14",
+                                backgroundColor: "transparent !important",
+                                "&:hover": {
+                                  backgroundColor: "transparent !important",
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip title="Eliminar">
+                            <IconButton
+                              onClick={() => handleEliminar(compra.id)}
+                              sx={{
+                                color: theme.palette.error.main,
+                                backgroundColor: "transparent !important",
+                                "&:hover": {
+                                  backgroundColor: "transparent !important",
+                                  color: "#c82333",
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    align="center"
+                    sx={{ py: 3, color: theme.palette.text.secondary }}
+                  >
+                    {filters.fecha || filters.proveedor || filters.estado
+                      ? "No se encontraron compras con los filtros aplicados."
+                      : "No hay compras registradas."}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 50]}
+            component="div"
+            count={filteredCompras.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Filas por página:"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
+            }
+            sx={{
+              "& .MuiTablePagination-actions > button": {
+                backgroundColor: theme.palette.background.trasparent,
+                "&:hover": {
+                  backgroundColor: theme.palette.background.trasparent,
+                },
+              },
+            }}
+          />
+        </TableContainer>
+      </Paper>
     </Box>
   );
 }

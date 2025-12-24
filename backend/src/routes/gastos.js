@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     }
     if (periodo?.trim() === "mensual") {
       query = `
-        SELECT 
+        SELECT
           FORMAT(C.fecha, 'yyyy-MM') AS periodo,
           SUM(DC.Precio * DC.Cantidad) AS total_gastado
         FROM Compras C
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
       `;
     } else if (periodo?.trim() === "trimestral") {
       query = `
-        SELECT 
+        SELECT
           CONCAT(YEAR(C.fecha), '-Q', DATEPART(QUARTER, C.fecha)) AS periodo,
           SUM(DC.Precio * DC.Cantidad) AS total_gastado
         FROM Compras C
@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
       `;
     } else if (periodo?.trim() === "anual") {
       query = `
-        SELECT 
+        SELECT
           CAST(YEAR(C.fecha) AS NVARCHAR) AS periodo,
           SUM(DC.Precio * DC.Cantidad) AS total_gastado
         FROM Compras C

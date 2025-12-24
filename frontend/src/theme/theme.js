@@ -4,8 +4,8 @@ import palette from "./palette";
 export const getTheme = () =>
   createTheme({
     palette: {
-      mode: "light", // Fijamos el modo claro
-      ...palette, // Usamos directamente la paleta
+      mode: "light",
+      ...palette,
     },
     typography: {
       fontFamily: "'Roboto', sans-serif !important",

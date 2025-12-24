@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-// componentes de gráficos
 import { BarChart } from "@mui/x-charts/BarChart";
 import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
 import { LineChart } from "@mui/x-charts/LineChart";
@@ -17,7 +16,6 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 
 const ComprasReportes = () => {
-  // Estados para el primer contenedor (gastos)
   const [periodo, setPeriodo] = useState("anual");
   const [startYear, setStartYear] = useState("2022");
   const [endYear, setEndYear] = useState("2025");
@@ -26,7 +24,6 @@ const ComprasReportes = () => {
   const [loading, setLoading] = useState(true);
   const [chartType, setChartType] = useState("bar");
 
-  // Estados para el segundo contenedor (productos más comprados)
   const [productLabels, setProductLabels] = useState([]);
   const [productValues, setProductValues] = useState([]);
   const [productLoading, setProductLoading] = useState(true);
@@ -34,12 +31,10 @@ const ComprasReportes = () => {
   const [topN, setTopN] = useState(5);
   const [productPeriod, setProductPeriod] = useState("anual");
 
-  // Referencia para el segundo contenedor
   const secondContainerRef = useRef(null);
 
   const years = ["2022", "2023", "2024", "2025"];
 
-  // Validación de años
   useEffect(() => {
     if (parseInt(endYear) < parseInt(startYear)) {
       setEndYear(startYear);
@@ -49,7 +44,6 @@ const ComprasReportes = () => {
     }
   }, [startYear, endYear]);
 
-  // Carga de datos para gastos (primer contenedor)
   useEffect(() => {
     setLoading(true);
     fetch(
@@ -81,7 +75,6 @@ const ComprasReportes = () => {
       });
   }, [periodo, startYear, endYear]);
 
-  // Carga de datos para productos más comprados (segundo contenedor)
   useEffect(() => {
     setProductLoading(true);
     setProductLabels([]);
@@ -101,18 +94,15 @@ const ComprasReportes = () => {
       });
   }, [topN, productPeriod]);
 
-  // Mantener el scroll en el segundo contenedor al cambiar topN o productPeriod
   useEffect(() => {
     if (secondContainerRef.current) {
       secondContainerRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [topN, productPeriod]);
 
-  // Formateador de valores para cantidades (sin moneda)
   const quantityFormatter = (value) =>
     value.toLocaleString("es-AR", { style: "decimal" });
 
-  // Preparación de datos para el gráfico de torta (segundo contenedor)
   const productPieData = productLabels.map((label, index) => ({
     id: index,
     value: productValues[index] || 0,
@@ -121,7 +111,6 @@ const ComprasReportes = () => {
 
   return (
     <>
-      {/* Primer contenedor: Reporte de Gastos */}
       <Container maxWidth="xl">
         <Grid container spacing={5} my={5}>
           <Grid size={12}>
@@ -311,7 +300,6 @@ const ComprasReportes = () => {
         </Grid>
       </Container>
 
-      {/* Segundo contenedor: Reporte de Productos más comprados */}
       <Container maxWidth="xl" ref={secondContainerRef}>
         <Grid container spacing={5} my={5}>
           <Grid size={12}>

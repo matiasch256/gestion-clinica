@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Button,
@@ -15,6 +14,7 @@ import {
   Box,
   Container,
 } from "@mui/material";
+import { useAuth } from "../../../context/authContext";
 
 export function Form() {
   const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ export function Form() {
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const validate = () => {
     const newErrors = {};
@@ -48,17 +48,12 @@ export function Form() {
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-
-    // Si el campo está vacío al salir, no mostramos error.
-    // Dejamos esa responsabilidad al botón de submit.
     if (!value) {
       const newErrors = { ...errors };
       delete newErrors[name];
       setErrors(newErrors);
       return;
     }
-
-    // Si hay valor, validamos solo ese campo
     const validationErrors = validate();
     if (validationErrors[name]) {
       setErrors((prev) => ({ ...prev, [name]: validationErrors[name] }));
@@ -76,11 +71,8 @@ export function Form() {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      if (validationErrors.email) {
-        emailRef.current.focus();
-      } else if (validationErrors.password) {
-        passwordRef.current.focus();
-      }
+      if (validationErrors.email) emailRef.current.focus();
+      else if (validationErrors.password) passwordRef.current.focus();
       return;
     }
 
@@ -103,8 +95,7 @@ export function Form() {
         setLoginError(errorData.message || "Las credenciales son incorrectas.");
       } else {
         const userData = await response.json();
-        localStorage.setItem("authToken", userData.token);
-        navigate("/home");
+        login(userData.token, userData.user);
       }
     } catch (error) {
       console.error("Error de conexión:", error);
@@ -120,8 +111,6 @@ export function Form() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-
-    // Limpia TODOS los errores en cuanto el usuario empieza a escribir
     setErrors({});
   };
 
@@ -148,21 +137,20 @@ export function Form() {
               }}
             >
               <img
-                src="/logo.svg"
-                alt="MC Solutions Logo"
+                src="/2.png"
+                alt="LOGO MC SOLUTIONS"
                 style={{
-                  width: "100px",
-                  height: "100px",
+                  width: "250px",
+                  height: "250px",
+                  objectFit: "contain",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                  backgroundColor: "#fff",
+                  padding: "5px",
                 }}
               />
             </Box>
           </Box>
-          <Typography variant="h5" color="text.primary" fontWeight="bold">
-            Plataforma de Gestión Clínica
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Sistema de Gestión
-          </Typography>
         </Box>
 
         <Card
@@ -188,6 +176,7 @@ export function Form() {
             >
               Ingrese sus credenciales para acceder al sistema
             </Typography>
+
             <form
               onSubmit={handleSubmit}
               style={{
@@ -203,7 +192,6 @@ export function Form() {
                   {loginError}
                 </Alert>
               )}
-
               <TextField
                 id="email"
                 name="email"
@@ -228,7 +216,6 @@ export function Form() {
                 variant="outlined"
                 sx={{ mb: 2, width: "100%" }}
               />
-
               <TextField
                 id="password"
                 name="password"
@@ -268,7 +255,6 @@ export function Form() {
                 variant="outlined"
                 sx={{ width: "100%" }}
               />
-
               <Box sx={{ width: "100%", mt: 1 }}>
                 <FormControlLabel
                   control={
@@ -283,7 +269,6 @@ export function Form() {
                   label="Recordar mis credenciales"
                 />
               </Box>
-
               <Button
                 type="submit"
                 variant="contained"
@@ -306,7 +291,6 @@ export function Form() {
                 )}
               </Button>
             </form>
-
             <Box sx={{ mt: 2, textAlign: "center" }}>
               <Typography
                 variant="body2"
@@ -318,9 +302,10 @@ export function Form() {
             </Box>
           </CardContent>
         </Card>
+
         <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="caption" color="text.secondary">
-            © 2025 MC Solution | Todos los derechos reservados
+            © 2025 MC Solutions | Todos los derechos reservados
           </Typography>
         </Box>
       </Container>

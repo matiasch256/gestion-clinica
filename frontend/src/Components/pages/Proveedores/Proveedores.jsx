@@ -17,7 +17,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-// Iconos para el menú
+
 import HomeIcon from "@mui/icons-material/Home";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
@@ -28,7 +28,7 @@ const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar)({
   width: "100%",
-  backgroundColor: "#000000", // Color del AppBar
+  backgroundColor: "#000000",
 });
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -45,7 +45,6 @@ const Main = styled("main")(({ theme }) => ({
   width: "100%",
 }));
 
-// Opciones del menú para el módulo Proveedores
 const menuItems = [
   { text: "Home", icon: <HomeIcon />, path: "/home" },
   { text: "Dashboard", icon: <DashboardIcon />, path: "/Proveedores" },
@@ -71,7 +70,7 @@ export const Proveedores = () => {
 
   const handleMenuClick = (path) => {
     navigate(path);
-    setOpen(false); // Cerrar drawer en móvil después de navegar
+    setOpen(false);
   };
 
   return (
@@ -122,7 +121,7 @@ export const Proveedores = () => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: "#f5f5f5", // Similar al estilo de tu CSS
+            backgroundColor: "#f5f5f5",
           },
         }}
         variant="temporary"

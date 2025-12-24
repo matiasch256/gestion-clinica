@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 export const loginUser = async (email, password) => {
   const pool = await getPool();
 
-  // 1. Buscar al usuario por email
   const result = await pool
     .request()
     .input("Email", email)
@@ -13,9 +12,8 @@ export const loginUser = async (email, password) => {
 
   const user = result.recordset[0];
 
-  // 2. Verificar si el usuario existe y está activo
   if (!user) {
-    throw new Error("Credenciales inválidas."); // Mensaje genérico
+    throw new Error("Credenciales inválidas.");
   }
   if (!user.Activo) {
     throw new Error(
@@ -23,14 +21,11 @@ export const loginUser = async (email, password) => {
     );
   }
 
-  // 3. Comparar la contraseña enviada con el hash guardado
   const isPasswordValid = await bcrypt.compare(password, user.PasswordHash);
   if (!isPasswordValid) {
-    throw new Error("Credenciales inválidas."); // Mensaje genérico
+    throw new Error("Credenciales inválidas.");
   }
 
-  // 4. Si todo es correcto, generar un JSON Web Token (JWT)
-  // El token contiene información (payload) que identifica al usuario
   const payload = {
     id: user.UsuarioID,
     email: user.Email,
@@ -38,10 +33,9 @@ export const loginUser = async (email, password) => {
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "8h", // El token expirará en 8 horas
+    expiresIn: "8h",
   });
 
-  // No enviar el hash de la contraseña al frontend
   delete user.PasswordHash;
 
   return { user, token };

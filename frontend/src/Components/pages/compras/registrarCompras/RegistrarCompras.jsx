@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+
 import {
   Table,
   TableBody,
@@ -22,13 +24,22 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
+  Tooltip,
+  Grid,
 } from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; // Icono para éxito
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CheckIcon from "@mui/icons-material/Check";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 export const RegistrarCompras = () => {
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const [productos, setProductos] = useState([
     { id: Date.now(), nombre: "", cantidad: 0, precio: 0 },
   ]);
@@ -43,7 +54,6 @@ export const RegistrarCompras = () => {
     message: "",
     isError: false,
   });
-  const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([
@@ -63,7 +73,6 @@ export const RegistrarCompras = () => {
 
   const handleProductoChange = (index, field, value) => {
     const nuevosProductos = [...productos];
-
     if (field === "cantidad" || field === "precio") {
       if (value === "") {
         nuevosProductos[index][field] = value;
@@ -74,7 +83,6 @@ export const RegistrarCompras = () => {
     } else {
       nuevosProductos[index][field] = value;
     }
-
     setProductos(nuevosProductos);
   };
 
@@ -100,38 +108,39 @@ export const RegistrarCompras = () => {
   };
 
   const handleCloseDialog = () => {
-    const success = !dialog.isError; // Verificamos si fue un éxito
-    setDialog({ ...dialog, open: false }); // Cerramos el diálogo
+    const success = !dialog.isError;
+    setDialog({ ...dialog, open: false });
     if (success) {
-      navigate("/compras/listaCompras"); // Navegamos a la lista SÓLO si fue exitoso
+      navigate("/compras/listaCompras");
     }
+  };
+
+  const handleCancelar = () => {
+    navigate("/compras/listaCompras");
   };
 
   const registrarCompraEnBackend = () => {
     if (!proveedor || !fecha) {
-      alert("Debes seleccionar un proveedor y una fecha.");
+      setDialog({
+        open: true,
+        title: "Faltan datos",
+        message: "Por favor selecciona un proveedor y una fecha.",
+        isError: true,
+      });
       return;
     }
-
     for (const p of productos) {
-      if (
-        !p.nombre ||
-        p.cantidad === "" ||
-        p.cantidad === null ||
-        isNaN(p.cantidad) ||
-        p.cantidad <= 0 ||
-        p.precio === "" ||
-        p.precio === null ||
-        isNaN(p.precio) ||
-        p.precio <= 0
-      ) {
-        alert(
-          "Todos los productos deben tener nombre, cantidad mayor a 0 y precio mayor a 0."
-        );
+      if (!p.nombre || p.cantidad <= 0 || p.precio <= 0) {
+        setDialog({
+          open: true,
+          title: "Datos inválidos",
+          message:
+            "Revise que todos los productos tengan nombre, cantidad y precio.",
+          isError: true,
+        });
         return;
       }
     }
-
     const datosCompra = {
       proveedor: proveedor,
       fecha: fecha,
@@ -150,303 +159,408 @@ export const RegistrarCompras = () => {
       .then(async (response) => {
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(
-            errorData.details || `HTTP error! status: ${response.status}`
-          );
+          throw new Error(errorData.details || `Error: ${response.status}`);
         }
         return response.json();
       })
-      .then((data) => {
-        // Mostramos el diálogo de éxito
+      .then(() => {
         setDialog({
           open: true,
           title: "¡Compra Registrada!",
-          message: "La compra se ha guardado exitosamente en el sistema.",
+          message: "La compra se ha guardado exitosamente.",
           isError: false,
         });
       })
       .catch((error) => {
-        // Mostramos el diálogo de error
-        console.error("Detalle del error al registrar:", error);
         setDialog({
           open: true,
-          title: "Error de Registro",
+          title: "Error",
           message: error.message,
           isError: true,
         });
       });
   };
 
-  const handleProveedorChange = (event) => {
-    setProveedor(event.target.value);
-  };
-
-  const handleFechaChange = (event) => {
-    setFecha(event.target.value);
-  };
-
   if (loading) {
     return (
-      <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-          <Skeleton variant="text" width="30%" />
-        </Typography>
-        <Box sx={{ mb: 3, display: "flex", gap: 2, flexWrap: "wrap" }}>
-          <Skeleton variant="rectangular" width={200} height={56} />
-          <Skeleton variant="rectangular" width={200} height={56} />
-        </Box>
-        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          <Skeleton variant="text" width="20%" />
-        </Typography>
-        <TableContainer component={Paper} elevation={3}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Array.from({ length: 3 }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="90%" height={56} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="60%" height={56} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="60%" height={56} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="60%" height={56} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-          <Skeleton variant="rectangular" width={120} height={36} />
-        </Box>
+      <Box sx={{ padding: 3, width: "100%", margin: "0 auto" }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
+          <Skeleton variant="text" width="40%" height={60} />
+          <Box sx={{ display: "flex", gap: 2, my: 3 }}>
+            <Skeleton variant="rectangular" width="60%" height={56} />
+            <Skeleton variant="rectangular" width="30%" height={56} />
+          </Box>
+          <Skeleton variant="rectangular" width="100%" height={200} />
+        </Paper>
       </Box>
     );
   }
 
   return (
-    <Box
-      sx={{
-        padding: 3,
-        maxWidth: "large",
-        margin: "0 auto",
-        border: "1px solid #ccc",
-        borderRadius: 2,
-        boxShadow: 3,
-        backgroundColor: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-        Registrar Compra
-      </Typography>
-      <Box
+    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+      <Paper
+        elevation={0}
         sx={{
-          mb: 3,
-          display: "flex",
-          gap: 2,
-          flexWrap: "wrap",
-          alignItems: "center",
+          p: 4,
+          borderRadius: 3,
+          bgcolor: theme.palette.background.default,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
         }}
       >
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Proveedor</InputLabel>
-          <Select
-            value={proveedor}
-            onChange={handleProveedorChange}
-            label="Proveedor"
-            sx={{ height: 56 }}
+        {/* TÍTULO */}
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            mb: 4,
+            fontWeight: "700",
+            color: theme.palette.text.primary,
+            borderLeft: `5px solid ${theme.palette.primary.main}`,
+            paddingLeft: 2,
+          }}
+        >
+          Registrar Nueva Compra
+        </Typography>
+
+        {/* --- FORMULARIO SUPERIOR --- */}
+        <Grid container spacing={3} sx={{ mb: 4 }} alignItems="center">
+          <Grid size={{ xs: 12, md: 8 }}>
+            <FormControl fullWidth>
+              <InputLabel>Proveedor</InputLabel>
+              <Select
+                value={proveedor}
+                onChange={(e) => setProveedor(e.target.value)}
+                label="Proveedor"
+                fullWidth
+                sx={{ bgcolor: theme.palette.background.default }}
+              >
+                <MenuItem value="">Seleccionar proveedor</MenuItem>
+                {proveedores.map((prov) => (
+                  <MenuItem key={prov.id} value={prov.id}>
+                    {prov.nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              label="Fecha de Compra"
+              type="date"
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
+              fullWidth
+              slotProps={{ inputLabel: { shrink: true } }}
+              sx={{ bgcolor: theme.palette.background.default }}
+            />
+          </Grid>
+        </Grid>
+
+        {/* --- TABLA DE PRODUCTOS --- */}
+        <Box sx={{ mb: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 2,
+              color: theme.palette.text.secondary,
+              fontWeight: "bold",
+            }}
           >
-            <MenuItem value="">Seleccionar proveedor</MenuItem>
-            {proveedores.map((prov) => (
-              <MenuItem key={prov.id} value={prov.id}>
-                {prov.nombre}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          label="Fecha"
-          type="date"
-          value={fecha}
-          onChange={handleFechaChange}
-          slotProps={{ inputLabel: { shrink: true } }}
-          sx={{ minWidth: 200, "& .MuiInputBase-root": { height: 56 } }}
-        />
-      </Box>
-      <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-        Productos
-      </Typography>
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: "35%" }}>Nombre</TableCell>
-              <TableCell sx={{ width: "20%" }}>Cantidad</TableCell>
-              <TableCell sx={{ width: "20%" }}>Precio Unitario</TableCell>
-              <TableCell sx={{ width: "15%" }}>Subtotal</TableCell>
-              <TableCell sx={{ width: "10%" }}></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {productos.map((p, index) => (
-              <TableRow key={p.id}>
-                <TableCell>
-                  <FormControl fullWidth>
-                    <InputLabel>Producto</InputLabel>
-                    <Select
-                      value={p.nombre}
-                      onChange={(e) =>
-                        handleProductoChange(index, "nombre", e.target.value)
-                      }
-                      label="Producto"
-                      sx={{ height: 56 }}
-                    >
-                      <MenuItem value="">Seleccionar producto</MenuItem>
-                      {productosDisponibles.map((prod) => (
-                        <MenuItem key={prod.id} value={prod.nombre}>
-                          {prod.nombre}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="numeric"
-                    value={p.cantidad}
-                    onChange={(e) =>
-                      handleProductoChange(index, "cantidad", e.target.value)
-                    }
-                    sx={{ "& .MuiInputBase-root": { height: 56 } }}
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="numeric"
-                    value={p.precio}
-                    onChange={(e) =>
-                      handleProductoChange(index, "precio", e.target.value)
-                    }
-                    sx={{ "& .MuiInputBase-root": { height: 56 } }}
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>${(p.cantidad * p.precio).toFixed(2)}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => eliminarProducto(index)}
+            Detalle de Productos
+          </Typography>
+
+          <TableContainer
+            component={Paper}
+            elevation={0}
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: 2,
+            }}
+          >
+            <Table>
+              <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
+                <TableRow>
+                  <TableCell
                     sx={{
-                      height: 50,
-                      mb: 1,
-                      borderColor: "#d32f2f !important",
-                      color: "#d32f2f !important",
-                      backgroundColor: "transparent !important",
-                      "&:hover": {
-                        borderColor: "#b71c1c !important",
-                        backgroundColor: "rgba(211, 47, 47, 0.04) !important",
-                      },
+                      width: "35%",
+                      fontWeight: "bold",
+                      color: theme.palette.text.secondary,
                     }}
-                    size="small"
                   >
-                    Eliminar
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+                    Producto
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "15%",
+                      fontWeight: "bold",
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    Cantidad
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "15%",
+                      fontWeight: "bold",
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    Precio Unit.
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "15%",
+                      fontWeight: "bold",
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    Subtotal
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "10%",
+                      fontWeight: "bold",
+                      color: theme.palette.text.secondary,
+                      textAlign: "center",
+                    }}
+                  >
+                    Acciones
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {productos.map((p, index) => (
+                  <TableRow key={p.id} hover>
+                    <TableCell>
+                      <FormControl fullWidth size="small">
+                        <Select
+                          displayEmpty
+                          value={p.nombre}
+                          onChange={(e) =>
+                            handleProductoChange(
+                              index,
+                              "nombre",
+                              e.target.value
+                            )
+                          }
+                          sx={{ bgcolor: theme.palette.background.default }}
+                        >
+                          <MenuItem value="" disabled>
+                            Seleccionar...
+                          </MenuItem>
+                          {productosDisponibles.map((prod) => (
+                            <MenuItem key={prod.id} value={prod.nombre}>
+                              {prod.nombre}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={p.cantidad}
+                        onChange={(e) =>
+                          handleProductoChange(
+                            index,
+                            "cantidad",
+                            e.target.value
+                          )
+                        }
+                        sx={{ bgcolor: theme.palette.background.default }}
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        type="number"
+                        size="small"
+                        value={p.precio}
+                        onChange={(e) =>
+                          handleProductoChange(index, "precio", e.target.value)
+                        }
+                        sx={{ bgcolor: theme.palette.background.default }}
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        sx={{ color: theme.palette.text.primary }}
+                      >
+                        ${(p.cantidad * p.precio).toFixed(2)}
+                      </Typography>
+                    </TableCell>
+
+                    {/* AQUI ESTA EL ÍCONO DEL TACHO */}
+                    <TableCell align="center">
+                      <Tooltip title="Eliminar producto">
+                        <IconButton
+                          onClick={() => eliminarProducto(index)}
+                          sx={{
+                            color: theme.palette.text.secondary,
+
+                            backgroundColor:
+                              theme.palette.background.trasparent,
+                            "&:hover": {
+                              color: theme.palette.error.main,
+
+                              backgroundColor:
+                                theme.palette.background.trasparent,
+                            },
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+
+        {/* --- BOTÓN AGREGAR --- */}
         <Button
-          variant="outlined"
-          color="primary"
           startIcon={<AddIcon />}
           onClick={agregarProducto}
+          fullWidth
           sx={{
-            height: 50,
-            mr: 1,
-            mb: 1,
-            borderColor: "#1976d2 !important",
-            color: "#1976d2 !important",
-            backgroundColor: "transparent !important",
+            height: "48px",
+            border: `1px dashed ${theme.palette.primary.main}`,
+            color: theme.palette.primary.main,
+            backgroundColor: theme.palette.background.trasparent,
+            fontWeight: "600",
+            borderRadius: 2,
+            mb: 4,
             "&:hover": {
-              borderColor: "#115293 !important",
-              backgroundColor: "rgba(25, 118, 210, 0.04) !important",
+              border: `1px solid ${theme.palette.primary.main}`,
+              backgroundColor: `${theme.palette.primary.main}10`,
             },
           }}
         >
-          Agregar Producto
+          Agregar otro producto
         </Button>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography variant="h6" component="span">
-            Total: ${calcularTotal()}
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={registrarCompraEnBackend}
-            sx={{
-              height: 50,
-              backgroundColor: "#1976d2 !important",
-              "&:hover": { backgroundColor: "#115293 !important" },
-              color: "#fff !important",
+
+        {/* --- FOOTER: TOTAL Y ACCIONES --- */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 4,
+            pt: 3,
+            borderTop: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          {/* Total */}
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 2, mr: "auto" }}
+          >
+            <Typography variant="h6" color="text.secondary">
+              Total a Pagar:
+            </Typography>
+            <Typography variant="h4" fontWeight="bold" color="primary.main">
+              ${calcularTotal()}
+            </Typography>
+          </Box>
+
+          {/* Botonera (Corregida) */}
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<CancelIcon />}
+              onClick={handleCancelar}
+              sx={{
+                color: theme.palette.text.secondary,
+                borderColor: theme.palette.divider,
+                backgroundColor: theme.palette.background.trasparent,
+                px: 3,
+                py: 1,
+                "&:hover": {
+                  borderColor: theme.palette.text.primary,
+                  backgroundColor: theme.palette.background.trasparent,
+                },
+              }}
+            >
+              Cancelar
+            </Button>
+
+            <Button
+              variant="contained"
+              startIcon={<CheckIcon />}
+              onClick={registrarCompraEnBackend}
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                fontWeight: "bold",
+                boxShadow: "none",
+                px: 6,
+                py: 1,
+                "&:hover": {
+                  bgcolor:
+                    theme.palette.primary.hover || theme.palette.primary.dark,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                },
+              }}
+            >
+              Guardar
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+
+      {/* --- DIALOGOS MODALES --- */}
+      <Dialog
+        open={dialog.open}
+        onClose={handleCloseDialog}
+        PaperProps={{ sx: { borderRadius: 2, padding: 1 } }}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {dialog.isError ? (
+            <ErrorOutlineIcon
+              fontSize="large"
+              sx={{ color: theme.palette.error.main }}
+            />
+          ) : (
+            <CheckCircleOutlineIcon
+              fontSize="large"
+              sx={{ color: theme.palette.accent.green }}
+            />
+          )}
+          <span
+            style={{
+              color: dialog.isError
+                ? theme.palette.error.main
+                : theme.palette.accent.green,
             }}
           >
-            Registrar Compra
-          </Button>
-        </Box>
-      </Box>
-      <Dialog open={dialog.open} onClose={handleCloseDialog}>
-        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          {dialog.isError ? (
-            <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
-          ) : (
-            <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
-          )}
-          {dialog.title}
+            {dialog.title}
+          </span>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>{dialog.message}</DialogContentText>
+          <DialogContentText sx={{ color: theme.palette.text.secondary }}>
+            {dialog.message}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={handleCloseDialog}
+            variant="contained"
             autoFocus
             sx={{
-              color: "#1976d2 !important",
-              bgcolor: "transparent !important",
+              bgcolor: dialog.isError
+                ? theme.palette.error.main
+                : theme.palette.primary.main,
+              color: "#fff",
+              fontWeight: "bold",
             }}
           >
             Aceptar

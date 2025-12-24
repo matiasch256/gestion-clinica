@@ -20,7 +20,7 @@ export const ProveedoresDashBoard = () => {
       .then((res) => res.json())
       .then((data) => {
         setTotal(data.length);
-        setUltimos(data.slice(-5).reverse()); // últimos 5 proveedores
+        setUltimos(data.slice(-5).reverse());
         setCargando(false);
       })
       .catch((err) => {

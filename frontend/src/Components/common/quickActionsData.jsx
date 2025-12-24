@@ -11,7 +11,7 @@ export const quickActionsHome = [
   {
     title: "Nueva Compra",
     description: "Registrar una nueva orden",
-    color: "#3B83F6", // Azul
+    color: "#3B83F6",
     colorHover: "#2564EB",
     icon: ShoppingCartIcon,
     action: () => alert("Registrando nueva compra..."),
@@ -19,7 +19,7 @@ export const quickActionsHome = [
   {
     title: "Agregar Producto",
     description: "Nuevo producto al inventario",
-    color: "#4caf50", // Verde
+    color: "#4caf50",
     colorHover: "#43a047",
     icon: InventoryIcon,
     action: () => alert("Agregando producto..."),
@@ -27,7 +27,7 @@ export const quickActionsHome = [
   {
     title: "Nuevo Proveedor",
     description: "Registrar proveedor",
-    color: "#ab47bc", // Púrpura
+    color: "#ab47bc",
     colorHover: "#9c27b0",
     icon: PeopleIcon,
     action: () => alert("Registrando proveedor..."),
@@ -35,7 +35,7 @@ export const quickActionsHome = [
   {
     title: "Nueva Categoría",
     description: "Crear categoría",
-    color: "#ff9800", // Naranja
+    color: "#ff9800",
     colorHover: "#fb8c00",
     icon: FolderIcon,
     action: () => alert("Creando categoría..."),
@@ -46,7 +46,7 @@ export const quickActionsCompras = [
   {
     title: "Registrar Compra",
     description: "Crear nueva orden de compra",
-    color: "#3B83F6", // Azul
+    color: "#3B83F6",
     colorHover: "#2564EB",
     icon: AddShoppingCartOutlinedIcon,
     action: () => alert("Registrando nueva compra..."),
@@ -54,7 +54,7 @@ export const quickActionsCompras = [
   {
     title: "Ver Facturas",
     description: "Consultar facturas recientes",
-    color: "#4caf50", // Verde
+    color: "#4caf50",
     colorHover: "#43a047",
     icon: ReceiptLongRoundedIcon,
     action: () => alert("Consultando facturas..."),
@@ -62,7 +62,7 @@ export const quickActionsCompras = [
   {
     title: "Consultar Stock",
     description: "Revisar inventario actual",
-    color: "#ab47bc", // Púrpura
+    color: "#ab47bc",
     colorHover: "#9c27b0",
     icon: Inventory2OutlinedIcon,
     action: () => alert("Consultando stock..."),
@@ -70,7 +70,7 @@ export const quickActionsCompras = [
   {
     title: "Ver Órdenes",
     description: "Gestionar órdenes pendientes",
-    color: "#ff9800", // Naranja
+    color: "#ff9800",
     colorHover: "#fb8c00",
     icon: VisibilityIcon,
     action: () => alert("Consultando órdenes..."),

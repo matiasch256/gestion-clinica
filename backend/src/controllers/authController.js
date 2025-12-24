@@ -13,7 +13,6 @@ export const login = async (req, res) => {
     const { user, token } = await authService.loginUser(email, password);
     res.status(200).json({ message: "Login exitoso", user, token });
   } catch (error) {
-    // Usamos 401 para errores de autenticación
     res.status(401).json({ message: error.message });
   }
 };

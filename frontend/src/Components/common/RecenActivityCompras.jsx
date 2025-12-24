@@ -13,7 +13,6 @@ import {
 const RecentActivityCompras = ({ ordenes, productos }) => {
   const navigate = useNavigate();
 
-  // Helper para dar formato de moneda
   const formatCurrency = (value) => {
     if (value === null || value === undefined) return "$0.00";
     return new Intl.NumberFormat("es-AR", {
@@ -22,7 +21,6 @@ const RecentActivityCompras = ({ ordenes, productos }) => {
     }).format(value);
   };
 
-  // Helper para los colores del Chip de estado
   const getStatusChipColor = (estado) => {
     switch (estado) {
       case "Pendiente":
@@ -43,7 +41,7 @@ const RecentActivityCompras = ({ ordenes, productos }) => {
 
   return (
     <Grid container spacing={4}>
-      {/* --- Tarjeta de Órdenes Recientes --- */}
+      {}
       <Grid size={{ xs: 12, lg: 6 }}>
         <Card elevation={3} sx={{ height: "100%" }}>
           <CardHeader
@@ -93,7 +91,7 @@ const RecentActivityCompras = ({ ordenes, productos }) => {
         </Card>
       </Grid>
 
-      {/* --- Tarjeta de Productos con Stock Bajo --- */}
+      {}
       <Grid size={{ xs: 12, lg: 6 }}>
         <Card elevation={3} sx={{ height: "100%" }}>
           <CardHeader

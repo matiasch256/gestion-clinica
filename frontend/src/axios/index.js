@@ -4,18 +4,12 @@ export const AUTH_TOKEN = "authToken";
 const CLIENT = "client";
 const UID = "uid";
 
-// Remember when logging in to store the access-token, client and uid in localStorage first
-
-// Create an Axios instance
 export const axiosInstance = axios.create({
   baseURL: "https://rs-blackmarket-api.herokuapp.com/api/v1",
-  // You can set other default settings here like headers, timeout, etc.
 });
 
-// Add a request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Assuming you're storing the variables in localStorage
     const token = localStorage.getItem(AUTH_TOKEN);
     const client = localStorage.getItem(CLIENT);
     const uid = localStorage.getItem(UID);
@@ -31,12 +25,10 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Add a response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
-    // Extract the variables that change on each response
     const newAccessToken = response.headers["access-token"];
-    // Fallback to LocalStorage
+
     const uid = response.headers["uid"] || localStorage.getItem(UID);
     const client = response.headers["client"] || localStorage.getItem(CLIENT);
 

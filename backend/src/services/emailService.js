@@ -32,7 +32,7 @@ export const enviarEmailConfirmacion = async (datosTurno) => {
 
   const mailOptions = {
     from: `"Tu Clínica Médica" <turnos@${process.env.MAILGUN_DOMAIN}>`,
-    to: "mdmsystem72@gmail.com", // emailPaciente,
+    to: "mdmsystem72@gmail.com",
     subject: "Confirmación de su Turno Médico",
     html: `
       <h1>Confirmación de Turno</h1>
@@ -71,12 +71,12 @@ export const enviarEmailRecordatorio = async (datosTurno) => {
     ubicacion,
   } = datosTurno;
 
-  const fechaFormateada = new Date(fechaHora).toLocaleDateString(/*...*/);
-  const horaFormateada = new Date(fechaHora).toLocaleTimeString(/*...*/);
+  const fechaFormateada = new Date(fechaHora).toLocaleDateString();
+  const horaFormateada = new Date(fechaHora).toLocaleTimeString();
 
   const mailOptions = {
     from: `"Recordatorio de Cita - Tu Clínica" <no-responder@${process.env.MAILGUN_DOMAIN}>`,
-    to: "mdmsystem72@gmail.com", //emailPaciente,
+    to: "mdmsystem72@gmail.com",
     subject: "Recordatorio de su Turno Médico para Mañana",
     html: `
       <h1>Recordatorio de Turno</h1>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 import {
   Table,
   TableBody,
@@ -17,17 +18,24 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Grid,
+  Divider,
 } from "@mui/material";
-import SaveIcon from "@mui/icons-material/Save";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+import CheckIcon from "@mui/icons-material/Check";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
 export default function ModificarCompra() {
+  const theme = useTheme();
   const { idCompra } = useParams();
   const navigate = useNavigate();
+
   const [compra, setCompra] = useState(null);
   const [loading, setLoading] = useState(true);
   const [proveedores, setProveedores] = useState([]);
   const [productosDisponibles, setProductosDisponibles] = useState([]);
+
   const [errorState, setErrorState] = useState({
     proveedor: false,
     fecha: false,
@@ -121,220 +129,276 @@ export default function ModificarCompra() {
 
   if (loading || !compra) {
     return (
-      <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-          <Skeleton variant="text" width="30%" />
-        </Typography>
-        <Box sx={{ mb: 3, display: "flex", gap: 2, flexWrap: "wrap" }}>
-          <Skeleton variant="rectangular" width={200} height={56} />
-          <Skeleton variant="rectangular" width={200} height={56} />
-        </Box>
-        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          <Skeleton variant="text" width="20%" />
-        </Typography>
-        <TableContainer component={Paper} elevation={3}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton variant="text" width="80%" />
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Array.from({ length: 3 }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="90%" height={56} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="60%" height={56} />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton variant="rectangular" width="60%" height={56} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
-          <Skeleton variant="rectangular" width={120} height={36} />
-          <Skeleton variant="rectangular" width={120} height={36} />
-        </Box>
+      <Box sx={{ padding: 3, width: "100%", margin: "0 auto" }}>
+        <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
+          <Skeleton variant="text" width="40%" height={60} />
+          <Grid container spacing={3} sx={{ my: 3 }}>
+            <Grid item xs={8}>
+              <Skeleton variant="rectangular" height={56} />
+            </Grid>
+            <Grid item xs={4}>
+              <Skeleton variant="rectangular" height={56} />
+            </Grid>
+          </Grid>
+          <Skeleton variant="rectangular" width="100%" height={200} />
+        </Paper>
       </Box>
     );
   }
 
   return (
-    <Box
-      sx={{
-        padding: 3,
-        maxWidth: 1200,
-        margin: "0 auto",
-        border: "1px solid #ccc",
-        borderRadius: 2,
-        boxShadow: 3,
-        backgroundColor: "#fff",
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-      }}
-    >
-      <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-        Editar Compra N° {compra.id}
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <Box
+    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          bgcolor: theme.palette.background.default,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        <Typography
+          variant="h5"
+          component="h1"
           sx={{
-            mb: 3,
-            display: "flex",
-            gap: 2,
-            flexWrap: "wrap",
-            alignItems: "center",
+            mb: 4,
+            fontWeight: "700",
+            color: theme.palette.text.primary,
+            borderLeft: `5px solid ${theme.palette.primary.main}`,
+            paddingLeft: 2,
           }}
         >
-          <FormControl sx={{ minWidth: 200 }} error={errorState.proveedor}>
-            <InputLabel>Proveedor</InputLabel>
-            <Select
-              value={compra.proveedor || ""}
-              onChange={(e) =>
-                setCompra({ ...compra, proveedor: parseInt(e.target.value) })
-              }
-              label="Proveedor"
-              sx={{ height: 56 }}
-            >
-              {proveedores.map((p) => (
-                <MenuItem key={p.id} value={p.id}>
-                  {p.nombre}
-                </MenuItem>
-              ))}
-            </Select>
-            {errorState.proveedor && (
-              <Typography color="error" variant="caption">
-                Seleccione un proveedor
-              </Typography>
-            )}
-          </FormControl>
-          <TextField
-            label="Fecha"
-            type="date"
-            name="fecha"
-            value={compra.fecha?.split("T")[0] || ""}
-            onChange={(e) => setCompra({ ...compra, fecha: e.target.value })}
-            slotProps={{ inputLabel: { shrink: true } }}
-            sx={{ minWidth: 200, "& .MuiInputBase-root": { height: 56 } }}
-            error={errorState.fecha}
-            helperText={errorState.fecha ? "Seleccione una fecha" : ""}
-          />
+          Editar Compra N° {compra.id}
+        </Typography>
 
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{ mb: 2, mt: 2, display: "block", width: "100%" }}
-          >
-            Productos
-          </Typography>
-          <TableContainer component={Paper} elevation={3}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ width: "40%" }}>Nombre</TableCell>
-                  <TableCell sx={{ width: "30%" }}>Cantidad</TableCell>
-                  <TableCell sx={{ width: "30%" }}>Precio</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {compra.productos.map((p, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <FormControl fullWidth>
-                        <InputLabel>Producto</InputLabel>
-                        <Select
-                          value={p.idProducto || ""}
-                          onChange={(e) =>
-                            handleChangeProducto(
-                              i,
-                              "idProducto",
-                              parseInt(e.target.value)
-                            )
-                          }
-                          label="Producto"
-                          sx={{ height: 56 }}
-                        >
-                          {productosDisponibles.map((prod) => (
-                            <MenuItem key={prod.id} value={prod.id}>
-                              {prod.nombre}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={8}>
+              <FormControl fullWidth error={errorState.proveedor}>
+                <InputLabel>Proveedor</InputLabel>
+                <Select
+                  value={compra.proveedor || ""}
+                  onChange={(e) =>
+                    setCompra({
+                      ...compra,
+                      proveedor: parseInt(e.target.value),
+                    })
+                  }
+                  label="Proveedor"
+                  sx={{ bgcolor: theme.palette.background.default }}
+                >
+                  {proveedores.map((p) => (
+                    <MenuItem key={p.id} value={p.id}>
+                      {p.nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errorState.proveedor && (
+                  <Typography
+                    color="error"
+                    variant="caption"
+                    sx={{ ml: 2, mt: 0.5 }}
+                  >
+                    Seleccione un proveedor
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                label="Fecha"
+                type="date"
+                name="fecha"
+                value={compra.fecha?.split("T")[0] || ""}
+                onChange={(e) =>
+                  setCompra({ ...compra, fecha: e.target.value })
+                }
+                fullWidth
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={{ bgcolor: theme.palette.background.default }}
+                error={errorState.fecha}
+                helperText={errorState.fecha ? "Seleccione una fecha" : ""}
+              />
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 4 }} />
+          <Box sx={{ width: "100%", mb: 2 }}>
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{
+                mb: 2,
+                fontWeight: "bold",
+                color: theme.palette.text.secondary,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <ReceiptLongIcon /> Productos
+            </Typography>
+
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              sx={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 2,
+                width: "100%",
+              }}
+            >
+              <Table>
+                <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        width: "40%",
+                        fontWeight: "bold",
+                        color: theme.palette.text.secondary,
+                      }}
+                    >
+                      Nombre
                     </TableCell>
-                    <TableCell>
-                      <TextField
-                        type="numeric"
-                        slotProps={{ inputLabel: { shrink: true } }}
-                        value={p.Cantidad}
-                        onChange={(e) =>
-                          handleChangeProducto(i, "Cantidad", e.target.value)
-                        }
-                        sx={{ "& .MuiInputBase-root": { height: 56 } }}
-                        fullWidth
-                        error={errorState.productos[i]}
-                        helperText={
-                          errorState.productos[i] ? "Debe ser mayor a 0" : ""
-                        }
-                      />
+                    <TableCell
+                      sx={{
+                        width: "30%",
+                        fontWeight: "bold",
+                        color: theme.palette.text.secondary,
+                      }}
+                    >
+                      Cantidad
                     </TableCell>
-                    <TableCell>
-                      <TextField
-                        type="numeric"
-                        value={p.Precio}
-                        onChange={(e) =>
-                          handleChangeProducto(i, "Precio", e.target.value)
-                        }
-                        sx={{ "& .MuiInputBase-root": { height: 56 } }}
-                        fullWidth
-                        error={errorState.productos[i]}
-                        helperText={
-                          errorState.productos[i] ? "Debe ser mayor a 0" : ""
-                        }
-                      />
+                    <TableCell
+                      sx={{
+                        width: "30%",
+                        fontWeight: "bold",
+                        color: theme.palette.text.secondary,
+                      }}
+                    >
+                      Precio
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {compra.productos.map((p, i) => (
+                    <TableRow key={i} hover>
+                      <TableCell>
+                        <FormControl fullWidth size="small">
+                          <Select
+                            value={p.idProducto || ""}
+                            onChange={(e) =>
+                              handleChangeProducto(
+                                i,
+                                "idProducto",
+                                parseInt(e.target.value)
+                              )
+                            }
+                            sx={{ bgcolor: theme.palette.background.default }}
+                            displayEmpty
+                          >
+                            {productosDisponibles.map((prod) => (
+                              <MenuItem key={prod.id} value={prod.id}>
+                                {prod.nombre}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={p.Cantidad}
+                          onChange={(e) =>
+                            handleChangeProducto(i, "Cantidad", e.target.value)
+                          }
+                          fullWidth
+                          sx={{ bgcolor: theme.palette.background.default }}
+                          error={errorState.productos[i]}
+                          helperText={
+                            errorState.productos[i] ? "Debe ser mayor a 0" : ""
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={p.Precio}
+                          onChange={(e) =>
+                            handleChangeProducto(i, "Precio", e.target.value)
+                          }
+                          fullWidth
+                          sx={{ bgcolor: theme.palette.background.default }}
+                          error={errorState.productos[i]}
+                          helperText={
+                            errorState.productos[i] ? "Debe ser mayor a 0" : ""
+                          }
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
 
           <Box
-            sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "flex-end" }}
+            sx={{
+              mt: 4,
+              display: "flex",
+              gap: 2,
+              justifyContent: "flex-end",
+              width: "100%",
+            }}
           >
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              startIcon={<SaveIcon />}
-            >
-              Guardar
-            </Button>
             <Button
               type="button"
               variant="outlined"
-              startIcon={<ArrowBackIcon />}
-              onClick={() => navigate(-1)}
+              color="secondary"
+              startIcon={<CancelIcon />}
+              onClick={() => navigate("/compras/listaCompras")}
+              sx={{
+                color: theme.palette.text.secondary,
+                borderColor: theme.palette.divider,
+                backgroundColor: theme.palette.background.trasparent,
+                px: 3,
+                py: 1,
+                "&:hover": {
+                  borderColor: theme.palette.text.primary,
+                  backgroundColor: theme.palette.background.trasparent,
+                },
+              }}
             >
               Cancelar
             </Button>
+
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<CheckIcon />}
+              sx={{
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                fontWeight: "bold",
+                boxShadow: "none",
+                px: 4,
+                py: 1,
+                "&:hover": {
+                  bgcolor:
+                    theme.palette.primary.hover || theme.palette.primary.dark,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                },
+              }}
+            >
+              Guardar
+            </Button>
           </Box>
-        </Box>
-      </form>
+        </form>
+      </Paper>
     </Box>
   );
 }

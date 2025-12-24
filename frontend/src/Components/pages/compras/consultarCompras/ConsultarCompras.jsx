@@ -10,7 +10,7 @@ export const ConsultarCompras = () => {
       .then((res) => res.json())
       .then((data) => {
         setCompras(data);
-        console.log("Compras obtenidas:", data); // Log para ver las compras
+        console.log("Compras obtenidas:", data);
         setLoading(false);
       })
       .catch((err) => {

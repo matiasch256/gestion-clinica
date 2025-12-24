@@ -41,7 +41,7 @@ const CategoryDistribution = () => {
             >
               <Box
                 sx={{
-                  width: `${(category.count / 145) * 100}%`, // Normalizado al máximo (145)
+                  width: `${(category.count / 145) * 100}%`,
                   height: "100%",
                   backgroundColor: category.color,
                   transition: "width 0.3s ease-in-out",

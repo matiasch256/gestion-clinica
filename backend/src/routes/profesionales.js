@@ -8,11 +8,11 @@ router.get("/", async (req, res) => {
     const pool = await getPool();
 
     const result = await pool.query(`
-      SELECT 
-        M.ID_Medico, 
-        M.Nombre, 
-        M.Apellido, 
-        E.Nombre AS Especialidad 
+      SELECT
+        M.ID_Medico,
+        M.Nombre,
+        M.Apellido,
+        E.Nombre AS Especialidad
       FROM Medicos M
       LEFT JOIN Especialidades E ON M.ID_Especialidad = E.ID_Especialidad
     `);

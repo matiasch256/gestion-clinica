@@ -11,7 +11,6 @@ export default function DashboardContent({
         {title}
       </Typography>
 
-      {/* Tarjetas */}
       <Grid container spacing={2}>
         {Array.isArray(cards) && cards.length > 0 ? (
           cards.map((card, index) => (
@@ -24,7 +23,6 @@ export default function DashboardContent({
         )}
       </Grid>
 
-      {/* Acciones rápidas */}
       {Array.isArray(actions) && actions.length > 0 && (
         <Card elevation={3} sx={{ mt: 3 }}>
           <CardContent>

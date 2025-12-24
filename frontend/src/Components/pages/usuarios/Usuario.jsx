@@ -9,7 +9,7 @@ export const Usuario = () => {
       const res = await axios.post("http://localhost:3000/api/usuarios", {
         nombre,
         email,
-      }); // Cambia la URL según tu backend
+      });
       alert(res.data.mensaje);
     } catch (err) {
       alert("Error al guardar");

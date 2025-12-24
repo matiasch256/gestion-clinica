@@ -7,6 +7,13 @@ import AddIcon from "@mui/icons-material/Add";
 import ListIcon from "@mui/icons-material/List";
 import PeopleIcon from "@mui/icons-material/People";
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
+import EventIcon from "@mui/icons-material/Event";
+import HistoryIcon from "@mui/icons-material/History";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import EventBusyIcon from "@mui/icons-material/EventBusy";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import PieChartIcon from "@mui/icons-material/PieChart";
+
 export const icons = {
   home: <HomeIcon />,
   dashboard: <DashboardIcon />,
@@ -17,4 +24,10 @@ export const icons = {
   list: <ListIcon />,
   people: <PeopleIcon />,
   productionQuantityLimits: <ProductionQuantityLimitsIcon />,
+  event: <EventIcon />,
+  history: <HistoryIcon />,
+  barChart: <BarChartIcon />,
+  eventBusy: <EventBusyIcon />,
+  trendingUp: <TrendingUpIcon />,
+  pieChart: <PieChartIcon />,
 };

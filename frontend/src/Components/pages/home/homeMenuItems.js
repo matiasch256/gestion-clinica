@@ -1,10 +1,12 @@
 import { icons } from "../../../utils/icons.jsx";
+import { ROLES } from "../../../utils/roles";
 
 export const homeMenuItems = [
   { text: "Inicio", icon: icons.dashboard, path: "/home" },
   {
     text: "Compras",
     icon: icons.addShoppingCart,
+    roles: [ROLES.ADMIN],
     children: [
       { text: "Dashboard", icon: icons.dashboard, path: "/compras" },
       {
@@ -23,8 +25,9 @@ export const homeMenuItems = [
   {
     text: "Categorias",
     icon: icons.dashboard,
+
+    roles: [ROLES.ADMIN, ROLES.DEPOSITO],
     children: [
-      { text: "Dashboard", icon: icons.dashboard, path: "/categorias" },
       {
         text: "Registrar Categoría",
         icon: icons.add,
@@ -40,8 +43,9 @@ export const homeMenuItems = [
   {
     text: "Productos",
     icon: icons.productionQuantityLimits,
+
+    roles: [ROLES.ADMIN, ROLES.DEPOSITO],
     children: [
-      { text: "Dashboard", icon: icons.dashboard, path: "/productos" },
       {
         text: "Registrar Producto",
         icon: icons.add,
@@ -53,8 +57,8 @@ export const homeMenuItems = [
   {
     text: "Proveedores",
     icon: icons.people,
+    roles: [ROLES.ADMIN],
     children: [
-      { text: "Dashboard", icon: icons.dashboard, path: "/proveedores" },
       {
         text: "Registrar Proveedor",
         icon: icons.add,
@@ -64,6 +68,98 @@ export const homeMenuItems = [
         text: "Lista Proveedores",
         icon: icons.list,
         path: "/proveedores/consultar",
+      },
+    ],
+  },
+  {
+    text: "Turnos",
+    icon: icons.event,
+    roles: [ROLES.ADMIN, ROLES.RECEPCION],
+    children: [
+      {
+        text: "Registrar Turno",
+        icon: icons.add,
+        path: "/turnos/registrar",
+      },
+      {
+        text: "Lista Turnos",
+        icon: icons.list,
+        path: "/turnos/ListaTurnos",
+      },
+      {
+        text: "Historial por Paciente",
+        icon: icons.history,
+        path: "/turnos/historial",
+      },
+    ],
+  },
+  {
+    text: "Pacientes",
+    icon: icons.people,
+    roles: [ROLES.ADMIN, ROLES.RECEPCION],
+    children: [
+      {
+        text: "Registrar Paciente",
+        icon: icons.add,
+        path: "/pacientes/registrar",
+      },
+      {
+        text: "Lista de Pacientes",
+        icon: icons.list,
+        path: "/pacientes/consultar",
+      },
+    ],
+  },
+  {
+    text: "Facturación",
+    icon: icons.assessment,
+    roles: [ROLES.ADMIN, ROLES.RECEPCION],
+    children: [
+      {
+        text: "Registrar Factura",
+        icon: icons.add,
+        path: "/facturacion/registrar",
+      },
+      {
+        text: "Lista de Facturas",
+        icon: icons.list,
+        path: "/facturacion/consultar",
+      },
+    ],
+  },
+  {
+    text: "Reportes",
+    icon: icons.barChart,
+
+    roles: [ROLES.ADMIN, ROLES.DEPOSITO],
+    children: [
+      {
+        text: "Reporte Stock",
+        icon: icons.barChart,
+        path: "/reportes/stock",
+
+        roles: [ROLES.ADMIN, ROLES.DEPOSITO],
+      },
+      {
+        text: "Stock por Categoría",
+        icon: icons.pieChart,
+        path: "/reportes/stock-categoria",
+
+        roles: [ROLES.ADMIN, ROLES.DEPOSITO],
+      },
+      {
+        text: "Tasa de Ausentismo",
+        icon: icons.eventBusy,
+        path: "/reportes/ausentismo",
+
+        roles: [ROLES.ADMIN],
+      },
+      {
+        text: "Rentabilidad",
+        icon: icons.trendingUp,
+        path: "/reportes/rentabilidad",
+
+        roles: [ROLES.ADMIN],
       },
     ],
   },

@@ -9,7 +9,7 @@ const tareaRecordatorio = async () => {
 
   try {
     const result = await pool.query(`
-      SELECT 
+      SELECT
         T.ID_TurnoMedico, T.FechaHora, T.Consultorio,
         P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.Email AS EmailPaciente,
         M.Nombre AS NombreMedico, M.Apellido AS ApellidoMedico,
@@ -18,7 +18,7 @@ const tareaRecordatorio = async () => {
       JOIN Pacientes P ON T.ID_Paciente = P.ID_Paciente
       JOIN Medicos M ON T.ID_Medico = M.ID_Medico
       LEFT JOIN Especialidades E ON M.ID_Especialidad = E.ID_Especialidad
-      WHERE 
+      WHERE
         T.FechaHora BETWEEN GETDATE() AND DATEADD(hour, 25, GETDATE())
         AND T.RecordatorioEnviado = 0
         AND P.Email IS NOT NULL;
@@ -41,7 +41,7 @@ const tareaRecordatorio = async () => {
         });
 
         await pool.query`
-          UPDATE TurnosMedicos 
+          UPDATE TurnosMedicos
           SET RecordatorioEnviado = 1, FechaEnvioRecordatorio = GETDATE()
           WHERE ID_TurnoMedico = ${turno.ID_TurnoMedico};
         `;

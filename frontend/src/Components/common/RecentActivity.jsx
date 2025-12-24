@@ -78,16 +78,17 @@ const RecentActivity = () => {
                   <Box
                     sx={{
                       display: "flex",
-                      flexDirection: "row", // texto + icono en la misma fila
-                      alignItems: "center", // centra verticalmente
+                      flexDirection: "row",
+                      alignItems: "center",
                       gap: 0.5,
                       color: "#6b7280",
                     }}
+                    secondaryTypographyProps={{ component: "div" }}
                   >
                     <Typography
                       variant="body2"
                       color="text.secondary"
-                      sx={{ flex: 1 }} // ocupa el espacio a la izquierda
+                      sx={{ flex: 1 }}
                     >
                       {activity.detail}
                     </Typography>

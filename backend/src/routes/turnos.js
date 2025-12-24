@@ -11,10 +11,10 @@ router.get("/", async (req, res) => {
     const pool = await getPool();
 
     const result = await pool.query(`
-      SELECT 
-        T.ID_TurnoMedico, 
-        P.Nombre + ' ' + P.Apellido AS Paciente, 
-        M.Nombre + ' ' + M.Apellido AS Medico, 
+      SELECT
+        T.ID_TurnoMedico,
+        P.Nombre + ' ' + P.Apellido AS Paciente,
+        M.Nombre + ' ' + M.Apellido AS Medico,
         T.FechaHora,
         ET.Descripcion AS Estado
       FROM TurnosMedicos T
@@ -74,7 +74,7 @@ router.get("/paciente/:id", async (req, res) => {
     request.input("pacienteId", sql.Int, id);
 
     const result = await request.query(`
-      SELECT 
+      SELECT
         T.ID_TurnoMedico,
         T.FechaHora,
         M.Nombre + ' ' + M.Apellido AS Medico,
@@ -134,7 +134,7 @@ router.post("/", async (req, res) => {
       nuevoTurnoId
     ).query(`
         SELECT
-          P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.Email AS EmailPaciente, 
+          P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.Email AS EmailPaciente,
           M.Nombre AS NombreMedico, M.Apellido AS ApellidoMedico,
           E.Nombre AS Especialidad
         FROM TurnosMedicos T
@@ -192,13 +192,13 @@ router.put("/:id", async (req, res) => {
 
     const result = await request.query(`
       UPDATE TurnosMedicos
-      SET 
-        ID_Paciente = @ID_Paciente, 
-        ID_Medico = @ID_Medico, 
-        FechaHora = @FechaHora, 
+      SET
+        ID_Paciente = @ID_Paciente,
+        ID_Medico = @ID_Medico,
+        FechaHora = @FechaHora,
         ID_EstadoTurno = @ID_EstadoTurno,
         Consultorio = @Consultorio -- 3. Añadimos la columna en el UPDATE
-      WHERE 
+      WHERE
         ID_TurnoMedico = @turnoId
     `);
 
@@ -224,19 +224,36 @@ router.delete("/:id", async (req, res) => {
 
     request.input("turnoId", sql.Int, id);
 
+    const estadoCanceladoResult = await pool.query`
+      SELECT ID_EstadoTurno FROM EstadosTurnoMedico WHERE Descripcion = 'Cancelado'
+    `;
+
+    if (estadoCanceladoResult.recordset.length === 0) {
+      return res.status(500).json({
+        error: "No se encontró el estado 'Cancelado' en la base de datos.",
+      });
+    }
+
+    const idCancelado = estadoCanceladoResult.recordset[0].ID_EstadoTurno;
+    request.input("idCancelado", sql.Int, idCancelado);
+
     const result = await request.query(
-      `DELETE FROM TurnosMedicos WHERE ID_TurnoMedico = @turnoId`
+      `UPDATE TurnosMedicos
+       SET ID_EstadoTurno = @idCancelado
+       WHERE ID_TurnoMedico = @turnoId`
     );
 
     if (result.rowsAffected[0] > 0) {
-      res.status(200).json({ message: "Turno eliminado exitosamente" });
+      res
+        .status(200)
+        .json({ message: "Turno cancelado exitosamente (Baja Lógica)" });
     } else {
       res.status(404).json({ error: "Turno no encontrado" });
     }
   } catch (err) {
-    console.error("Error al eliminar el turno:", err);
+    console.error("Error al cancelar el turno:", err);
     res.status(500).json({
-      error: "Error en el servidor al eliminar el turno",
+      error: "Error en el servidor al cancelar el turno",
       details: err.message,
     });
   }
