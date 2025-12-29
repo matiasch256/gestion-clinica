@@ -1,0 +1,2 @@
+ALTER TABLE Pacientes
+ADD Email VARCHAR(255) NULL;

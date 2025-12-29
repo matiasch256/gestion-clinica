@@ -1,0 +1,3 @@
+ALTER TABLE Pacientes
+ADD Activo BIT NOT NULL DEFAULT 1;
+GO
