@@ -122,7 +122,7 @@ export default function MainLayout({ title = "App", menuItems = [] }) {
           <Box sx={{ display: "flex", alignItems: "center" }}>
                        
             <img
-              src="./icono.png"
+              src="icono.png"
               alt="Logo Mc Solutions"
               style={{ height: 45, marginRight: 10 }}
             />

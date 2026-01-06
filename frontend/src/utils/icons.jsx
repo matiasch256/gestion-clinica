@@ -13,6 +13,12 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PieChartIcon from "@mui/icons-material/PieChart";
+import SearchIcon from "@mui/icons-material/Search";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DescriptionIcon from "@mui/icons-material/Description";
 
 export const icons = {
   home: <HomeIcon />,
@@ -30,4 +36,10 @@ export const icons = {
   eventBusy: <EventBusyIcon />,
   trendingUp: <TrendingUpIcon />,
   pieChart: <PieChartIcon />,
+  search: <SearchIcon />,
+  edit: <EditIcon />,
+  delete: <DeleteIcon />,
+  view: <VisibilityIcon />,
+  pdf: <PictureAsPdfIcon />,
+  excel: <DescriptionIcon />,
 };
