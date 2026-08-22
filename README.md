@@ -71,7 +71,7 @@ gestion-clinica/
 
 ### 1. Clonar el repositorio
 ```bash
-git clone [https://github.com/matiasch256/gestion-clinica.git](https://github.com/matiasch256/gestion-clinica.git)
+git clone https://github.com/matiasch256/gestion-clinica.git
 cd gestion-clinica
 ```
 
