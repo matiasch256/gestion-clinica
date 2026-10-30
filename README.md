@@ -36,7 +36,7 @@ gestion-clinica/
         │   ├── common/        # Piezas reutilizables (layout con menú, dashboard, rutas protegidas)
         │   ├── layouts/       # Layout de formularios
         │   └── pages/         # Pantallas por módulo: turnos, pacientes, facturas, compras,
-        │                      # productos, categorías, proveedores, reportes, usuarios, login (form)
+        │                      # productos, categorías, proveedores, reportes, login (form)
         ├── context/           # Estado de la sesión del usuario (authContext)
         ├── theme/             # Paleta y tema de Material UI
         ├── styles/            # Estilos de botones
@@ -59,7 +59,6 @@ Todas cuelgan de `http://localhost:3000`:
 | `/api/productos`, `/api/categorias` | Inventario |
 | `/proveedores` (sin `/api`), `/api/compras`, `/api/gastos` | Compras |
 | `/api/dashboard`, `/api/reportes` | Métricas y reportes |
-| `/api/usuarios` | Usuarios (ver la nota del paso 7) |
 
 ### Roles
 
@@ -250,7 +249,7 @@ Si te olvidás una contraseña, no hay forma de recuperarla: lo más simple es b
 DELETE FROM MDMSYSTEM.dbo.Usuarios WHERE Email = 'admin@clinica.com';
 ```
 
-> **Nota:** la pantalla `/usuarios` de la aplicación **todavía no crea usuarios reales**. El endpoint `POST /api/usuarios` guarda en una tabla de prueba (`PruebaUsuarios`) que no existe en la base. Hasta que se corrija, usá `createUser.js`.
+> **Nota:** la aplicación no tiene una pantalla para crear usuarios. Por ahora, la única forma es `createUser.js`.
 
 ### 8. Levantar el backend
 
