@@ -1,0 +1,12 @@
+# Bitácora local de trabajo con Claude Code (no se sube)
+CLAUDE.md
+
+# Dependencias (se reinstalan con npm install)
+node_modules/
+
+# Variables de entorno: contienen contraseñas y claves
+.env
+.env.*
+
+# Compilados
+dist/

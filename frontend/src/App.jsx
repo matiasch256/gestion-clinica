@@ -7,7 +7,6 @@ import { homeMenuItems } from "./components/pages/home/homeMenuItems";
 import { Form } from "./components/pages/form/Form";
 import { Home } from "./components/pages/home/Home";
 import { Unauthorized } from "./components/pages/Unauthorized";
-import { Usuario } from "./components/pages/usuarios/Usuario";
 import { ComprasDashboard } from "./components/pages/compras/comprasDashboard/ComprasDashboard";
 import { RegistrarCompras } from "./components/pages/compras/registrarCompras/RegistrarCompras";
 import ModificarCompra from "./components/pages/compras/modificarCompra/ModificarCompra";
@@ -102,7 +101,6 @@ function App() {
                 element={<ReporteRentabilidad />}
               />
             </Route>
-            <Route path="/usuarios" element={<Usuario />} />
           </Route>
 
           <Route
