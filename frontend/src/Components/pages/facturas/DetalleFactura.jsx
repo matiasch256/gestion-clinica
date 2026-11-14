@@ -1,3 +1,8 @@
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import DetailItem from "../../common/DetailItem";
+import StatusChip from "../../common/StatusChip";
+import EmptyState from "../../common/EmptyState";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -35,9 +40,6 @@ export const DetalleFactura = () => {
       .finally(() => setLoading(false));
   }, [facturaId]);
 
-  const getStatusChip = (estado) => {
-    /* ... (puedes copiar la función de ListadoFacturas) ... */
-  };
   const formatCurrency = (value) =>
     new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -45,119 +47,91 @@ export const DetalleFactura = () => {
     }).format(value);
 
   if (loading) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Skeleton variant="rectangular" width="100%" height={400} />
-      </Box>
-    );
+    return <Skeleton variant="rounded" height={320} />;
   }
 
   if (!factura) {
     return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <Typography variant="h5" color="error">
-          Factura no encontrada
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
-          sx={{ mt: 2 }}
-        >
-          Volver
-        </Button>
-      </Box>
+      <EmptyState
+        title="Factura no encontrada"
+        action={
+          <Button variant="outlined" onClick={() => navigate(-1)}>
+            Volver
+          </Button>
+        }
+      />
     );
   }
 
   return (
-    <Box sx={{ padding: 3, maxWidth: 900, margin: "0 auto" }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Detalle de Factura N° {factura.ID_FacturaPaciente}
-      </Typography>
+    <>
+      <PageHeader
+        title={`Factura #${factura.ID_FacturaPaciente}`}
+        subtitle="Detalle de la factura"
+        onBack={() => navigate(-1)}
+        actions={
+          <StatusChip status={factura.Estado} sx={{ textTransform: "none" }} />
+        }
+      />
 
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Paciente
-            </Typography>
-            <Typography variant="body1">
-              {factura.ApellidoPaciente}, {factura.NombrePaciente}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              DNI: {factura.DNI}
-            </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Datos de la Factura
-            </Typography>
-            <Typography variant="body1">
-              Fecha:{" "}
-              {new Date(factura.FechaEmision).toLocaleDateString("es-AR")}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-              <Typography variant="body1" sx={{ mr: 1 }}>
-                Estado:
-              </Typography>
-              <Chip
-                label={factura.Estado}
-                color={factura.Estado === "Pagada" ? "success" : "warning"}
-                size="small"
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <SectionCard title="Datos de la factura">
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <DetailItem
+                label="Paciente"
+                value={`${factura.ApellidoPaciente}, ${factura.NombrePaciente}`}
               />
-            </Box>
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3, md: 2 }}>
+              <DetailItem label="DNI" value={factura.DNI} />
+            </Grid>
+            <Grid size={{ xs: 6, sm: 3, md: 3 }}>
+              <DetailItem
+                label="Fecha de emisión"
+                value={new Date(factura.FechaEmision).toLocaleDateString(
+                  "es-AR"
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 3 }}>
+              <DetailItem label="Total">
+                <Typography variant="h5" component="span">
+                  {formatCurrency(factura.Total)}
+                </Typography>
+              </DetailItem>
+            </Grid>
           </Grid>
-        </Grid>
-      </Paper>
+        </SectionCard>
 
-      <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-        Servicios Facturados
-      </Typography>
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Servicio</TableCell>
-              <TableCell align="right">Precio Unitario</TableCell>
-              <TableCell align="center">Cantidad</TableCell>
-              <TableCell align="right">Subtotal</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {factura.detalles.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{item.Servicio}</TableCell>
-                <TableCell align="right">
-                  {formatCurrency(item.PrecioUnitario)}
-                </TableCell>
-                <TableCell align="center">{item.Cantidad}</TableCell>
-                <TableCell align="right">
-                  {formatCurrency(item.SubTotal)}
-                </TableCell>
+        <SectionCard title="Servicios facturados" disablePadding>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Servicio</TableCell>
+                <TableCell align="right">Precio unitario</TableCell>
+                <TableCell align="right">Cantidad</TableCell>
+                <TableCell align="right">Subtotal</TableCell>
               </TableRow>
-            ))}
-            <TableRow sx={{ "& td": { border: 0, fontWeight: "bold" } }}>
-              <TableCell colSpan={3} align="right">
-                TOTAL
-              </TableCell>
-              <TableCell align="right">
-                {formatCurrency(factura.Total)}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Button
-        variant="contained"
-        startIcon={<ArrowBackIcon />}
-        onClick={() => navigate(-1)}
-        sx={{ mt: 3 }}
-      >
-        Volver a la Lista
-      </Button>
-    </Box>
+            </TableHead>
+            <TableBody>
+              {factura.detalles.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>{item.Servicio}</TableCell>
+                  <TableCell align="right">
+                    {formatCurrency(item.PrecioUnitario)}
+                  </TableCell>
+                  <TableCell align="right">{item.Cantidad}</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>
+                    {formatCurrency(item.SubTotal)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </SectionCard>
+      </Box>
+    </>
   );
 };
 

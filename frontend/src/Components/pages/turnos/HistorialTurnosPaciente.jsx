@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Box, Button } from "@mui/material";
+import PageHeader from "../../common/PageHeader";
 import { BuscadorPacientes } from "./BuscadorPacientes";
 import { ListaResultadosPacientes } from "./ListaResultadosPacientes";
 import { DetalleHistorialPaciente } from "./DetalleHistorialPaciente";
 
 export const HistorialTurnosPaciente = () => {
+  const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
 
@@ -20,34 +23,35 @@ export const HistorialTurnosPaciente = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, maxWidth: 1200, margin: "0 auto" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
-        }}
-      >
-        <Typography variant="h4" component="h1">
-          Historial de Turnos
-        </Typography>
-        <Button variant="contained">Ir a Agenda</Button>
+    <>
+      <PageHeader
+        title="Historial de turnos"
+        subtitle="Buscá un paciente para ver todos sus turnos"
+        actions={
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/turnos/ListaTurnos")}
+          >
+            Ir a la agenda
+          </Button>
+        }
+      />
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <BuscadorPacientes onSearch={handleSearch} />
+
+        {searchResults.length > 0 && !selectedPatient && (
+          <ListaResultadosPacientes
+            pacientes={searchResults}
+            onSelectPaciente={setSelectedPatient}
+          />
+        )}
+
+        {selectedPatient && (
+          <DetalleHistorialPaciente paciente={selectedPatient} />
+        )}
       </Box>
-
-      <BuscadorPacientes onSearch={handleSearch} />
-
-      {searchResults.length > 0 && (
-        <ListaResultadosPacientes
-          pacientes={searchResults}
-          onSelectPaciente={setSelectedPatient}
-        />
-      )}
-
-      {selectedPatient && (
-        <DetalleHistorialPaciente paciente={selectedPatient} />
-      )}
-    </Box>
+    </>
   );
 };
 
