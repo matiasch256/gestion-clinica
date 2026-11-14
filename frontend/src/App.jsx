@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { CssBaseline } from "@mui/material";
 import MainLayout from "./components/common/MainLayout";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import { RoleBasedRoute } from "./components/common/RoleBasedRoute";
@@ -45,7 +44,6 @@ import { ROLES } from "./utils/roles";
 function App() {
   return (
     <>
-      <CssBaseline />
       <Routes>
         <Route path="/" element={<Form />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
