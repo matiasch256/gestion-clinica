@@ -174,7 +174,7 @@ export const ReporteStockCritico = () => {
             color="success"
             sx={{ fontSize: 80, opacity: 0.8 }}
           />
-          <Typography variant="h5" fontWeight="bold" color="success.main">
+          <Typography variant="h5" fontWeight={600} color="success.main">
             ¡Todo en orden!
           </Typography>
           <Typography color="text.secondary">
@@ -185,7 +185,7 @@ export const ReporteStockCritico = () => {
     }
 
     return (
-      <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+      <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
         <Typography
           variant="h6"
           gutterBottom
@@ -220,7 +220,7 @@ export const ReporteStockCritico = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: "100%", margin: "0 auto" }}>
-      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+      <Paper variant="outlined" sx={{ p: 3, mb: 3, borderRadius: 2 }}>
         <Box
           sx={{
             display: "flex",
@@ -232,7 +232,7 @@ export const ReporteStockCritico = () => {
           }}
         >
           <Box>
-            <Typography variant="h5" component="h1" fontWeight="bold">
+            <Typography variant="h5" component="h1" fontWeight={600}>
               Reporte Táctico: Stock Crítico
             </Typography>
             <Typography variant="body2" color="text.secondary">

@@ -114,7 +114,7 @@ const ComprasReportes = () => {
       <Container maxWidth="xl">
         <Grid container spacing={5} my={5}>
           <Grid size={12}>
-            <Paper elevation={4}>
+            <Paper variant="outlined">
               <Box sx={{ p: 2 }}>
                 {loading ? (
                   <>
@@ -260,7 +260,7 @@ const ComprasReportes = () => {
                         ]}
                         sx={{
                           [`& .${pieArcLabelClasses.root}`]: {
-                            fontWeight: "bold",
+                            fontWeight: 600,
                           },
                         }}
                         width={500}
@@ -303,7 +303,7 @@ const ComprasReportes = () => {
       <Container maxWidth="xl" ref={secondContainerRef}>
         <Grid container spacing={5} my={5}>
           <Grid size={12}>
-            <Paper elevation={4}>
+            <Paper variant="outlined">
               <Box sx={{ p: 2 }}>
                 {productLoading ? (
                   <>
@@ -406,7 +406,7 @@ const ComprasReportes = () => {
                         ]}
                         sx={{
                           [`& .${pieArcLabelClasses.root}`]: {
-                            fontWeight: "bold",
+                            fontWeight: 600,
                           },
                         }}
                         width={500}

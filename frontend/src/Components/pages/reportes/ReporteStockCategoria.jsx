@@ -34,7 +34,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const KpiCard = ({ title, value, icon, color = "text.primary" }) => (
-  <Card elevation={3} sx={{ height: "100%", borderRadius: 2 }}>
+  <Card variant="outlined" sx={{ height: "100%", borderRadius: 2 }}>
     <CardContent sx={{ textAlign: "center", py: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
         {icon}
@@ -42,11 +42,11 @@ const KpiCard = ({ title, value, icon, color = "text.primary" }) => (
       <Typography
         variant="h4"
         component="p"
-        sx={{ fontWeight: "bold", mb: 1, color: color }}
+        sx={{ fontWeight: 600, mb: 1, color: color }}
       >
         {value}
       </Typography>
-      <Typography variant="body2" color="text.secondary" fontWeight="bold">
+      <Typography variant="body2" color="text.secondary" fontWeight={600}>
         {title.toUpperCase()}
       </Typography>
     </CardContent>
@@ -185,7 +185,7 @@ export const ReporteStockCategoria = () => {
 
     if (!summary || !details || details.length === 0) {
       return (
-        <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
+        <Paper variant="outlined" sx={{ p: 4, textAlign: "center" }}>
           <Typography>No se encontraron datos de productos.</Typography>
         </Paper>
       );
@@ -224,7 +224,7 @@ export const ReporteStockCategoria = () => {
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 5 }}>
             <Paper
-              elevation={3}
+              variant="outlined"
               sx={{
                 p: 3,
                 height: "100%",
@@ -234,7 +234,7 @@ export const ReporteStockCategoria = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
+              <Typography variant="h6" fontWeight={600} gutterBottom>
                 Distribución por Valor
               </Typography>
               <Box
@@ -276,7 +276,7 @@ export const ReporteStockCategoria = () => {
                       [`& .${pieArcLabelClasses.root}`]: {
                         fill: "white",
                         fontSize: 12,
-                        fontWeight: "bold",
+                        fontWeight: 600,
                       },
                     }}
                   />
@@ -291,20 +291,20 @@ export const ReporteStockCategoria = () => {
 
           <Grid size={{ xs: 12, md: 7 }}>
             <Paper
-              elevation={3}
+              variant="outlined"
               sx={{ height: "100%", borderRadius: 2, overflow: "hidden" }}
             >
               <TableContainer sx={{ maxHeight: 400 }}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: "bold" }}>
+                      <TableCell sx={{ fontWeight: 600 }}>
                         Categoría
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                      <TableCell align="right" sx={{ fontWeight: 600 }}>
                         Cantidad Total
                       </TableCell>
-                      <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                      <TableCell align="right" sx={{ fontWeight: 600 }}>
                         Valor Estimado
                       </TableCell>
                     </TableRow>
@@ -335,7 +335,7 @@ export const ReporteStockCategoria = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: "100%", margin: "0 auto" }}>
-      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+      <Paper variant="outlined" sx={{ p: 3, mb: 3, borderRadius: 2 }}>
         <Box
           sx={{
             display: "flex",
@@ -346,7 +346,7 @@ export const ReporteStockCategoria = () => {
           }}
         >
           <Box>
-            <Typography variant="h5" component="h1" fontWeight="bold">
+            <Typography variant="h5" component="h1" fontWeight={600}>
               Reporte: Stock por Categoría
             </Typography>
             <Typography variant="body2" color="text.secondary">

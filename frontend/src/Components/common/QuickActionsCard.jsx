@@ -1,74 +1,67 @@
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  Button,
-  Grid,
-  Typography,
-  Box,
-} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Box, ButtonBase, Grid, Typography } from "@mui/material";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import SectionCard from "./SectionCard";
+import { useAuth } from "../../context/authContext";
 
-const QuickActionsCard = ({ quickActions }) => {
+// Accesos directos. Todos con el mismo aspecto y el color de marca:
+// se distinguen por el ícono y el texto, no por el color.
+// Cada acción: { title, description, icon, path, roles? }
+const QuickActionsCard = ({ quickActions, title = "Acciones rápidas" }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const visible = quickActions.filter(
+    (action) => !action.roles || action.roles.includes(user?.Rol)
+  );
+  if (visible.length === 0) return null;
+
   return (
-    <Card sx={{ mt: 3 }}>
-      <CardHeader
-        title={<Typography variant="h6">Acciones Rápidas</Typography>}
-      />
-      <CardContent>
-        <Grid container spacing={2}>
-          {quickActions.map((action, index) => (
-            <Grid key={index} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-              <Button
-                variant="contained"
+    <SectionCard title={title}>
+      <Grid container spacing={2}>
+        {visible.map((action) => (
+          <Grid key={action.path} size={{ xs: 12, sm: 6 }}>
+            <ButtonBase
+              onClick={() => navigate(action.path)}
+              sx={{
+                width: "100%",
+                p: 1.5,
+                gap: 1.5,
+                justifyContent: "flex-start",
+                textAlign: "left",
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 2,
+                transition: "border-color 0.2s, background-color 0.2s",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "primary.lighter",
+                },
+              }}
+            >
+              <Box
                 sx={{
-                  height: "100%",
-                  width: "90%",
-                  padding: "16px",
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  color: "white",
-                  backgroundColor: `${action.color} !important`,
-                  "&:hover": {
-                    backgroundColor: `${action.colorHover} !important`,
-                    opacity: 4,
-                  },
-                  textTransform: "none",
-                  borderRadius: "8px",
+                  p: 1,
+                  borderRadius: 2,
+                  bgcolor: "primary.lighter",
+                  color: "primary.main",
                 }}
-                onClick={action.action}
               >
-                <action.icon sx={{ fontSize: "24px", color: "white" }} />
-                <Box textAlign="center">
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    {action.title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      letterSpacing: "0.2px",
-                    }}
-                  >
-                    {action.description}
-                  </Typography>
-                </Box>
-              </Button>
-            </Grid>
-          ))}
-        </Grid>
-      </CardContent>
-    </Card>
+                <action.icon fontSize="small" />
+              </Box>
+              <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                <Typography variant="subtitle2">{action.title}</Typography>
+                <Typography variant="caption" color="text.secondary" noWrap>
+                  {action.description}
+                </Typography>
+              </Box>
+              <ChevronRightIcon fontSize="small" color="action" />
+            </ButtonBase>
+          </Grid>
+        ))}
+      </Grid>
+    </SectionCard>
   );
 };
 

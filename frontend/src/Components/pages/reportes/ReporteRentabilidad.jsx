@@ -68,9 +68,9 @@ export const ReporteRentabilidad = () => {
            
       <Grid container spacing={5} my={5}>
                
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
                    
-          <Paper elevation={4}>
+          <Paper variant="outlined">
                        
             <Box sx={{ p: 3 }}>
                            

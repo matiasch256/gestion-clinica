@@ -1,8 +1,13 @@
-import { Box, Typography } from "@mui/material";
+import { Chip } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import PageHeader from "./PageHeader";
 
-const DashboardHeader = () => {
-  const today = new Date().toLocaleDateString("es-ES", {
+// Cabecera de los paneles: la misma de cualquier pantalla, con la fecha de hoy.
+const DashboardHeader = ({
+  title = "Panel de control",
+  subtitle = "Resumen de la actividad del sistema",
+}) => {
+  const today = new Date().toLocaleDateString("es-AR", {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -10,47 +15,22 @@ const DashboardHeader = () => {
   });
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "background.paper",
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: 2,
-        p: 3,
-        mb: 3,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        boxShadow: "0px 2px 4px rgba(0,0,0,0.02)",
-      }}
-    >
-      <Box>
-        <Typography variant="h5" fontWeight="bold" color="text.primary">
-          Panel de Control
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Aquí tienes un resumen de la actividad del sistema.
-        </Typography>
-      </Box>
-
-      <Box
-        sx={{
-          display: { xs: "none", md: "flex" },
-          alignItems: "center",
-          gap: 1,
-          color: "primary.main",
-          bgcolor: "primary.lighter",
-          p: 1,
-          borderRadius: 1,
-        }}
-      >
-        <CalendarTodayIcon fontSize="small" />
-        <Typography variant="subtitle2" sx={{ textTransform: "capitalize" }}>
-          {today}
-        </Typography>
-      </Box>
-    </Box>
+    <PageHeader
+      title={title}
+      subtitle={subtitle}
+      actions={
+        <Chip
+          icon={<CalendarTodayIcon />}
+          label={today.charAt(0).toUpperCase() + today.slice(1)}
+          sx={{
+            display: { xs: "none", md: "inline-flex" },
+            bgcolor: "primary.lighter",
+            color: "primary.dark",
+            "& .MuiChip-icon": { color: "inherit", fontSize: 16, ml: 1 },
+          }}
+        />
+      }
+    />
   );
 };
 

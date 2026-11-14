@@ -1,3 +1,9 @@
+import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+import PageHeader from "../../../common/PageHeader";
+import SectionCard from "../../../common/SectionCard";
+import SystemMetricsGrid from "../../../common/SystemMetricsGrid";
+import StatusChip from "../../../common/StatusChip";
 import { useState } from "react";
 import {
   Card,
@@ -45,14 +51,15 @@ function TabPanel(props) {
       aria-labelledby={`tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && children}
     </div>
   );
 }
 
-export function ProductosDashboard({ onNavigate }) {
+export function ProductosDashboard() {
+  const navigate = useNavigate();
+  const theme = useTheme();
   const [selectedTab, setSelectedTab] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState("30");
 
   const metricas = {
     totalProductos: 1247,
@@ -64,12 +71,12 @@ export function ProductosDashboard({ onNavigate }) {
   };
 
   const productosPorCategoria = [
-    { name: "Oficina", value: 324, color: "#007bff" },
-    { name: "Tecnología", value: 256, color: "#28a745" },
-    { name: "Mobiliario", value: 189, color: "#ffc107" },
-    { name: "Limpieza", value: 145, color: "#17a2b8" },
-    { name: "Papelería", value: 167, color: "#6f42c1" },
-    { name: "Otros", value: 166, color: "#fd7e14" },
+    { name: "Oficina", value: 324 },
+    { name: "Tecnología", value: 256 },
+    { name: "Mobiliario", value: 189 },
+    { name: "Limpieza", value: 145 },
+    { name: "Papelería", value: 167 },
+    { name: "Otros", value: 166 },
   ];
 
   const stockPorMes = [
@@ -124,378 +131,104 @@ export function ProductosDashboard({ onNavigate }) {
     setSelectedTab(newValue);
   };
 
+  const series = theme.palette.charts.series;
+
+  const metricCards = [
+    {
+      title: "Total de productos",
+      value: metricas.totalProductos.toLocaleString("es-AR"),
+      caption: `+${metricas.productosNuevos} este mes`,
+      icon: Inventory2Icon,
+    },
+    {
+      title: "Stock bajo",
+      value: metricas.stockBajo,
+      caption: "Requieren reposición",
+      icon: WarningAmberIcon,
+      tone: "warning",
+    },
+    {
+      title: "Sin stock",
+      value: metricas.sinStock,
+      caption: "Productos agotados",
+      icon: ArchiveIcon,
+      tone: "error",
+    },
+    {
+      title: "Valor del inventario",
+      value: formatCurrency(metricas.valorInventario),
+      caption: "+12,5% vs. mes anterior",
+      icon: AttachMoneyIcon,
+    },
+    {
+      title: "Más vendidos",
+      value: metricas.productosMasVendidos,
+      caption: "Top de productos activos",
+      icon: TrendingUpIcon,
+    },
+    {
+      title: "Categorías",
+      value: productosPorCategoria.length,
+      caption: "Categorías activas",
+      icon: LabelIcon,
+    },
+  ];
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          justifyContent: "space-between",
-          alignItems: { xs: "stretch", md: "center" },
-          gap: 2,
-        }}
-      >
+    <>
+      <PageHeader
+        title="Productos"
+        subtitle="Inventario y rendimiento de los productos"
+        actions={
+          <>
+            <Button
+              startIcon={<BarChartIcon />}
+              onClick={() => navigate("/reportes/stock")}
+            >
+              Reportes
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<InventoryIcon />}
+              onClick={() => navigate("/productos/lista")}
+            >
+              Ver inventario
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate("/productos/registrar")}
+            >
+              Agregar producto
+            </Button>
+          </>
+        }
+      />
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <SystemMetricsGrid systemMetrics={metricCards} />
+
         <Box>
-          <Typography variant="h5">Dashboard de Productos</Typography>
-          <Typography variant="body2" sx={{ color: "#6B7280" }}>
-            Gestiona tu inventario y monitorea el rendimiento de productos
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 1,
-            "& .MuiButton-contained": {
-              backgroundColor: "#3B82F6",
-              color: "#fff",
-              "&:hover": {
-                backgroundColor: "#2563EB",
-              },
-            },
-            "& .MuiButton-outlined": {
-              backgroundColor: "#fff",
-
-              "&:hover": {
-                backgroundColor: "#dbeafe",
-                borderColor: "#9CA3AF",
-                color: "#2563EB",
-              },
-            },
-          }}
-        >
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => onNavigate("productos", "registrar")}
-          >
-            Agregar Producto
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<InventoryIcon />}
-            sx={{
-              borderColor: "#D1D5DB",
-              color: "#374151",
-              "&:hover": { borderColor: "#9CA3AF" },
-            }}
-            onClick={() => onNavigate("productos", "lista")}
-          >
-            Ver Inventario
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<BarChartIcon />}
-            sx={{
-              borderColor: "#D1D5DB",
-              color: "#374151",
-              "&:hover": { borderColor: "#9CA3AF" },
-            }}
-            onClick={() => onNavigate("productos", "reportes")}
-          >
-            Reportes
-          </Button>
-        </Box>
-      </Box>
-
-      <Grid container spacing={2}>
-        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
-          <Card>
-            <CardContent
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: "#6B7280" }}>
-                  Total Productos
-                </Typography>
-                <Typography variant="h6">
-                  {metricas.totalProductos.toLocaleString()}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#6B7280" }}>
-                  <span style={{ color: "#10B981" }}>
-                    +{metricas.productosNuevos}
-                  </span>{" "}
-                  este mes
-                </Typography>
-              </Box>
-              <Inventory2Icon sx={{ color: "#6B7280" }} />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-          <Card>
-            <CardContent
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: "#6B7280" }}>
-                  Stock Bajo
-                </Typography>
-                <Typography variant="h6" sx={{ color: "#F59E0B" }}>
-                  {metricas.stockBajo}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#6B7280" }}>
-                  Requieren reposición
-                </Typography>
-              </Box>
-              <WarningAmberIcon sx={{ color: "#F59E0B" }} />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-          <Card>
-            <CardContent
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: "#6B7280" }}>
-                  Sin Stock
-                </Typography>
-                <Typography variant="h6" sx={{ color: "#EF4444" }}>
-                  {metricas.sinStock}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#6B7280" }}>
-                  Productos agotados
-                </Typography>
-              </Box>
-              <ArchiveIcon sx={{ color: "#EF4444" }} />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-          <Card>
-            <CardContent
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: "#6B7280" }}>
-                  Valor Inventario
-                </Typography>
-                <Typography variant="h6">
-                  {formatCurrency(metricas.valorInventario)}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#6B7280" }}>
-                  <span style={{ color: "#10B981" }}>+12.5%</span> vs mes
-                  anterior
-                </Typography>
-              </Box>
-              <AttachMoneyIcon sx={{ color: "#6B7280" }} />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-          <Card>
-            <CardContent
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: "#6B7280" }}>
-                  Más Vendidos
-                </Typography>
-                <Typography variant="h6">
-                  {metricas.productosMasVendidos}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#6B7280" }}>
-                  Top productos activos
-                </Typography>
-              </Box>
-              <TrendingUpIcon sx={{ color: "#10B981" }} />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-          <Card>
-            <CardContent
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: "#6B7280" }}>
-                  Categorías
-                </Typography>
-                <Typography variant="h6">
-                  {productosPorCategoria.length}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "#6B7280" }}>
-                  Categorías activas
-                </Typography>
-              </Box>
-              <LabelIcon sx={{ color: "#6B7280" }} />
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      <Box sx={{ pb: 2 }} size="100%">
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: 36,
-            width: "fit-content",
-            padding: "3px",
-            borderRadius: 12,
-
-            bgcolor: "#F8F9FA",
-
-            color: "#6B7280",
-          }}
-        >
           <Tabs
             value={selectedTab}
             onChange={handleTabChange}
-            aria-label="dashboard tabs"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-
-              height: 36,
-              width: "fit-content",
-              borderRadius: 12,
-              padding: 3,
-              "& .MuiTabs-flexContainer": {
-                gap: 2,
-              },
-              "& .MuiTabs-indicator": {
-                display: "none",
-              },
-            }}
+            aria-label="Secciones del panel de productos"
+            sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}
           >
-            <Tab
-              label="Resumen"
-              sx={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                height: 20,
-                minHeight: "unset",
-                borderRadius: 12,
-                border: "1px solid transparent",
-                px: 2,
-                py: 1,
-                fontSize: 14,
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-                transition: "color 0.2s, box-shadow 0.2s",
-                margin: "auto 0",
-                "&:focus-visible": {
-                  borderColor: "#3B82F6",
-                  boxShadow: `0 0 0 3px #3B82F650`,
-                  outline: "1px solid",
-                },
-
-                color: "#374151",
-                bgcolor: "#F8F9FA !important",
-
-                "&.Mui-selected": {
-                  color: "#3B82F6",
-                  bgcolor: "#FFFFFF !important",
-                },
-                "&:hover": {
-                  bgcolor: "#FFFFFF !important",
-                },
-              }}
-            />
-            <Tab
-              label="Control de Stock"
-              sx={{
-                display: "inline-flex",
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6 / 4,
-                height: 20,
-                minHeight: "unset",
-                borderRadius: 12,
-                border: "1px solid transparent",
-                px: 2,
-                py: 1,
-                fontSize: 14,
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-                textTransform: "none",
-                color: "#374151",
-                margin: "auto 0",
-                bgcolor: "#F8F9FA !important",
-
-                "&.Mui-selected": {
-                  color: "#3B82F6",
-                  bgcolor: "#FFFFFF !important",
-                },
-                "&:hover": {
-                  bgcolor: "#FFFFFF !important",
-                },
-              }}
-            />
-            <Tab
-              label="Más Vendidos"
-              sx={{
-                display: "inline-flex",
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6 / 4,
-                height: 20,
-                minHeight: "unset",
-                borderRadius: 12,
-                border: "1px solid transparent",
-                px: 2,
-                py: 1.2,
-                fontSize: 14,
-                fontWeight: 500,
-                whiteSpace: "nowrap",
-                textTransform: "none",
-                color: "#374151",
-                margin: "auto 0",
-                bgcolor: "#F8F9FA !important",
-
-                "&.Mui-selected": {
-                  color: "#3B82F6",
-                  bgcolor: "#FFFFFF !important",
-                },
-                "&:hover": {
-                  bgcolor: "#FFFFFF !important",
-                },
-              }}
-            />
+            <Tab label="Resumen" id="tab-0" />
+            <Tab label="Control de stock" id="tab-1" />
+            <Tab label="Más vendidos" id="tab-2" />
           </Tabs>
-        </Box>
 
-        <TabPanel value={selectedTab} index={0}>
-          <Grid container spacing={2}>
-            <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent>
-                  <Typography variant="h6">Productos por Categoría</Typography>
-                  <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                    Distribución actual del inventario
-                  </Typography>
-                  <Box sx={{ height: 320, mt: 2 }}>
+          <TabPanel value={selectedTab} index={0}>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 7 }}>
+                <SectionCard
+                  title="Productos por categoría"
+                  description="Distribución actual del inventario"
+                  sx={{ height: "100%" }}
+                >
+                  <Box sx={{ height: 300 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -503,236 +236,195 @@ export function ProductosDashboard({ onNavigate }) {
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
-                          outerRadius={120}
-                          paddingAngle={5}
+                          outerRadius={110}
+                          paddingAngle={3}
                           dataKey="value"
                         >
                           {productosPorCategoria.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
+                            <Cell
+                              key={entry.name}
+                              fill={series[index % series.length]}
+                            />
                           ))}
                         </Pie>
                         <Tooltip formatter={(value) => [value, "Productos"]} />
                       </PieChart>
                     </ResponsiveContainer>
                   </Box>
-                  <Grid container spacing={1} sx={{ mt: 2 }}>
-                    {productosPorCategoria.map((categoria, index) => (
-                      <Grid item size={{ xs: 6 }} key={index}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                            ml: 18,
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              height: 12,
-                              width: 12,
-                              borderRadius: "50%",
-                              backgroundColor: categoria.color,
-                            }}
-                          />
-                          <Typography
-                            variant="body2"
-                            sx={{ color: "#6B7280 !important" }}
-                          >
-                            {categoria.name}: {categoria.value}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item size={{ xs: 12, md: 6, lg: 6 }}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <WarningAmberIcon sx={{ color: "#F59E0B" }} />
-                    <Typography variant="h6">Stock Bajo</Typography>
-                  </Box>
-                  <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                    Productos que requieren reposición urgente
-                  </Typography>
                   <Box
                     sx={{
-                      mt: 2,
                       display: "flex",
-                      flexDirection: "column",
-                      gap: 2,
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                      columnGap: 3,
+                      rowGap: 1,
+                      mt: 2,
                     }}
                   >
-                    {productosStockBajo.map((producto, index) => (
+                    {productosPorCategoria.map((categoria, index) => (
                       <Box
-                        key={index}
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          p: 2,
-                          border: "1px solid",
-                          borderColor: "#E5E7EB",
-                          borderRadius: 1,
-                        }}
+                        key={categoria.name}
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
-                        <Box>
-                          <Typography variant="subtitle1">
-                            {producto.nombre}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                            {producto.categoria}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ textAlign: "right" }}>
-                          <Chip
-                            label={`Stock: ${producto.stock}`}
-                            color={producto.stock === 0 ? "error" : "default"}
-                            variant="outlined"
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "#6B7280", display: "block", mt: 0.5 }}
-                          >
-                            Mín: {producto.minimo}
-                          </Typography>
-                        </Box>
+                        <Box
+                          sx={{
+                            width: 10,
+                            height: 10,
+                            borderRadius: "50%",
+                            bgcolor: series[index % series.length],
+                          }}
+                        />
+                        <Typography variant="body2" color="text.secondary">
+                          {categoria.name}: {categoria.value}
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    sx={{
-                      mt: 2,
-                      borderColor: "#D1D5DB !important",
-                      backgroundColor: "#2563EB !important",
-                      color: "#FFFFFF !important",
-                      "&:hover": {
-                        borderColor: "#9CA3AF !important",
-                        backgroundColor: "#2563EB!important",
-                      },
-                    }}
-                    onClick={() => onNavigate("productos", "stock-bajo")}
-                  >
-                    Ver Todos los Productos con Stock Bajo
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </TabPanel>
+                </SectionCard>
+              </Grid>
 
-        <TabPanel value={selectedTab} index={1}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Movimientos de Stock</Typography>
-              <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                Entradas y salidas de productos en los últimos 6 meses
-              </Typography>
-              <Box sx={{ height: 320, mt: 2 }}>
+              <Grid size={{ xs: 12, md: 5 }}>
+                <SectionCard
+                  title="Stock bajo"
+                  description="Productos que requieren reposición"
+                  disablePadding
+                  sx={{ height: "100%" }}
+                  action={
+                    <Button
+                      size="small"
+                      onClick={() => navigate("/reportes/stock")}
+                    >
+                      Ver todos
+                    </Button>
+                  }
+                >
+                  {productosStockBajo.map((producto, index) => (
+                    <Box
+                      key={producto.nombre}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 2,
+                        px: 3,
+                        py: 1.5,
+                        borderTop: index === 0 ? 0 : 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="subtitle2" noWrap>
+                          {producto.nombre}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {producto.categoria} · Mínimo: {producto.minimo}
+                        </Typography>
+                      </Box>
+                      <StatusChip
+                        color={producto.stock === 0 ? "error" : "warning"}
+                        status={`Stock: ${producto.stock}`}
+                        sx={{ textTransform: "none" }}
+                      />
+                    </Box>
+                  ))}
+                </SectionCard>
+              </Grid>
+            </Grid>
+          </TabPanel>
+
+          <TabPanel value={selectedTab} index={1}>
+            <SectionCard
+              title="Movimientos de stock"
+              description="Entradas y salidas de productos en los últimos 6 meses"
+            >
+              <Box sx={{ height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={stockPorMes}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke={theme.palette.divider}
+                    />
                     <XAxis dataKey="mes" />
                     <YAxis />
                     <Tooltip />
                     <Line
                       type="monotone"
                       dataKey="entradas"
-                      stroke="#28a745"
+                      stroke={theme.palette.success.main}
                       strokeWidth={2}
                       name="Entradas"
                     />
                     <Line
                       type="monotone"
                       dataKey="salidas"
-                      stroke="#dc3545"
+                      stroke={theme.palette.error.main}
                       strokeWidth={2}
                       name="Salidas"
                     />
                     <Line
                       type="monotone"
                       dataKey="stock"
-                      stroke="#007bff"
+                      stroke={theme.palette.primary.main}
                       strokeWidth={2}
-                      name="Stock Total"
+                      name="Stock total"
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </Box>
-            </CardContent>
-          </Card>
-        </TabPanel>
+            </SectionCard>
+          </TabPanel>
 
-        <TabPanel value={selectedTab} index={2}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Productos Más Vendidos</Typography>
-              <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                Top 5 productos con mejor rendimiento en ventas
-              </Typography>
-              <Box
-                sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}
-              >
-                {productosMasVendidos.map((producto, index) => (
+          <TabPanel value={selectedTab} index={2}>
+            <SectionCard
+              title="Productos más vendidos"
+              description="Los 5 productos con mejor rendimiento en ventas"
+              disablePadding
+            >
+              {productosMasVendidos.map((producto, index) => (
+                <Box
+                  key={producto.nombre}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    px: 3,
+                    py: 1.5,
+                    borderTop: index === 0 ? 0 : 1,
+                    borderColor: "divider",
+                  }}
+                >
                   <Box
-                    key={index}
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
                       alignItems: "center",
-                      p: 2,
-                      border: "1px solid",
-                      borderColor: "#E5E7EB",
-                      borderRadius: 1,
+                      justifyContent: "center",
+                      width: 36,
+                      height: 36,
+                      borderRadius: "50%",
+                      bgcolor: "primary.lighter",
+                      color: "primary.main",
+                      typography: "subtitle2",
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          height: 40,
-                          width: 40,
-                          borderRadius: "50%",
-                          bgcolor: "#EFF6FF",
-                        }}
-                      >
-                        <Typography
-                          variant="subtitle1"
-                          sx={{ color: "#3B82F6" }}
-                        >
-                          #{index + 1}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="subtitle1">
-                          {producto.nombre}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                          {producto.ventas} unidades vendidas
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ textAlign: "right" }}>
-                      <Typography variant="subtitle1">
-                        {formatCurrency(producto.revenue)}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "#6B7280" }}>
-                        Revenue
-                      </Typography>
-                    </Box>
+                    {index + 1}
                   </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </TabPanel>
+                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Typography variant="subtitle2" noWrap>
+                      {producto.nombre}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {producto.ventas} unidades vendidas
+                    </Typography>
+                  </Box>
+                  <Typography variant="subtitle1">
+                    {formatCurrency(producto.revenue)}
+                  </Typography>
+                </Box>
+              ))}
+            </SectionCard>
+          </TabPanel>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }

@@ -41,7 +41,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const KpiCard = ({ title, value, icon, colorText }) => (
-  <Card elevation={3} sx={{ height: "100%", borderRadius: 2 }}>
+  <Card variant="outlined" sx={{ height: "100%", borderRadius: 2 }}>
     <CardContent sx={{ textAlign: "center", py: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
         {icon}
@@ -49,11 +49,11 @@ const KpiCard = ({ title, value, icon, colorText }) => (
       <Typography
         variant="h4"
         component="p"
-        sx={{ fontWeight: "bold", mb: 1, color: colorText }}
+        sx={{ fontWeight: 600, mb: 1, color: colorText }}
       >
         {value}
       </Typography>
-      <Typography variant="body2" color="text.secondary" fontWeight="bold">
+      <Typography variant="body2" color="text.secondary" fontWeight={600}>
         {title.toUpperCase()}
       </Typography>
     </CardContent>
@@ -255,11 +255,11 @@ export const ReporteAusentismo = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: "100%", margin: "0 auto" }}>
-      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+      <Paper variant="outlined" sx={{ p: 3, mb: 3, borderRadius: 2 }}>
         <Typography
           variant="h5"
           component="h1"
-          sx={{ mb: 3, fontWeight: "bold" }}
+          sx={{ mb: 3, fontWeight: 600 }}
         >
           Reporte: Tasa de Ausentismo
         </Typography>
@@ -394,7 +394,7 @@ export const ReporteAusentismo = () => {
               <IconButton
                 onClick={handleGenerateReport}
                 size="small"
-                sx={{ bgcolor: theme.palette.background.trasparent }}
+                sx={{ bgcolor: "transparent" }}
               >
                 <RefreshIcon />
               </IconButton>
@@ -410,7 +410,7 @@ export const ReporteAusentismo = () => {
                     value={`${summary.PorcentajeAusentismo}%`}
                     icon={
                       <EventBusyIcon
-                        sx={{ fontSize: 40, color: theme.palette.error.main }}
+                        sx={{ fontSize: 40, color: "error.main" }}
                       />
                     }
                     colorText={theme.palette.error.main}
@@ -422,7 +422,7 @@ export const ReporteAusentismo = () => {
                     value={summary.TotalTurnos}
                     icon={
                       <TotalIcon
-                        sx={{ fontSize: 40, color: theme.palette.primary.main }}
+                        sx={{ fontSize: 40, color: "primary.main" }}
                       />
                     }
                     colorText={theme.palette.primary.main}
@@ -434,7 +434,7 @@ export const ReporteAusentismo = () => {
                     value={summary.TotalCompletados}
                     icon={
                       <EventAvailableIcon
-                        sx={{ fontSize: 40, color: theme.palette.accent.green }}
+                        sx={{ fontSize: 40, color: "success.main" }}
                       />
                     }
                     colorText={theme.palette.accent.green}
@@ -445,7 +445,7 @@ export const ReporteAusentismo = () => {
 
             <Grid size={{ xs: 12, md: 5 }}>
               <Paper
-                elevation={3}
+                variant="outlined"
                 sx={{
                   p: 2,
                   height: "100%",
@@ -474,7 +474,7 @@ export const ReporteAusentismo = () => {
                       [`& .${pieArcLabelClasses.root}`]: {
                         fill: "white",
                         fontSize: 12,
-                        fontWeight: "bold",
+                        fontWeight: 600,
                       },
                     }}
                   />
@@ -488,7 +488,7 @@ export const ReporteAusentismo = () => {
             </Grid>
           </Grid>
 
-          <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
+          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
             <Box
               sx={{
                 display: "flex",
@@ -499,7 +499,7 @@ export const ReporteAusentismo = () => {
                 gap: 2,
               }}
             >
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h6" fontWeight={600}>
                 Detalle de Turnos
               </Typography>
               <Box sx={{ display: "flex", gap: 1 }}>
@@ -510,11 +510,11 @@ export const ReporteAusentismo = () => {
                   onClick={handleExportExcel}
                   disabled={details.length === 0}
                   sx={{
-                    color: theme.palette.accent.green,
-                    borderColor: theme.palette.accent.green,
+                    color: "success.main",
+                    borderColor: "success.main",
                     "&:hover": {
-                      borderColor: theme.palette.accent.green,
-                      bgcolor: theme.palette.background.trasparent,
+                      borderColor: "success.main",
+                      bgcolor: "transparent",
                     },
                   }}
                 >
@@ -527,11 +527,11 @@ export const ReporteAusentismo = () => {
                   onClick={handleExportPDF}
                   disabled={details.length === 0}
                   sx={{
-                    color: theme.palette.error.main,
-                    borderColor: theme.palette.error.main,
+                    color: "error.main",
+                    borderColor: "error.main",
                     "&:hover": {
-                      borderColor: theme.palette.error.main,
-                      bgcolor: theme.palette.background.trasparent,
+                      borderColor: "error.main",
+                      bgcolor: "transparent",
                     },
                   }}
                 >
@@ -547,14 +547,14 @@ export const ReporteAusentismo = () => {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ fontWeight: "bold" }}>
+                        <TableCell sx={{ fontWeight: 600 }}>
                           Paciente
                         </TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>Fecha</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>
+                        <TableCell sx={{ fontWeight: 600 }}>Fecha</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>
                           Profesional
                         </TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>
+                        <TableCell sx={{ fontWeight: 600 }}>
                           Estado
                         </TableCell>
                       </TableRow>
@@ -584,12 +584,12 @@ export const ReporteAusentismo = () => {
                                   size="small"
                                   variant="outlined"
                                   sx={{
-                                    fontWeight: "bold",
+                                    fontWeight: 600,
                                     border: "1px solid",
                                     borderColor: statusColor,
                                     color: statusColor,
                                     bgcolor:
-                                      theme.palette.background.trasparent,
+                                      "transparent",
                                   }}
                                 />
                               </TableCell>
