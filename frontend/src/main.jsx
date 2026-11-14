@@ -4,6 +4,7 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import { getTheme } from "./theme/theme";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/authContext";
+import { FeedbackProvider } from "./context/FeedbackProvider";
 
 function Main() {
   return (
@@ -11,7 +12,9 @@ function Main() {
       <ThemeProvider theme={getTheme()}>
         <AuthProvider>
           <CssBaseline />
-          <App />
+          <FeedbackProvider>
+            <App />
+          </FeedbackProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
