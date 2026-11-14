@@ -1,40 +1,43 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import LockIcon from "@mui/icons-material/Lock";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 export const Unauthorized = () => {
   const navigate = useNavigate();
 
   return (
-    <Container>
-           
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        p: 3,
+        textAlign: "center",
+      }}
+    >
       <Box
         sx={{
-          p: 4,
-          mt: 10,
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 2,
-          textAlign: "center",
+          p: 2,
+          borderRadius: "50%",
+          bgcolor: "error.lighter",
+          color: "error.main",
         }}
       >
-                <LockIcon color="error" sx={{ fontSize: 80 }} />       
-        <Typography variant="h4" component="h1" fontWeight="bold">
-                    Acceso Denegado (403)        
-        </Typography>
-               
-        <Typography variant="body1">
-                    No tienes los permisos necesarios para acceder a esta
-          página.        
-        </Typography>
-               
-        <Button variant="contained" onClick={() => navigate(-1)}>
-                    Volver a la página anterior      
-        </Button>
-             
+        <LockOutlinedIcon sx={{ fontSize: 40 }} />
       </Box>
-         
-    </Container>
+      <Typography variant="h5" component="h1">
+        Acceso denegado
+      </Typography>
+      <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
+        No tenés los permisos necesarios para ver esta página.
+      </Typography>
+      <Button variant="contained" onClick={() => navigate(-1)} sx={{ mt: 1 }}>
+        Volver
+      </Button>
+    </Box>
   );
 };

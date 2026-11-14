@@ -1,495 +1,315 @@
-import React, { useState, useMemo } from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  ButtonBase,
+  Collapse,
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
 import { useAuth } from "../../context/authContext";
-import { ROLES } from "../../utils/roles";
+import { MENU_SECTIONS } from "../pages/home/homeMenuItems";
+import { PAGE_MAX_WIDTH } from "../../theme/theme";
 
-const drawerWidth = 279;
+const DRAWER_WIDTH = 264;
+const ICON_COLUMN = 40;
 
-const AppBar = styled(MuiAppBar)(({ theme }) => ({
-  width: "100%",
-  backgroundColor: theme.palette.background.paper,
-  color: theme.palette.text.primary,
-  boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.1) !important",
-}));
+// Estilo único para todos los ítems del menú (repetición).
+const navItemSx = {
+  mx: 1,
+  my: 0.25,
+  py: 0.75,
+  borderRadius: 2,
+  color: "text.secondary",
+  "& .MuiListItemIcon-root": { minWidth: ICON_COLUMN, color: "inherit" },
+  "&:hover": { bgcolor: "primary.lighter", color: "primary.main" },
+  "&.Mui-selected, &.Mui-selected:hover": {
+    bgcolor: "primary.lighter",
+    color: "primary.main",
+  },
+  "&.Mui-selected .MuiListItemText-primary": { fontWeight: 600 },
+};
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-start",
-}));
+const firstSegment = (path = "") => path.split("/")[1] || "";
 
-export default function MainLayout({ title = "App", menuItems = [] }) {
+const getInitials = (name) => {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0][0];
+  return initials.toUpperCase();
+};
+
+export default function MainLayout({ menuItems = [] }) {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(true);
-  const [iconHover, setIconHover] = useState(theme.palette.error.main);
-  const [openMenu, setOpenMenu] = useState({});
   const { user, logout } = useAuth();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
-  const filteredMenuItems = useMemo(() => {
-    if (!user || !user.Rol) return [];
+  const [drawerOpen, setDrawerOpen] = useState(isDesktop);
+  const [openGroups, setOpenGroups] = useState({});
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+
+  const visibleItems = useMemo(() => {
+    if (!user?.Rol) return [];
+    const allowed = (entry) => !entry.roles || entry.roles.includes(user.Rol);
 
     return menuItems
-      .filter((item) => {
-        if (!item.roles) return true;
-        return item.roles.includes(user.Rol);
-      })
-      .map((item) => {
-        if (!item.children) return item;
-
-        const visibleChildren = item.children.filter((child) => {
-          if (!child.roles) return true;
-
-          return child.roles.includes(user.Rol);
-        });
-
-        return { ...item, children: visibleChildren };
-      })
-
+      .filter(allowed)
+      .map((item) =>
+        item.children
+          ? { ...item, children: item.children.filter(allowed) }
+          : item
+      )
       .filter((item) => !item.children || item.children.length > 0);
   }, [menuItems, user]);
 
-  const handleDrawerToggle = () => {
-    setOpen(!open);
-  };
-  const handleMenuClick = (path) => {
+  // El módulo de la pantalla actual: se resalta y se abre solo.
+  const activeGroup = useMemo(() => {
+    const current = firstSegment(location.pathname);
+    const match = visibleItems.find(
+      (item) =>
+        item.children &&
+        item.children.some((child) => firstSegment(child.path) === current)
+    );
+    return match?.text;
+  }, [visibleItems, location.pathname]);
+
+  useEffect(() => {
+    if (activeGroup) {
+      setOpenGroups((prev) => ({ ...prev, [activeGroup]: true }));
+    }
+  }, [activeGroup]);
+
+  useEffect(() => {
+    setDrawerOpen(isDesktop);
+  }, [isDesktop]);
+
+  const goTo = (path) => {
     navigate(path);
+    if (!isDesktop) setDrawerOpen(false);
   };
 
-  const handleSubMenuClick = (text) => {
-    setOpenMenu((prev) => ({ ...prev, [text]: !prev[text] }));
-  };
+  const toggleGroup = (text) =>
+    setOpenGroups((prev) => ({ ...prev, [text]: !prev[text] }));
 
-  const handleLogout = () => {
-    logout();
-  };
-
-  const getAvatarInitial = () => {
-    if (!user || !user.Nombre) return "?";
-    const names = user.Nombre.split(" ");
-    if (names.length > 1 && names[1].length > 0) {
-      return `${names[0][0]}${names[1][0]}`.toUpperCase();
-    }
-    return user.Nombre[0].toUpperCase();
-  };
-
-  const getGreeting = () => {
-    if (!user) return "";
-
-    let greeting = "Bienvenido/a";
-
-    if (user.Genero === "Femenino") {
-      greeting = "Bienvenida";
-    } else if (user.Genero === "Masculino") {
-      greeting = "Bienvenido";
+  const renderItem = (item) => {
+    if (!item.children) {
+      return (
+        <ListItemButton
+          key={item.text}
+          selected={location.pathname === item.path}
+          onClick={() => goTo(item.path)}
+          sx={navItemSx}
+        >
+          <ListItemIcon>{item.icon}</ListItemIcon>
+          <ListItemText primary={item.text} />
+        </ListItemButton>
+      );
     }
 
-    return `${greeting}, ${user.Nombre}`;
-  };
-  return (
-    <Box sx={{ display: "flex" }}>
-            <CssBaseline />     
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-               
-        <Toolbar>
-                   
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-                       
-            <img
-              src="./icono.png"
-              alt="Logo Mc Solutions"
-              style={{ height: 45, marginRight: 10 }}
-            />
-                       
-            <IconButton
-              color="inherit"
-              aria-label="toggle drawer"
-              onClick={handleDrawerToggle}
-              edge="start"
-              sx={{
-                ml: 16,
-                bgcolor: "transparent !important",
-                "&:hover": { color: theme.palette.sidebar.active },
-              }}
-            >
-              <MenuIcon sx={{ width: 24, height: 24 }} />           
-            </IconButton>
-                     
-          </Box>
-                   
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{ bgcolor: "divider.main", mx: 3.8 }}
-          />
-          <Box sx={{ flexGrow: 1 }} />         
-          <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
-                       
-            <Typography
-              variant="subtitle2"
-              sx={{
-                mr: 2,
-                color: theme.palette.text.primary,
-                whiteSpace: "nowrap",
-              }}
-            >
-                            {getGreeting()}           
-            </Typography>
-                       
-            <IconButton
-              color="inherit"
-              sx={{ p: 0, bgcolor: "transparent !important" }}
-            >
-                           
-              <Avatar sx={{ width: 32, height: 32, bgcolor: "primary.main" }}>
-                                {getAvatarInitial()}             
-              </Avatar>
-                         
-            </IconButton>
-                     
-          </Box>
-                 
-        </Toolbar>
-             
-      </AppBar>
-           
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            mt: "64px",
+    const isOpen = Boolean(openGroups[item.text]);
+    const isActive = activeGroup === item.text;
 
-            height: "calc(100% - 64px)",
-            borderRight: `1px solid ${theme.palette.divider}`,
-            backgroundColor: theme.palette.background.paper,
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-               
-        <DrawerHeader>
-                   
-          <Typography variant="h6" sx={{ flexGrow: 1, ml: 2 }}>
-                        Menú          
-          </Typography>
-                 
-        </DrawerHeader>
-                <Divider />       
-        <Box
+    return (
+      <Fragment key={item.text}>
+        <ListItemButton
+          onClick={() => toggleGroup(item.text)}
+          aria-expanded={isOpen}
           sx={{
-            p: 2,
-            textAlign: "left",
-            display: "flex",
-            alignItems: "center",
+            ...navItemSx,
+            ...(isActive && { color: "primary.main" }),
           }}
         >
-                   
-          <Avatar
-            sx={{ width: 32, height: 32, mr: 2, bgcolor: "primary.main" }}
-          >
-                        {getAvatarInitial()}         
-          </Avatar>
-                   
-          <Box>
-                       
-            <Typography variant="subtitle1" fontWeight="bold">
-                            {user ? user.Nombre : "Cargando..."}           
-            </Typography>
-                       
-            <Typography variant="body2" color="text.secondary">
-                            {user ? user.Rol : ""}           
-            </Typography>
-                     
-          </Box>
-                 
-        </Box>
-                <Divider />       
-        <List>
-                   
-          {filteredMenuItems.map((item, index) => (
-            <React.Fragment key={index}>
-                           
-              {item.children ? (
-                <ListItem
-                  disablePadding
-                  sx={{
-                    "&:hover": {
-                      "& .MuiListItemIcon-root": {
-                        color: "primary.main",
-                      },
-                      "& .MuiListItemText-primary": {
-                        color: "primary.main",
-                      },
-                    },
-                  }}
-                >
-                                   
-                  <ListItemButton
-                    onClick={() => handleSubMenuClick(item.text)}
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: theme.palette.sidebar.hover,
-                      },
-                      ...(openMenu[item.text] && {
-                        "& .MuiListItemIcon-root": {
-                          color: theme.palette.sidebar.active,
-                        },
-                        "& .MuiListItemText-primary": {
-                          color: theme.palette.sidebar.active,
-                        },
-                      }),
-                    }}
-                  >
-                       
-                    <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                          {item.icon}   
-                    </ListItemIcon>
-                        <ListItemText primary={item.text} />   
-                    {openMenu[item.text] ? <ExpandLess /> : <ExpandMore />}   
-                  </ListItemButton>
-                     
-                </ListItem>
-              ) : (
-                <ListItem
-                  disablePadding
-                  sx={{
-                    "&:hover": {
-                      "& .MuiListItemIcon-root": {
-                        color: "primary.main",
-                      },
-                      "& .MuiListItemText-primary": {
-                        color: "primary.main",
-                      },
-                    },
-                  }}
-                >
-                     
-                  <ListItemButton
-                    onClick={() => handleMenuClick(item.path)}
-                    selected={location.pathname === item.path}
-                    sx={{
-                      "&:hover": {
-                        backgroundColor: theme.palette.sidebar.hover,
-                      },
-                      "&.Mui-selected": {
-                        backgroundColor: theme.palette.sidebar.hover,
-                        color: theme.palette.sidebar.active,
-                        "& .MuiListItemIcon-root": {
-                          color: theme.palette.sidebar.active,
-                        },
-                      },
-                    }}
-                  >
-                       
-                    <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                          {item.icon}   
-                    </ListItemIcon>
-                        <ListItemText primary={item.text} />   
-                  </ListItemButton>
-                     
-                </ListItem>
-              )}
-                 
-              {item.children && (
-                <Collapse in={openMenu[item.text]} timeout="auto" unmountOnExit>
-                     
-                  <List component="div" disablePadding>
-                       
-                    {item.children.map((child, i) => (
-                      <ListItem
-                        key={i}
-                        disablePadding
-                        sx={{
-                          "&:hover": {
-                            "& .MuiListItemIcon-root": {
-                              color: "primary.main",
-                            },
-                            "& .MuiListItemText-primary": {
-                              color: "primary.main",
-                            },
-                          },
-                        }}
-                      >
-                           
-                        <ListItemButton
-                          sx={{
-                            pl: 4,
-                            "&:hover": {
-                              backgroundColor: theme.palette.sidebar.hover,
-                            },
-                            "&.Mui-selected": {
-                              backgroundColor: theme.palette.sidebar.hover,
-                              color: theme.palette.sidebar.active,
-                              "& .MuiListItemIcon-root": {
-                                color: theme.palette.sidebar.active,
-                              },
-                            },
-                          }}
-                          selected={location.pathname === child.path}
-                          onClick={() => handleMenuClick(child.path)}
-                        >
-                             
-                          {child.icon && (
-                            <ListItemIcon
-                              sx={{
-                                color: openMenu[item.text]
-                                  ? theme.palette.sidebar.active
-                                  : theme.palette.text.secondary,
-                              }}
-                            >
-                                  {child.icon}   
-                            </ListItemIcon>
-                          )}
-                              <ListItemText primary={child.text} />   
-                        </ListItemButton>
-                           
-                      </ListItem>
-                    ))}
-                       
-                  </List>
-                     
-                </Collapse>
-              )}
-                 
-            </React.Fragment>
-          ))}
-           
-        </List>
-          <Divider /> 
-        <List>
-             
-          <ListItem
-            disablePadding
-            sx={{
-              "&:hover": {
-                "& .MuiListItemIcon-root": {
-                  color: "primary.main",
-                },
-                "& .MuiListItemText-primary": {
-                  color: "primary.main",
-                },
-              },
+          <ListItemIcon>{item.icon}</ListItemIcon>
+          <ListItemText
+            primary={item.text}
+            slotProps={{
+              primary: { sx: { fontWeight: isActive ? 600 : 400 } },
             }}
-          >
-               
-            <ListItemButton
-              onClick={() => handleMenuClick("/perfil")}
-              selected={location.pathname === "/perfil"}
-              sx={{
-                "&:hover": {
-                  backgroundColor: theme.palette.sidebar.hover,
-                },
-                "&.Mui-selected": {
-                  backgroundColor: theme.palette.sidebar.hover,
-                  color: theme.palette.sidebar.active,
-                  "& .MuiListItemIcon-root": {
-                    color: theme.palette.sidebar.active,
-                  },
-                },
-              }}
-            >
-                 
-              <ListItemIcon sx={{ color: theme.palette.text.secondary }}>
-                   
-                <IconButton color="inherit" sx={{ p: 0 }}>
-                     
-                  <Avatar
-                    sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
-                  >
-                        {getAvatarInitial()}   
-                  </Avatar>
-                     
-                </IconButton>
-                   
-              </ListItemIcon>
-                  <ListItemText primary="Mi Perfil" />   
-            </ListItemButton>
-               
-          </ListItem>
-             
-          <ListItem disablePadding>
-               
-            <ListItemButton
-              onMouseEnter={() =>
-                setIconHover(theme.palette.error.contrastText)
-              }
-              onMouseLeave={() => setIconHover(theme.palette.error.main)}
-              onClick={handleLogout}
-              sx={{
-                "&:hover": {
-                  backgroundColor: theme.palette.error.main,
-                },
-              }}
-            >
-                 
-              <ListItemIcon>
-                    <LogoutIcon sx={{ color: iconHover }} />   
-              </ListItemIcon>
-                 
-              <ListItemText primary="Cerrar Sesión" sx={{ color: iconHover }} />
-                 
-            </ListItemButton>
-             
-          </ListItem>
-           
-        </List>
-         
-      </Drawer>
-       
-      <Box
-        component="main"
+          />
+          {isOpen ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={isOpen} timeout="auto" unmountOnExit>
+          <List disablePadding>
+            {item.children.map((child) => (
+              <ListItemButton
+                key={child.path}
+                selected={location.pathname === child.path}
+                onClick={() => goTo(child.path)}
+                sx={{ ...navItemSx, pl: `${16 + ICON_COLUMN}px`, py: 0.5 }}
+              >
+                <ListItemText
+                  primary={child.text}
+                  slotProps={{ primary: { variant: "body2" } }}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        </Collapse>
+      </Fragment>
+    );
+  };
+
+  const ungrouped = visibleItems.filter((item) => !item.section);
+  const sections = MENU_SECTIONS.map((name) => ({
+    name,
+    items: visibleItems.filter((item) => item.section === name),
+  })).filter((section) => section.items.length > 0);
+
+  return (
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <AppBar
+        position="fixed"
+        color="inherit"
+        elevation={0}
         sx={{
-          flexGrow: 1,
-          p: 3,
-          transition: theme.transitions.create("margin", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
-          marginLeft: `-${drawerWidth}px`,
-          ...(open && {
-            transition: theme.transitions.create("margin", {
-              easing: theme.transitions.easing.easeOut,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-            marginLeft: 0,
-          }),
+          zIndex: theme.zIndex.drawer + 1,
+          bgcolor: "background.paper",
+          borderBottom: 1,
+          borderColor: "divider",
         }}
       >
-            <Toolbar />
-            <Outlet /> 
+        <Toolbar sx={{ gap: 1.5 }}>
+          <IconButton
+            edge="start"
+            aria-label="Mostrar u ocultar el menú"
+            onClick={() => setDrawerOpen((open) => !open)}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Box
+            component="img"
+            src="/icono.png"
+            alt=""
+            sx={{ width: 36, height: 36, borderRadius: 2 }}
+          />
+          <Typography variant="h6" component="div" noWrap>
+            Gestión Clínica
+          </Typography>
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          <ButtonBase
+            onClick={(event) => setUserMenuAnchor(event.currentTarget)}
+            aria-label="Menú de usuario"
+            aria-haspopup="menu"
+            sx={{ gap: 1.5, p: 0.5, borderRadius: 2, textAlign: "right" }}
+          >
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>
+              <Typography variant="subtitle2" noWrap>
+                {user?.Nombre}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {user?.Rol}
+              </Typography>
+            </Box>
+            <Avatar
+              sx={{
+                width: 36,
+                height: 36,
+                bgcolor: "primary.main",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+              }}
+            >
+              {getInitials(user?.Nombre)}
+            </Avatar>
+          </ButtonBase>
+          <Menu
+            anchorEl={userMenuAnchor}
+            open={Boolean(userMenuAnchor)}
+            onClose={() => setUserMenuAnchor(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <MenuItem
+              onClick={() => {
+                setUserMenuAnchor(null);
+                logout();
+              }}
+              sx={{ color: "error.main" }}
+            >
+              <ListItemIcon sx={{ color: "inherit" }}>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              Cerrar sesión
+            </MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+
+      <Drawer
+        variant={isDesktop ? "persistent" : "temporary"}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        sx={{
+          width: isDesktop && drawerOpen ? DRAWER_WIDTH : 0,
+          flexShrink: 0,
+          transition: theme.transitions.create("width", {
+            duration: theme.transitions.duration.shorter,
+          }),
+          "& .MuiDrawer-paper": {
+            width: DRAWER_WIDTH,
+            boxSizing: "border-box",
+            borderRight: 1,
+            borderColor: "divider",
+          },
+        }}
+      >
+        <Toolbar />
+        <Box component="nav" aria-label="Menú principal" sx={{ py: 1 }}>
+          <List disablePadding>{ungrouped.map(renderItem)}</List>
+          {sections.map((section) => (
+            <List
+              key={section.name}
+              disablePadding
+              subheader={
+                <ListSubheader
+                  disableSticky
+                  sx={{
+                    mt: 2,
+                    lineHeight: "32px",
+                    typography: "caption",
+                    fontWeight: 600,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "text.secondary",
+                  }}
+                >
+                  {section.name}
+                </ListSubheader>
+              }
+            >
+              {section.items.map(renderItem)}
+            </List>
+          ))}
+        </Box>
+      </Drawer>
+
+      <Box component="main" sx={{ flexGrow: 1, minWidth: 0, p: 3 }}>
+        <Toolbar />
+        <Box sx={{ maxWidth: PAGE_MAX_WIDTH, mx: "auto" }}>
+          <Outlet />
+        </Box>
       </Box>
-       
     </Box>
   );
 }

@@ -13,6 +13,10 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PieChartIcon from "@mui/icons-material/PieChart";
+import CategoryIcon from "@mui/icons-material/Category";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
 export const icons = {
   home: <HomeIcon />,
@@ -30,4 +34,8 @@ export const icons = {
   eventBusy: <EventBusyIcon />,
   trendingUp: <TrendingUpIcon />,
   pieChart: <PieChartIcon />,
+  category: <CategoryIcon />,
+  inventory: <Inventory2Icon />,
+  localShipping: <LocalShippingIcon />,
+  receipt: <ReceiptLongIcon />,
 };

@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Alert,
   Box,
-  Container,
+  IconButton,
 } from "@mui/material";
 import { useAuth } from "../../../context/authContext";
 
@@ -121,82 +121,47 @@ export function Form() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(to bottom, #e0f2f7 0%, #ffffff 100%)",
+        bgcolor: "background.default",
         p: 2,
       }}
     >
-      <Container maxWidth="sm">
-        <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-            <Box
-              sx={{
-                bgcolor: "transparent",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                src="/2.png"
-                alt="LOGO MC SOLUTIONS"
-                style={{
-                  width: "250px",
-                  height: "250px",
-                  objectFit: "contain",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  backgroundColor: "#fff",
-                  padding: "5px",
-                }}
-              />
-            </Box>
-          </Box>
+      <Box sx={{ width: "100%", maxWidth: 420 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+          <Box
+            component="img"
+            src="/2.png"
+            alt="Soluciones MC"
+            sx={{ width: 112, height: 112, borderRadius: 3 }}
+          />
         </Box>
 
-        <Card
-          sx={{
-            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
-            borderRadius: 2,
-          }}
-        >
-          <CardContent sx={{ p: 4 }}>
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: "bold" }}
-              align="center"
-              gutterBottom
-            >
-              Iniciar Sesión
+        <Card>
+          <CardContent sx={{ p: 4, "&:last-child": { pb: 4 } }}>
+            <Typography variant="h5" component="h1" align="center">
+              Iniciar sesión
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               align="center"
-              sx={{ mb: 3, fontWeight: 300 }}
+              sx={{ mt: 0.5, mb: 3 }}
             >
-              Ingrese sus credenciales para acceder al sistema
+              Ingresá tus credenciales para acceder al sistema
             </Typography>
 
-            <form
+            <Box
+              component="form"
               onSubmit={handleSubmit}
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
               noValidate
+              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
             >
-              {loginError && (
-                <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-                  {loginError}
-                </Alert>
-              )}
+              {loginError && <Alert severity="error">{loginError}</Alert>}
               <TextField
                 id="email"
                 name="email"
                 label="Correo electrónico"
                 type="email"
+                size="medium"
                 fullWidth
                 placeholder="usuario@gmail.com"
                 value={formData.email}
@@ -206,21 +171,22 @@ export function Form() {
                 inputRef={emailRef}
                 error={!!errors.email}
                 helperText={errors.email || ""}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Mail fontSize="small" color="action" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Mail fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                  },
                 }}
-                variant="outlined"
-                sx={{ mb: 2, width: "100%" }}
               />
               <TextField
                 id="password"
                 name="password"
                 label="Contraseña"
                 type={showPassword ? "text" : "password"}
+                size="medium"
                 fullWidth
                 placeholder="••••••••"
                 value={formData.password}
@@ -230,85 +196,85 @@ export function Form() {
                 inputRef={passwordRef}
                 error={!!errors.password}
                 helperText={errors.password || ""}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock fontSize="small" color="action" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Button
-                        onClick={() => setShowPassword(!showPassword)}
-                        disabled={isLoading}
-                        sx={{ minWidth: "auto", p: 1 }}
-                      >
-                        {showPassword ? (
-                          <VisibilityOff fontSize="small" color="action" />
-                        ) : (
-                          <Visibility fontSize="small" color="action" />
-                        )}
-                      </Button>
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock fontSize="small" color="action" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          aria-label={
+                            showPassword
+                              ? "Ocultar contraseña"
+                              : "Mostrar contraseña"
+                          }
+                          onClick={() => setShowPassword(!showPassword)}
+                          disabled={isLoading}
+                        >
+                          {showPassword ? (
+                            <VisibilityOff fontSize="small" />
+                          ) : (
+                            <Visibility fontSize="small" />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  },
                 }}
-                variant="outlined"
-                sx={{ width: "100%" }}
               />
-              <Box sx={{ width: "100%", mt: 1 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      id="remember"
-                      name="rememberMe"
-                      checked={formData.rememberMe}
-                      onChange={handleInputChange}
-                      disabled={isLoading}
-                    />
-                  }
-                  label="Recordar mis credenciales"
-                />
-              </Box>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id="remember"
+                    name="rememberMe"
+                    checked={formData.rememberMe}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                  />
+                }
+                label="Recordar mis credenciales"
+                sx={{ mt: -1 }}
+              />
               <Button
                 type="submit"
                 variant="contained"
+                size="large"
                 disabled={isLoading}
                 fullWidth
-                sx={{
-                  py: 1.5,
-                  mt: 2,
-                  "&:hover": { bgcolor: "#0d47a1" },
-                  "&:active": { bgcolor: "#0b3c91" },
-                }}
+                startIcon={
+                  isLoading ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : null
+                }
               >
-                {isLoading ? (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <CircularProgress size={20} color="inherit" />
-                    Iniciando sesión...
-                  </Box>
-                ) : (
-                  "Iniciar Sesión"
-                )}
+                {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
               </Button>
-            </form>
-            <Box sx={{ mt: 2, textAlign: "center" }}>
               <Typography
                 variant="body2"
                 color="primary"
-                sx={{ cursor: "pointer", textDecoration: "underline" }}
+                align="center"
+                sx={{ cursor: "pointer" }}
               >
-                ¿Olvidó su contraseña?
+                ¿Olvidaste tu contraseña?
               </Typography>
             </Box>
           </CardContent>
         </Card>
 
-        <Box sx={{ mt: 4, textAlign: "center" }}>
-          <Typography variant="caption" color="text.secondary">
-            © 2025 MC Solutions | Todos los derechos reservados
-          </Typography>
-        </Box>
-      </Container>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          align="center"
+          component="p"
+          sx={{ mt: 3 }}
+        >
+          © 2025 MC Solutions | Todos los derechos reservados
+        </Typography>
+      </Box>
     </Box>
   );
 }
