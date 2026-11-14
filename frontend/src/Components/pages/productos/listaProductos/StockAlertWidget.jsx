@@ -1,120 +1,93 @@
-import React from "react";
 import {
-  Box,
-  Typography,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
+  AccordionSummary,
+  Box,
   List,
   ListItem,
   ListItemText,
-  Button,
+  Paper,
+  Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import CircleIcon from "@mui/icons-material/Circle";
-import { useNavigate } from "react-router-dom";
+import StatusChip from "../../../common/StatusChip";
+import { getStockStatus } from "../../../../utils/stock";
 
-const StockAlertWidget = ({ productos, showActionButton = false }) => {
-  const navigate = useNavigate();
+const GROUPS = [
+  { tone: "success", label: "OK" },
+  { tone: "warning", label: "Cerca del mínimo" },
+  { tone: "error", label: "Bajo" },
+];
 
-  const getStockStatus = (stock, stockMinimo) => {
-    if (stock <= stockMinimo) {
-      return { color: "#d32f2f", label: "Bajo" };
-    } else if (stock <= stockMinimo * 1.1) {
-      return { color: "#f57c00", label: "Cercano al límite" };
-    } else {
-      return { color: "#2e7d32", label: "OK" };
-    }
-  };
-
-  const stockSummary = productos.reduce(
-    (acc, producto) => {
-      const status = getStockStatus(producto.stock, producto.stockMinimo);
-      if (status.label === "Bajo") acc.rojo++;
-      else if (status.label === "Cercano al límite") acc.naranja++;
-      else acc.verde++;
-      return acc;
-    },
-    { verde: 0, naranja: 0, rojo: 0 }
-  );
-
-  const productosEnRiesgo = productos.filter(
-    (producto) =>
-      getStockStatus(producto.stock, producto.stockMinimo).label !== "OK"
-  );
+// Resumen del estado de stock: tres contadores juntos y, debajo,
+// el detalle de los productos en riesgo.
+const StockAlertWidget = ({ productos }) => {
+  const withStatus = productos.map((producto) => ({
+    producto,
+    status: getStockStatus(producto.stock, producto.stockMinimo),
+  }));
+  const enRiesgo = withStatus.filter(({ status }) => status.tone !== "success");
 
   return (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="h6" sx={{ mb: 1 }}>
-        Alertas de Stock
-      </Typography>
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <CircleIcon sx={{ color: "#2e7d32", fontSize: 16 }} />
-          <Typography>OK: {stockSummary.verde}</Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <CircleIcon sx={{ color: "#f57c00", fontSize: 16 }} />
-          <Typography>Cercano al límite: {stockSummary.naranja}</Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <CircleIcon sx={{ color: "#d32f2f", fontSize: 16 }} />
-          <Typography>Bajo: {stockSummary.rojo}</Typography>
-        </Box>
+    <Paper variant="outlined" sx={{ borderRadius: 3, overflow: "hidden" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 2,
+          px: 2,
+          py: 1.5,
+        }}
+      >
+        <Typography variant="subtitle2" sx={{ mr: 1 }}>
+          Estado de stock
+        </Typography>
+        {GROUPS.map((group) => (
+          <StatusChip
+            key={group.tone}
+            color={group.tone}
+            status={`${group.label}: ${
+              withStatus.filter(({ status }) => status.tone === group.tone)
+                .length
+            }`}
+            sx={{ textTransform: "none" }}
+          />
+        ))}
       </Box>
-      {productosEnRiesgo.length > 0 && (
-        <Accordion>
+      {enRiesgo.length > 0 && (
+        <Accordion
+          disableGutters
+          elevation={0}
+          square
+          sx={{ borderTop: 1, borderColor: "divider" }}
+        >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>
-              Productos en riesgo ({productosEnRiesgo.length})
+            <Typography variant="body2">
+              Ver productos en riesgo ({enRiesgo.length})
             </Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <List>
-              {productosEnRiesgo.map((producto) => {
-                const status = getStockStatus(
-                  producto.stock,
-                  producto.stockMinimo
-                );
-                return (
-                  <ListItem
-                    key={producto.id}
-                    secondaryAction={
-                      showActionButton && (
-                        <Button
-                          variant="outlined"
-                          onClick={() =>
-                            navigate(`/compras/crear?productoId=${producto.id}`)
-                          }
-                        >
-                          Crear Orden
-                        </Button>
-                      )
-                    }
-                  >
-                    <ListItemText
-                      primary={`${producto.nombre} (Stock: ${producto.stock}, Mínimo: ${producto.stockMinimo})`}
-                      secondary={
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <CircleIcon
-                            sx={{ color: status.color, fontSize: 12 }}
-                          />
-                          <Typography variant="body2">
-                            {status.label}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  </ListItem>
-                );
-              })}
+          <AccordionDetails sx={{ pt: 0 }}>
+            <List dense disablePadding>
+              {enRiesgo.map(({ producto, status }) => (
+                <ListItem
+                  key={producto.id}
+                  disableGutters
+                  secondaryAction={
+                    <StatusChip color={status.tone} status={status.label} />
+                  }
+                >
+                  <ListItemText
+                    primary={producto.nombre}
+                    secondary={`Stock: ${producto.stock} · Mínimo: ${producto.stockMinimo}`}
+                  />
+                </ListItem>
+              ))}
             </List>
           </AccordionDetails>
         </Accordion>
       )}
-    </Box>
+    </Paper>
   );
 };
 

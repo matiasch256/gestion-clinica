@@ -12,7 +12,14 @@ const STATUS_COLORS = {
     "confirmado",
     "realizado",
   ],
-  warning: ["pendiente", "reservado", "programado", "en espera", "parcial"],
+  info: ["programado", "reservado"],
+  warning: [
+    "pendiente",
+    "pendiente de pago",
+    "en espera",
+    "parcial",
+    "ausente",
+  ],
   error: [
     "cancelada",
     "cancelado",
@@ -21,7 +28,6 @@ const STATUS_COLORS = {
     "eliminada",
     "anulada",
     "anulado",
-    "ausente",
     "vencida",
   ],
 };

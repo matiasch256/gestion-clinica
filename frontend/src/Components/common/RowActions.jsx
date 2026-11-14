@@ -32,6 +32,7 @@ const RowActions = ({
   onEdit,
   onDelete,
   deleteLabel = "Eliminar",
+  deleteDisabled = false,
   children,
 }) => (
   <Box sx={{ display: "inline-flex", gap: 0.5 }}>
@@ -50,6 +51,7 @@ const RowActions = ({
       <ActionButton
         title={deleteLabel}
         onClick={onDelete}
+        disabled={deleteDisabled}
         hoverColor="error.main"
       >
         <DeleteOutlineIcon fontSize="small" />
