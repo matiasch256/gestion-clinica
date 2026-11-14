@@ -1,6 +1,7 @@
+import PageHeader from "../../../common/PageHeader";
+import { FORM_MAX_WIDTH } from "../../../../theme/theme";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Typography,
@@ -34,7 +35,6 @@ const UNIDADES_MEDIDA = [
 ];
 
 export const RegistrarProducto = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const [nombre, setNombre] = useState("");
@@ -164,31 +164,12 @@ export const RegistrarProducto = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+    <>
+      <PageHeader title="Registrar Producto" onBack={() => navigate(-1)} />
       <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
+        variant="outlined"
+        sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
       >
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          Registrar Producto
-        </Typography>
-
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 5 }}>
             <TextField
@@ -203,7 +184,6 @@ export const RegistrarProducto = () => {
               slotProps={{ inputLabel: { shrink: true } }}
               error={errores.nombre}
               helperText={errores.nombre ? "Campo obligatorio" : ""}
-              sx={{ bgcolor: theme.palette.background.default }}
             />
           </Grid>
 
@@ -220,7 +200,6 @@ export const RegistrarProducto = () => {
               slotProps={{ inputLabel: { shrink: true } }}
               error={errores.codigo}
               helperText={errores.codigo ? "Campo obligatorio" : ""}
-              sx={{ bgcolor: theme.palette.background.default }}
             />
           </Grid>
 
@@ -238,7 +217,6 @@ export const RegistrarProducto = () => {
                     categoriaSeleccionada: false,
                   }));
                 }}
-                sx={{ bgcolor: theme.palette.background.default }}
               >
                 <MenuItem value="">
                   <em>Seleccione una categoría</em>
@@ -270,7 +248,6 @@ export const RegistrarProducto = () => {
               slotProps={{ inputLabel: { shrink: true } }}
               error={errores.descripcion}
               helperText={errores.descripcion ? "Campo obligatorio" : ""}
-              sx={{ bgcolor: theme.palette.background.default }}
             />
           </Grid>
 
@@ -282,11 +259,11 @@ export const RegistrarProducto = () => {
                 gap: 1,
                 mt: 2,
                 mb: 1,
-                color: theme.palette.text.secondary,
+                color: "text.secondary",
               }}
             >
               <InventoryIcon />
-              <Typography variant="h6" fontWeight="bold">
+              <Typography variant="h6" fontWeight={600}>
                 Datos de Inventario
               </Typography>
             </Box>
@@ -304,7 +281,6 @@ export const RegistrarProducto = () => {
                   setUnidadMedida(e.target.value);
                   setErrores((prev) => ({ ...prev, unidadMedida: false }));
                 }}
-                sx={{ bgcolor: theme.palette.background.default }}
               >
                 <MenuItem value="">
                   <em>Seleccionar...</em>
@@ -335,7 +311,6 @@ export const RegistrarProducto = () => {
               slotProps={{ inputLabel: { shrink: true } }}
               error={errores.stock}
               helperText={errores.stock ? "Número válido requerido" : ""}
-              sx={{ bgcolor: theme.palette.background.default }}
             />
           </Grid>
 
@@ -353,7 +328,6 @@ export const RegistrarProducto = () => {
               slotProps={{ inputLabel: { shrink: true } }}
               error={errores.stockMinimo}
               helperText={errores.stockMinimo ? "Mayor a 0" : ""}
-              sx={{ bgcolor: theme.palette.background.default }}
             />
           </Grid>
         </Grid>
@@ -368,19 +342,11 @@ export const RegistrarProducto = () => {
         >
           <Button
             variant="outlined"
-            color="secondary"
-            startIcon={<CancelIcon />}
+            color="inherit"
             onClick={() => navigate("/productos/lista")}
             sx={{
-              color: theme.palette.text.secondary,
-              borderColor: theme.palette.divider,
-              backgroundColor: theme.palette.background.trasparent,
               px: 3,
               py: 1,
-              "&:hover": {
-                borderColor: theme.palette.text.primary,
-                backgroundColor: theme.palette.background.trasparent,
-              },
             }}
           >
             Cancelar
@@ -391,17 +357,8 @@ export const RegistrarProducto = () => {
             startIcon={<CheckIcon />}
             onClick={registrarProducto}
             sx={{
-              bgcolor: theme.palette.primary.main,
-              color: theme.palette.primary.contrastText,
-              fontWeight: "bold",
-              boxShadow: "none",
               px: 4,
               py: 1,
-              "&:hover": {
-                bgcolor:
-                  theme.palette.primary.hover || theme.palette.primary.dark,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              },
             }}
           >
             Guardar
@@ -421,13 +378,13 @@ export const RegistrarProducto = () => {
           variant="filled"
           sx={{
             width: "100%",
-            fontWeight: "bold",
+            fontWeight: 600,
             "& .MuiAlert-action": {
               "& .MuiIconButton-root": {
-                backgroundColor: theme.palette.background.trasparent,
+                backgroundColor: "transparent",
                 color: "inherit",
                 "&:hover": {
-                  backgroundColor: theme.palette.background.trasparent,
+                  backgroundColor: "transparent",
                 },
               },
             },
@@ -436,6 +393,6 @@ export const RegistrarProducto = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </>
   );
 };

@@ -1,6 +1,7 @@
+import PageHeader from "../../../common/PageHeader";
+import { FORM_MAX_WIDTH } from "../../../../theme/theme";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Typography,
@@ -18,7 +19,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 export const RegistrarProveedor = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -124,31 +124,15 @@ export const RegistrarProveedor = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+    <>
+      <PageHeader
+        title={editandoId ? "Editar Proveedor" : "Registrar Proveedor"}
+        onBack={() => navigate(-1)}
+      />
       <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
+        variant="outlined"
+        sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
       >
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          {editandoId ? "Editar Proveedor" : "Registrar Proveedor"}
-        </Typography>
-
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -164,7 +148,6 @@ export const RegistrarProveedor = () => {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.nombre}
                 helperText={errores.nombre ? "Nombre inválido o vacío" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -181,7 +164,6 @@ export const RegistrarProveedor = () => {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.telefono}
                 helperText={errores.telefono ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -193,11 +175,11 @@ export const RegistrarProveedor = () => {
                   gap: 1,
                   mt: 2,
                   mb: 1,
-                  color: theme.palette.text.secondary,
+                  color: "text.secondary",
                 }}
               >
                 <LocationOnIcon />
-                <Typography variant="h6" fontWeight="bold">
+                <Typography variant="h6" fontWeight={600}>
                   Ubicación
                 </Typography>
               </Box>
@@ -217,7 +199,6 @@ export const RegistrarProveedor = () => {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.direccion}
                 helperText={errores.direccion ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -234,7 +215,6 @@ export const RegistrarProveedor = () => {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.barrio}
                 helperText={errores.barrio ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
           </Grid>
@@ -249,19 +229,11 @@ export const RegistrarProveedor = () => {
           >
             <Button
               variant="outlined"
-              color="secondary"
-              startIcon={<CancelIcon />}
+              color="inherit"
               onClick={() => navigate("/proveedores/consultar")}
               sx={{
-                color: theme.palette.text.secondary,
-                borderColor: theme.palette.divider,
-                backgroundColor: theme.palette.background.trasparent,
                 px: 3,
                 py: 1,
-                "&:hover": {
-                  borderColor: theme.palette.text.primary,
-                  backgroundColor: theme.palette.background.trasparent,
-                },
               }}
             >
               Cancelar
@@ -272,17 +244,8 @@ export const RegistrarProveedor = () => {
               variant="contained"
               startIcon={<CheckIcon />}
               sx={{
-                bgcolor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-                fontWeight: "bold",
-                boxShadow: "none",
                 px: 4,
                 py: 1,
-                "&:hover": {
-                  bgcolor:
-                    theme.palette.primary.hover || theme.palette.primary.dark,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                },
               }}
             >
               Guardar
@@ -303,13 +266,13 @@ export const RegistrarProveedor = () => {
           variant="filled"
           sx={{
             width: "100%",
-            fontWeight: "bold",
+            fontWeight: 600,
             "& .MuiAlert-action": {
               "& .MuiIconButton-root": {
-                backgroundColor: theme.palette.background.trasparent,
+                backgroundColor: "transparent",
                 color: "inherit",
                 "&:hover": {
-                  backgroundColor: theme.palette.background.trasparent,
+                  backgroundColor: "transparent",
                 },
               },
             },
@@ -318,6 +281,6 @@ export const RegistrarProveedor = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </>
   );
 };

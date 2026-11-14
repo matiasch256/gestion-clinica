@@ -1,6 +1,8 @@
+import PageHeader from "../../../common/PageHeader";
+import { FORM_MAX_WIDTH } from "../../../../theme/theme";
+import { useFeedback } from "../../../../context/FeedbackProvider";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 import {
   Table,
   TableBody,
@@ -27,9 +29,9 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
 export default function ModificarCompra() {
-  const theme = useTheme();
   const { idCompra } = useParams();
   const navigate = useNavigate();
+  const { notify } = useFeedback();
 
   const [compra, setCompra] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,9 +99,9 @@ export default function ModificarCompra() {
     ) {
       setErrorState(newErrorState);
       if (newErrorState.proveedor || newErrorState.fecha) {
-        alert("Debes seleccionar un proveedor y una fecha.");
+        notify("Debes seleccionar un proveedor y una fecha.", "warning");
       } else {
-        alert("La cantidad y el precio deben ser mayores a 0.");
+        notify("La cantidad y el precio deben ser mayores a 0.", "warning");
       }
       return;
     }
@@ -117,10 +119,10 @@ export default function ModificarCompra() {
       );
 
       if (response.ok) {
-        alert("Compra actualizada correctamente");
+        notify("Compra actualizada correctamente");
         navigate("/compras/listaCompras");
       } else {
-        alert("Error al actualizar");
+        notify("Error al actualizar", "error");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -129,52 +131,39 @@ export default function ModificarCompra() {
 
   if (loading || !compra) {
     return (
-      <Box sx={{ padding: 3, width: "100%", margin: "0 auto" }}>
-        <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
+      <>
+        <Paper
+          variant="outlined"
+          sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
+        >
           <Skeleton variant="text" width="40%" height={60} />
           <Grid container spacing={3} sx={{ my: 3 }}>
-            <Grid item xs={8}>
+            <Grid size={{ xs: 8 }}>
               <Skeleton variant="rectangular" height={56} />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <Skeleton variant="rectangular" height={56} />
             </Grid>
           </Grid>
           <Skeleton variant="rectangular" width="100%" height={200} />
         </Paper>
-      </Box>
+      </>
     );
   }
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+    <>
+      <PageHeader
+        title={<>Editar Compra N° {compra.id}</>}
+        onBack={() => navigate(-1)}
+      />
       <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
+        variant="outlined"
+        sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
       >
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          Editar Compra N° {compra.id}
-        </Typography>
-
         <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <FormControl fullWidth error={errorState.proveedor}>
                 <InputLabel>Proveedor</InputLabel>
                 <Select
@@ -186,7 +175,6 @@ export default function ModificarCompra() {
                     })
                   }
                   label="Proveedor"
-                  sx={{ bgcolor: theme.palette.background.default }}
                 >
                   {proveedores.map((p) => (
                     <MenuItem key={p.id} value={p.id}>
@@ -206,7 +194,7 @@ export default function ModificarCompra() {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 label="Fecha"
                 type="date"
@@ -217,7 +205,6 @@ export default function ModificarCompra() {
                 }
                 fullWidth
                 slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ bgcolor: theme.palette.background.default }}
                 error={errorState.fecha}
                 helperText={errorState.fecha ? "Seleccione una fecha" : ""}
               />
@@ -231,8 +218,8 @@ export default function ModificarCompra() {
               component="h2"
               sx={{
                 mb: 2,
-                fontWeight: "bold",
-                color: theme.palette.text.secondary,
+                fontWeight: 600,
+                color: "text.secondary",
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
@@ -245,19 +232,18 @@ export default function ModificarCompra() {
               component={Paper}
               elevation={0}
               sx={{
-                border: `1px solid ${theme.palette.divider}`,
+                border: 1,
+                borderColor: "divider",
                 borderRadius: 2,
                 width: "100%",
               }}
             >
               <Table>
-                <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
+                <TableHead>
                   <TableRow>
                     <TableCell
                       sx={{
                         width: "40%",
-                        fontWeight: "bold",
-                        color: theme.palette.text.secondary,
                       }}
                     >
                       Nombre
@@ -265,8 +251,6 @@ export default function ModificarCompra() {
                     <TableCell
                       sx={{
                         width: "30%",
-                        fontWeight: "bold",
-                        color: theme.palette.text.secondary,
                       }}
                     >
                       Cantidad
@@ -274,8 +258,6 @@ export default function ModificarCompra() {
                     <TableCell
                       sx={{
                         width: "30%",
-                        fontWeight: "bold",
-                        color: theme.palette.text.secondary,
                       }}
                     >
                       Precio
@@ -296,7 +278,6 @@ export default function ModificarCompra() {
                                 parseInt(e.target.value)
                               )
                             }
-                            sx={{ bgcolor: theme.palette.background.default }}
                             displayEmpty
                           >
                             {productosDisponibles.map((prod) => (
@@ -316,7 +297,6 @@ export default function ModificarCompra() {
                             handleChangeProducto(i, "Cantidad", e.target.value)
                           }
                           fullWidth
-                          sx={{ bgcolor: theme.palette.background.default }}
                           error={errorState.productos[i]}
                           helperText={
                             errorState.productos[i] ? "Debe ser mayor a 0" : ""
@@ -332,7 +312,6 @@ export default function ModificarCompra() {
                             handleChangeProducto(i, "Precio", e.target.value)
                           }
                           fullWidth
-                          sx={{ bgcolor: theme.palette.background.default }}
                           error={errorState.productos[i]}
                           helperText={
                             errorState.productos[i] ? "Debe ser mayor a 0" : ""
@@ -359,18 +338,10 @@ export default function ModificarCompra() {
               type="button"
               variant="outlined"
               color="secondary"
-              startIcon={<CancelIcon />}
               onClick={() => navigate("/compras/listaCompras")}
               sx={{
-                color: theme.palette.text.secondary,
-                borderColor: theme.palette.divider,
-                backgroundColor: theme.palette.background.trasparent,
                 px: 3,
                 py: 1,
-                "&:hover": {
-                  borderColor: theme.palette.text.primary,
-                  backgroundColor: theme.palette.background.trasparent,
-                },
               }}
             >
               Cancelar
@@ -381,17 +352,8 @@ export default function ModificarCompra() {
               variant="contained"
               startIcon={<CheckIcon />}
               sx={{
-                bgcolor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-                fontWeight: "bold",
-                boxShadow: "none",
                 px: 4,
                 py: 1,
-                "&:hover": {
-                  bgcolor:
-                    theme.palette.primary.hover || theme.palette.primary.dark,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                },
               }}
             >
               Guardar
@@ -399,6 +361,6 @@ export default function ModificarCompra() {
           </Box>
         </form>
       </Paper>
-    </Box>
+    </>
   );
 }
