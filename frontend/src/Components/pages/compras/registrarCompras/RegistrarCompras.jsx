@@ -20,11 +20,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   Tooltip,
   Grid,
@@ -32,10 +27,9 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
+import ResultDialog from "../../../common/ResultDialog";
 
 export const RegistrarCompras = () => {
   const navigate = useNavigate();
@@ -447,35 +441,7 @@ export const RegistrarCompras = () => {
           </Box>
         </Box>
       </Paper>
-
-      {/* --- DIALOGOS MODALES --- */}
-      <Dialog
-        open={dialog.open}
-        onClose={handleCloseDialog}
-        PaperProps={{ sx: { borderRadius: 2, padding: 1 } }}
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {dialog.isError ? (
-            <ErrorOutlineIcon fontSize="large" sx={{ color: "error.main" }} />
-          ) : (
-            <CheckCircleOutlineIcon
-              fontSize="large"
-              sx={{ color: "success.main" }}
-            />
-          )}
-          {dialog.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ color: "text.secondary" }}>
-            {dialog.message}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} variant="contained" autoFocus>
-            Aceptar
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ResultDialog dialog={dialog} onClose={handleCloseDialog} />
     </>
   );
 };

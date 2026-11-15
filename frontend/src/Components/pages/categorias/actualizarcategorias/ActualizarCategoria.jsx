@@ -41,7 +41,7 @@ export const ActualizarCategoria = () => {
         setCargando(false);
         navigate("/categorias/consultar");
       });
-  }, [id, navigate]);
+  }, [id, navigate, notify]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

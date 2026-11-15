@@ -9,8 +9,6 @@ import {
   Grid,
   TextField,
   Button,
-  Snackbar,
-  Alert,
   Divider,
   Skeleton,
 } from "@mui/material";
@@ -19,6 +17,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EditIcon from "@mui/icons-material/Edit";
+import { useFeedback } from "../../../../context/FeedbackProvider";
 
 export const ActualizarProveedor = () => {
   const { id } = useParams();
@@ -37,11 +36,7 @@ export const ActualizarProveedor = () => {
     telefono: false,
   });
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
+  const { notify: mostrarMensaje } = useFeedback();
 
   useEffect(() => {
     fetch(`http://localhost:3000/proveedores/${id}`)
@@ -61,16 +56,7 @@ export const ActualizarProveedor = () => {
         mostrarMensaje("Error al cargar los datos del proveedor", "error");
         setCargando(false);
       });
-  }, [id, navigate]);
-
-  const mostrarMensaje = (mensaje, severidad) => {
-    setSnackbar({ open: true, message: mensaje, severity: severidad });
-  };
-
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbar({ ...snackbar, open: false });
-  };
+  }, [id, navigate, mostrarMensaje]);
 
   const validarCampos = () => {
     let nuevosErrores = {
@@ -252,34 +238,6 @@ export const ActualizarProveedor = () => {
           </Box>
         </form>
       </Paper>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontWeight: 600,
-            "& .MuiAlert-action": {
-              "& .MuiIconButton-root": {
-                backgroundColor: "transparent",
-                color: "inherit",
-                "&:hover": {
-                  backgroundColor: "transparent",
-                },
-              },
-            },
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

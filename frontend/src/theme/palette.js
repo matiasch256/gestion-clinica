@@ -65,7 +65,7 @@ const chartSeries = [
 ];
 
 export default {
-  primary: { ...primary, hover: primary.dark },
+  primary,
   secondary: {
     main: neutral[700],
     contrastText: "#ffffff",
@@ -79,9 +79,6 @@ export default {
     default: neutral[100],
     paper: "#ffffff",
     subtle: neutral[50],
-    // Alias heredados: se eliminan al terminar la migración de pantallas.
-    redlighter: error.lighter,
-    trasparent: "transparent",
   },
   text: {
     primary: neutral[900],
@@ -90,33 +87,5 @@ export default {
   divider,
   charts: {
     series: chartSeries,
-    // Alias heredados.
-    chart1: chartSeries[0],
-    chart2: chartSeries[1],
-    chart3: chartSeries[2],
-    chart4: chartSeries[3],
-    chart5: chartSeries[4],
-  },
-
-  // Alias heredados: se eliminan al terminar la migración de pantallas.
-  sidebar: {
-    background: "#ffffff",
-    text: neutral[700],
-    active: primary.main,
-    hover: primary.lighter,
-    border: divider,
-  },
-  accent: {
-    blue: primary.main,
-    green: success.main,
-    orange: warning.main,
-    purple: "#6f42c1",
-    cyan: info.main,
-  },
-  quickActions: {
-    compra: primary.main,
-    producto: primary.main,
-    proveedor: primary.main,
-    categoria: primary.main,
   },
 };

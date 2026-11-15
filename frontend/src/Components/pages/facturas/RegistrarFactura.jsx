@@ -56,7 +56,7 @@ export const RegistrarFactura = () => {
 
   const [numeroFactura, setNumeroFactura] = useState("");
   const [metodoPagoId, setMetodoPagoId] = useState("");
-  const [fechaEmision, setFechaEmision] = useState(getTodayDate());
+  const [fechaEmision] = useState(getTodayDate());
 
   const [dialog, setDialog] = useState({
     open: false,

@@ -15,14 +15,13 @@ import {
   MenuItem,
   FormHelperText,
   Divider,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import QrCodeIcon from "@mui/icons-material/QrCode";
+import { useFeedback } from "../../../../context/FeedbackProvider";
 
 const UNIDADES_MEDIDA = [
   "Unidad",
@@ -56,11 +55,7 @@ export const RegistrarProducto = () => {
     categoriaSeleccionada: false,
   });
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
+  const { notify: mostrarMensaje } = useFeedback();
 
   useEffect(() => {
     fetch("http://localhost:3000/api/categorias")
@@ -72,20 +67,7 @@ export const RegistrarProducto = () => {
         console.error("Error al obtener categorías:", error);
         mostrarMensaje("Error al cargar las categorías", "error");
       });
-  }, []);
-
-  const mostrarMensaje = (mensaje, severidad) => {
-    setSnackbar({
-      open: true,
-      message: mensaje,
-      severity: severidad,
-    });
-  };
-
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbar({ ...snackbar, open: false });
-  };
+  }, [mostrarMensaje]);
 
   const validarCampos = () => {
     const stockNum = parseInt(stock);
@@ -133,7 +115,7 @@ export const RegistrarProducto = () => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
       })
-      .then((data) => {
+      .then(() => {
         mostrarMensaje("Producto registrado exitosamente", "success");
 
         setNombre("");
@@ -365,34 +347,6 @@ export const RegistrarProducto = () => {
           </Button>
         </Box>
       </Paper>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontWeight: 600,
-            "& .MuiAlert-action": {
-              "& .MuiIconButton-root": {
-                backgroundColor: "transparent",
-                color: "inherit",
-                "&:hover": {
-                  backgroundColor: "transparent",
-                },
-              },
-            },
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

@@ -1,14 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTheme } from "@mui/material/styles";
 import {
   Box,
-  Typography,
-  Paper,
   Skeleton,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Grid,
   Button,
   IconButton,
   Tooltip,
@@ -16,10 +14,7 @@ import {
 } from "@mui/material";
 
 import RefreshIcon from "@mui/icons-material/Refresh";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import WarningIcon from "@mui/icons-material/Warning";
 
 import { BarChart } from "@mui/x-charts/BarChart";
 
@@ -27,7 +22,13 @@ import { utils, writeFile } from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import EmptyState from "../../common/EmptyState";
+import { ExportButtons } from "../../common/TableCard";
+
 export const ReporteStockCritico = () => {
+  const theme = useTheme();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -113,191 +114,121 @@ export const ReporteStockCritico = () => {
 
   const renderContent = () => {
     if (loading) {
-      return (
-        <Box>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height={400}
-            sx={{ borderRadius: 2 }}
-          />
-        </Box>
-      );
+      return <Skeleton variant="rounded" width="100%" height={400} />;
     }
 
     if (error) {
       return (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 4,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
-            bgcolor: "#fff4f4",
-            border: "1px solid #ffcdd2",
-          }}
+        <Alert
+          severity="error"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              startIcon={<RefreshIcon />}
+              onClick={fetchData}
+            >
+              Reintentar
+            </Button>
+          }
         >
-          <WarningIcon color="error" sx={{ fontSize: 60 }} />
-          <Typography variant="h6" color="error">
-            No se pudo generar el reporte
-          </Typography>
-          <Typography variant="body2">{error}</Typography>
-          <Button
-            startIcon={<RefreshIcon />}
-            onClick={fetchData}
-            variant="outlined"
-            color="error"
-          >
-            Reintentar
-          </Button>
-        </Paper>
+          {error}
+        </Alert>
       );
     }
 
     if (data.length === 0) {
       return (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 6,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
-            border: "1px dashed #ccc",
-            bgcolor: "#fafafa",
-          }}
-        >
-          <CheckCircleOutlineIcon
-            color="success"
-            sx={{ fontSize: 80, opacity: 0.8 }}
-          />
-          <Typography variant="h5" fontWeight={600} color="success.main">
-            ¡Todo en orden!
-          </Typography>
-          <Typography color="text.secondary">
-            No se encontraron productos con stock crítico en este momento.
-          </Typography>
-        </Paper>
+        <EmptyState
+          icon={CheckCircleOutlineIcon}
+          title="Todo en orden"
+          description="No hay productos con stock crítico en este momento."
+        />
       );
     }
 
     return (
-      <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
-        <Typography
-          variant="h6"
-          gutterBottom
-          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-        >
-          <WarningIcon color="error" /> Visualización de Déficit
-        </Typography>
-        <BarChart
-          height={400}
-          xAxis={[
-            {
-              data: data.map((item) => item.nombre),
-              scaleType: "band",
-              label: "Producto",
-            },
-          ]}
-          series={[
-            {
-              data: data.map((item) => item.Deficit),
-              label: "Déficit (Unidades Faltantes)",
-              valueFormatter: quantityFormatter,
-              color: "#d32f2f",
-            },
-          ]}
-          yAxis={[{ label: "Cantidad a Reponer" }]}
-          margin={{ top: 20, bottom: 70, left: 70, right: 20 }}
-          slotProps={{ legend: { hidden: false } }}
-        />
-      </Paper>
+      <BarChart
+        height={400}
+        xAxis={[
+          {
+            data: data.map((item) => item.nombre),
+            scaleType: "band",
+            label: "Producto",
+          },
+        ]}
+        series={[
+          {
+            data: data.map((item) => item.Deficit),
+            label: "Déficit (unidades faltantes)",
+            valueFormatter: quantityFormatter,
+            color: theme.palette.error.main,
+          },
+        ]}
+        yAxis={[{ label: "Cantidad a reponer" }]}
+        margin={{ top: 20, bottom: 20, left: 20, right: 20 }}
+      />
     );
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: "100%", margin: "0 auto" }}>
-      <Paper variant="outlined" sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Box>
-            <Typography variant="h5" component="h1" fontWeight={600}>
-              Reporte Táctico: Stock Crítico
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Generado el: {reportDate.toLocaleString("es-AR")}
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Tooltip title="Actualizar Datos">
+    <Box>
+      <PageHeader
+        title="Stock crítico"
+        subtitle={`Generado el: ${reportDate.toLocaleString("es-AR")}`}
+        actions={
+          <Tooltip title="Actualizar">
+            <span>
               <IconButton
                 onClick={fetchData}
-                color="primary"
                 disabled={loading}
-                sx={{
-                  bgcolor: (theme) => theme.palette.background.transparent,
-                }}
+                aria-label="Actualizar"
               >
                 <RefreshIcon />
               </IconButton>
-            </Tooltip>
+            </span>
+          </Tooltip>
+        }
+      />
 
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<AssessmentIcon />}
-              onClick={handleExportExcel}
-              disabled={loading || data.length === 0}
-              color="success"
-            >
-              Excel
-            </Button>
-
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<PictureAsPdfIcon />}
-              onClick={handleExportPDF}
-              disabled={loading || data.length === 0}
-              color="error"
-            >
-              PDF
-            </Button>
-          </Box>
-        </Box>
-
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Mostrar Top</InputLabel>
+      <SectionCard
+        title="Déficit por producto"
+        description="Unidades que faltan para llegar al stock mínimo"
+        action={
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+              gap: 1,
+              color: "text.secondary",
+            }}
+          >
+            {!loading && data.length > 0 && (
+              <ExportButtons
+                onExcel={handleExportExcel}
+                onPdf={handleExportPDF}
+              />
+            )}
+            <FormControl sx={{ minWidth: 160 }}>
+              <InputLabel>Mostrar</InputLabel>
               <Select
                 value={topN}
                 onChange={(e) => setTopN(e.target.value)}
-                label="Mostrar Top"
+                label="Mostrar"
               >
-                <MenuItem value={5}>Top 5 Críticos</MenuItem>
-                <MenuItem value={10}>Top 10 Críticos</MenuItem>
-                <MenuItem value={15}>Top 15 Críticos</MenuItem>
-                <MenuItem value={100}>Ver Todos</MenuItem>
+                <MenuItem value={5}>Top 5 críticos</MenuItem>
+                <MenuItem value={10}>Top 10 críticos</MenuItem>
+                <MenuItem value={15}>Top 15 críticos</MenuItem>
+                <MenuItem value={100}>Ver todos</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      {renderContent()}
+          </Box>
+        }
+      >
+        {renderContent()}
+      </SectionCard>
     </Box>
   );
 };
