@@ -1,6 +1,7 @@
+import PageHeader from "../../../common/PageHeader";
+import { FORM_MAX_WIDTH } from "../../../../theme/theme";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Typography,
@@ -14,8 +15,6 @@ import {
   MenuItem,
   FormHelperText,
   Divider,
-  Snackbar,
-  Alert,
   Skeleton,
 } from "@mui/material";
 
@@ -23,9 +22,9 @@ import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import EditIcon from "@mui/icons-material/Edit";
+import { useFeedback } from "../../../../context/FeedbackProvider";
 
 export function ModificarProducto() {
-  const theme = useTheme();
   const { idProducto } = useParams();
   const navigate = useNavigate();
 
@@ -45,11 +44,7 @@ export function ModificarProducto() {
   const [loading, setLoading] = useState(true);
   const [errores, setErrores] = useState({});
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
+  const { notify: mostrarMensaje } = useFeedback();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,16 +76,7 @@ export function ModificarProducto() {
     };
 
     fetchData();
-  }, [idProducto]);
-
-  const mostrarMensaje = (mensaje, severidad) => {
-    setSnackbar({ open: true, message: mensaje, severity: severidad });
-  };
-
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbar({ ...snackbar, open: false });
-  };
+  }, [idProducto, mostrarMensaje]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -163,8 +149,11 @@ export function ModificarProducto() {
 
   if (loading) {
     return (
-      <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
-        <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
+      <>
+        <Paper
+          variant="outlined"
+          sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
+        >
           <Skeleton variant="text" width="40%" height={60} />
           <Grid container spacing={3} sx={{ mt: 2 }}>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -175,36 +164,17 @@ export function ModificarProducto() {
             </Grid>
           </Grid>
         </Paper>
-      </Box>
+      </>
     );
   }
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+    <>
+      <PageHeader title="Editar Producto" onBack={() => navigate(-1)} />
       <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
+        variant="outlined"
+        sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
       >
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          Editar Producto
-        </Typography>
-
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -218,7 +188,6 @@ export function ModificarProducto() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.nombre}
                 helperText={errores.nombre ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -233,7 +202,6 @@ export function ModificarProducto() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.codigo}
                 helperText={errores.codigo ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -246,7 +214,6 @@ export function ModificarProducto() {
                   value={producto.categoriaId}
                   label="Categoría"
                   onChange={handleChange}
-                  sx={{ bgcolor: theme.palette.background.default }}
                 >
                   <MenuItem value="">
                     <em>Seleccione una categoría</em>
@@ -272,7 +239,6 @@ export function ModificarProducto() {
                   value={producto.activo ? "true" : "false"}
                   label="Estado"
                   onChange={handleChange}
-                  sx={{ bgcolor: theme.palette.background.default }}
                 >
                   <MenuItem value="true">Activo</MenuItem>
                   <MenuItem value="false">Inactivo</MenuItem>
@@ -293,7 +259,6 @@ export function ModificarProducto() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.descripcion}
                 helperText={errores.descripcion ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -308,7 +273,6 @@ export function ModificarProducto() {
                 rows={2}
                 variant="outlined"
                 slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -320,11 +284,11 @@ export function ModificarProducto() {
                   gap: 1,
                   mt: 2,
                   mb: 1,
-                  color: theme.palette.text.secondary,
+                  color: "text.secondary",
                 }}
               >
                 <InventoryIcon />
-                <Typography variant="h6" fontWeight="bold">
+                <Typography variant="h6" fontWeight={600}>
                   Inventario
                 </Typography>
               </Box>
@@ -342,7 +306,6 @@ export function ModificarProducto() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.unidadMedida}
                 helperText={errores.unidadMedida ? "Campo obligatorio" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -358,7 +321,7 @@ export function ModificarProducto() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.stock}
                 helperText={errores.stock ? "Debe ser >= 0" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
+                sx={{ bgcolor: "background.paper" }}
               />
             </Grid>
 
@@ -374,7 +337,7 @@ export function ModificarProducto() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 error={errores.stockMinimo}
                 helperText={errores.stockMinimo ? "Debe ser > 0" : ""}
-                sx={{ bgcolor: theme.palette.background.default }}
+                sx={{ bgcolor: "background.paper" }}
               />
             </Grid>
           </Grid>
@@ -389,19 +352,11 @@ export function ModificarProducto() {
           >
             <Button
               variant="outlined"
-              color="secondary"
-              startIcon={<CancelIcon />}
+              color="inherit"
               onClick={() => navigate(-1)}
               sx={{
-                color: theme.palette.text.secondary,
-                borderColor: theme.palette.divider,
-                backgroundColor: theme.palette.background.trasparent,
                 px: 3,
                 py: 1,
-                "&:hover": {
-                  borderColor: theme.palette.text.primary,
-                  backgroundColor: theme.palette.background.trasparent,
-                },
               }}
             >
               Cancelar
@@ -412,17 +367,8 @@ export function ModificarProducto() {
               variant="contained"
               startIcon={<CheckIcon />}
               sx={{
-                bgcolor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-                fontWeight: "bold",
-                boxShadow: "none",
                 px: 4,
                 py: 1,
-                "&:hover": {
-                  bgcolor:
-                    theme.palette.primary.hover || theme.palette.primary.dark,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                },
               }}
             >
               Guardar
@@ -430,35 +376,7 @@ export function ModificarProducto() {
           </Box>
         </form>
       </Paper>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{
-            width: "100%",
-            fontWeight: "bold",
-            "& .MuiAlert-action": {
-              "& .MuiIconButton-root": {
-                backgroundColor: theme.palette.background.trasparent,
-                color: "inherit",
-                "&:hover": {
-                  backgroundColor: theme.palette.background.trasparent,
-                },
-              },
-            },
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+    </>
   );
 }
 

@@ -1,3 +1,8 @@
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import DetailItem from "../../common/DetailItem";
+import EmptyState from "../../common/EmptyState";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -23,13 +28,6 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import CakeIcon from "@mui/icons-material/Cake";
 import WcIcon from "@mui/icons-material/Wc";
 
-const InfoItem = ({ icon, primary, secondary }) => (
-  <ListItem>
-    <ListItemIcon sx={{ minWidth: 40 }}>{icon}</ListItemIcon>
-    <ListItemText primary={primary} secondary={secondary} />
-  </ListItem>
-);
-
 export const DetallePaciente = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -52,127 +50,113 @@ export const DetallePaciente = () => {
   }, [id]);
 
   if (loading) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Skeleton variant="rectangular" width="100%" height={400} />
-      </Box>
-    );
+    return <Skeleton variant="rounded" height={320} />;
   }
 
   if (!paciente) {
     return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <Typography variant="h5" color="error">
-          Paciente no encontrado
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
-          sx={{ mt: 2 }}
-        >
-          Volver
-        </Button>
-      </Box>
+      <EmptyState
+        title="Paciente no encontrado"
+        action={
+          <Button variant="outlined" onClick={() => navigate(-1)}>
+            Volver
+          </Button>
+        }
+      />
     );
   }
 
+  const direccion =
+    [paciente.Direccion, paciente.Ciudad, paciente.Provincia]
+      .filter(Boolean)
+      .join(", ") +
+      (paciente.CodigoPostal ? ` (${paciente.CodigoPostal})` : "") ||
+    "No especificada";
+
   return (
-    <Box sx={{ padding: 3, maxWidth: 900, margin: "0 auto" }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <Avatar sx={{ width: 60, height: 60, mr: 2, bgcolor: "primary.main" }}>
-          <PersonIcon sx={{ fontSize: 40 }} />
-        </Avatar>
-        <Box>
-          <Typography variant="h4" component="h1">
-            {paciente.Nombre} {paciente.Apellido}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Paciente ID: {paciente.ID_Paciente}
-          </Typography>
-        </Box>
-      </Box>
+    <>
+      <PageHeader
+        title={`${paciente.Nombre} ${paciente.Apellido}`}
+        subtitle={`Paciente #${paciente.ID_Paciente}`}
+        onBack={() => navigate(-1)}
+        actions={
+          <Button
+            variant="outlined"
+            startIcon={<EditOutlinedIcon />}
+            onClick={() =>
+              navigate(`/pacientes/modificar/${paciente.ID_Paciente}`)
+            }
+          >
+            Editar
+          </Button>
+        }
+      />
 
-      <Paper elevation={3} sx={{ p: 2 }}>
-        <List>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <InfoItem
-                icon={<BadgeIcon />}
-                primary="DNI"
-                secondary={paciente.DNI}
-              />
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionCard
+            title="Datos personales"
+            icon={<BadgeIcon />}
+            sx={{ height: "100%" }}
+          >
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 6 }}>
+                <DetailItem label="DNI" value={paciente.DNI} />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <DetailItem
+                  label="Fecha de nacimiento"
+                  value={
+                    paciente.FechaNacimiento
+                      ? new Date(paciente.FechaNacimiento).toLocaleDateString(
+                          "es-AR"
+                        )
+                      : "No especificada"
+                  }
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <DetailItem
+                  label="Género"
+                  value={paciente.Genero || "No especificado"}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <InfoItem
-                icon={<CakeIcon />}
-                primary="Fecha de Nacimiento"
-                secondary={
-                  paciente.FechaNacimiento
-                    ? new Date(paciente.FechaNacimiento).toLocaleDateString(
-                        "es-AR"
-                      )
-                    : "No especificada"
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <InfoItem
-                icon={<WcIcon />}
-                primary="Género"
-                secondary={paciente.Genero || "No especificado"}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <InfoItem
-                icon={<EmailIcon />}
-                primary="Email"
-                secondary={paciente.Email || "No registrado"}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <InfoItem
-                icon={<PhoneIcon />}
-                primary="Teléfono"
-                secondary={paciente.Telefono || "No registrado"}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <InfoItem
-                icon={<PhoneIcon />}
-                primary="Celular"
-                secondary={paciente.Celular || "No registrado"}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Divider sx={{ my: 1 }} />
-            </Grid>
-            <Grid item xs={12}>
-              <InfoItem
-                icon={<HomeIcon />}
-                primary="Dirección"
-                secondary={
-                  [paciente.Direccion, paciente.Ciudad, paciente.Provincia]
-                    .filter(Boolean)
-                    .join(", ") +
-                    (paciente.CodigoPostal
-                      ? ` (${paciente.CodigoPostal})`
-                      : "") || "No especificada"
-                }
-              />
-            </Grid>
-          </Grid>
-        </List>
-      </Paper>
+          </SectionCard>
+        </Grid>
 
-      <Button
-        variant="contained"
-        startIcon={<ArrowBackIcon />}
-        onClick={() => navigate(-1)}
-        sx={{ mt: 3 }}
-      >
-        Volver a la Lista
-      </Button>
-    </Box>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SectionCard
+            title="Contacto"
+            icon={<PhoneIcon />}
+            sx={{ height: "100%" }}
+          >
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12 }}>
+                <DetailItem
+                  label="Email"
+                  value={paciente.Email || "No registrado"}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <DetailItem
+                  label="Teléfono"
+                  value={paciente.Telefono || "No registrado"}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <DetailItem
+                  label="Celular"
+                  value={paciente.Celular || "No registrado"}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <DetailItem label="Dirección" value={direccion} />
+              </Grid>
+            </Grid>
+          </SectionCard>
+        </Grid>
+      </Grid>
+    </>
   );
 };

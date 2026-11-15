@@ -1,18 +1,20 @@
+import PageHeader from "../../../common/PageHeader";
+import { FORM_MAX_WIDTH } from "../../../../theme/theme";
+import { useFeedback } from "../../../../context/FeedbackProvider";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 import { Box, Typography, TextField, Button, Paper, Grid } from "@mui/material";
 
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 export const RegistrarCategoria = () => {
-  const theme = useTheme();
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [editandoId, setEditandoId] = useState(null);
 
   const navigate = useNavigate();
+  const { notify } = useFeedback();
   const location = useLocation();
 
   useEffect(() => {
@@ -28,12 +30,12 @@ export const RegistrarCategoria = () => {
     e.preventDefault();
 
     if (!nombre.trim() || !descripcion.trim()) {
-      alert("Todos los campos son obligatorios.");
+      notify("Todos los campos son obligatorios.", "warning");
       return;
     }
 
     if (!isNaN(nombre)) {
-      alert("El nombre no puede ser un número.");
+      notify("El nombre no puede ser un número.", "warning");
       return;
     }
 
@@ -55,10 +57,10 @@ export const RegistrarCategoria = () => {
         setNombre("");
         setDescripcion("");
         setEditandoId(null);
-        alert("Categoría guardada correctamente");
+        notify("Categoría guardada correctamente");
         navigate("/categorias/consultar");
       })
-      .catch((err) => alert(err.message));
+      .catch((err) => notify(err.message, "error"));
   };
 
   const handleCancelar = () => {
@@ -66,33 +68,15 @@ export const RegistrarCategoria = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+    <>
+      <PageHeader
+        title={editandoId ? "Editar Categoría" : "Registrar Categoría"}
+        onBack={() => navigate(-1)}
+      />
       <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-          maxWidth: 800,
-          margin: "0 auto",
-        }}
+        variant="outlined"
+        sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
       >
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          {editandoId ? "Editar Categoría" : "Registrar Categoría"}
-        </Typography>
-
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 12 }}>
@@ -104,7 +88,6 @@ export const RegistrarCategoria = () => {
                 fullWidth
                 variant="outlined"
                 slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -120,7 +103,6 @@ export const RegistrarCategoria = () => {
                 variant="outlined"
                 placeholder="Breve descripción de la categoría..."
                 slotProps={{ inputLabel: { shrink: true } }}
-                sx={{ bgcolor: theme.palette.background.default }}
               />
             </Grid>
 
@@ -135,18 +117,8 @@ export const RegistrarCategoria = () => {
             >
               <Button
                 variant="outlined"
-                color="secondary"
-                startIcon={<CancelIcon />}
+                color="inherit"
                 onClick={handleCancelar}
-                sx={{
-                  color: theme.palette.text.secondary,
-                  borderColor: theme.palette.divider,
-                  backgroundColor: theme.palette.background.trasparent,
-                  "&:hover": {
-                    borderColor: theme.palette.text.primary,
-                    backgroundColor: theme.palette.background.trasparent,
-                  },
-                }}
               >
                 Cancelar
               </Button>
@@ -155,17 +127,6 @@ export const RegistrarCategoria = () => {
                 type="submit"
                 variant="contained"
                 startIcon={<CheckIcon />}
-                sx={{
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  fontWeight: "bold",
-                  boxShadow: "none",
-                  "&:hover": {
-                    bgcolor:
-                      theme.palette.primary.hover || theme.palette.primary.dark,
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  },
-                }}
               >
                 {editandoId ? "Actualizar" : "Guardar"}
               </Button>
@@ -173,6 +134,6 @@ export const RegistrarCategoria = () => {
           </Grid>
         </Box>
       </Paper>
-    </Box>
+    </>
   );
 };

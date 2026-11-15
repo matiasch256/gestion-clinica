@@ -2,37 +2,25 @@ import { useEffect, useState, useCallback } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Box,
-  Typography,
-  Paper,
   Skeleton,
   Grid,
-  Button,
   TextField,
   Autocomplete,
-  Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TablePagination,
-  Chip,
-  Divider,
   Tooltip,
   IconButton,
   Alert,
 } from "@mui/material";
 
-import SearchIcon from "@mui/icons-material/Search";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import TotalIcon from "@mui/icons-material/ConfirmationNumber";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import WarningIcon from "@mui/icons-material/Warning";
 
 import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
 
@@ -40,25 +28,14 @@ import { utils, writeFile } from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-const KpiCard = ({ title, value, icon, colorText }) => (
-  <Card elevation={3} sx={{ height: "100%", borderRadius: 2 }}>
-    <CardContent sx={{ textAlign: "center", py: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-        {icon}
-      </Box>
-      <Typography
-        variant="h4"
-        component="p"
-        sx={{ fontWeight: "bold", mb: 1, color: colorText }}
-      >
-        {value}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" fontWeight="bold">
-        {title.toUpperCase()}
-      </Typography>
-    </CardContent>
-  </Card>
-);
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import FilterBar from "../../common/FilterBar";
+import TableCard, { ExportButtons } from "../../common/TableCard";
+import StatCard from "../../common/StatCard";
+import StatusChip from "../../common/StatusChip";
+import EmptyState from "../../common/EmptyState";
+import { paginationLabels, countLabel } from "../../../utils/tableLabels";
 
 export const ReporteAusentismo = () => {
   const theme = useTheme();
@@ -85,25 +62,6 @@ export const ReporteAusentismo = () => {
     idProfesional: null,
     idEspecialidad: null,
   });
-
-  const cleanColor = (color) => {
-    return color ? color.replace("!important", "").trim() : color;
-  };
-
-  const getStatusColor = (estado) => {
-    switch (estado) {
-      case "Completado":
-        return theme.palette.accent.green;
-      case "Cancelado":
-        return theme.palette.error.main;
-      case "Ausente":
-        return theme.palette.accent.orange;
-      case "Pendiente":
-        return theme.palette.primary.main;
-      default:
-        return theme.palette.text.secondary;
-    }
-  };
 
   useEffect(() => {
     Promise.all([
@@ -177,6 +135,8 @@ export const ReporteAusentismo = () => {
     if (filtros.fechaDesde && filtros.fechaHasta) {
       handleGenerateReport();
     }
+    // Solo al entrar: después el reporte se genera con el botón Buscar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleExportExcel = () => {
@@ -221,25 +181,26 @@ export const ReporteAusentismo = () => {
     );
   };
 
+  // Mismos colores de estado que usa StatusChip en la tabla.
   const pieData = summary
     ? [
         {
           id: 0,
           value: summary.TotalCompletados,
           label: "Completado",
-          color: cleanColor(theme.palette.accent.green),
+          color: theme.palette.success.main,
         },
         {
           id: 1,
           value: summary.TotalCancelados,
           label: "Cancelado",
-          color: cleanColor(theme.palette.error.main),
+          color: theme.palette.error.main,
         },
         {
           id: 2,
           value: summary.TotalPendientes,
           label: "Pendiente",
-          color: cleanColor(theme.palette.primary.main),
+          color: theme.palette.warning.main,
         },
       ].filter((item) => item.value > 0)
     : [];
@@ -247,214 +208,143 @@ export const ReporteAusentismo = () => {
   useEffect(() => {
     setPage(0);
   }, [details]);
-  const handleChangePage = (event, newPage) => setPage(newPage);
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: "100%", margin: "0 auto" }}>
-      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{ mb: 3, fontWeight: "bold" }}
-        >
-          Reporte: Tasa de Ausentismo
-        </Typography>
+    <Box>
+      <PageHeader
+        title="Tasa de ausentismo"
+        subtitle={
+          reportGenerated
+            ? `Actualizado: ${reportDate.toLocaleString("es-AR")}`
+            : "Turnos completados, cancelados y pendientes por período"
+        }
+        actions={
+          <Tooltip title="Actualizar">
+            <span>
+              <IconButton
+                onClick={handleGenerateReport}
+                disabled={loading}
+                aria-label="Actualizar"
+              >
+                <RefreshIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        }
+      />
 
-        <Grid container spacing={2} alignItems="center">
-          <Grid size={{ xs: 12, md: 2 }}>
-            <TextField
-              name="fechaDesde"
-              label="Fecha Desde"
-              type="date"
-              value={filtros.fechaDesde}
-              onChange={handleFilterChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth
-              size="small"
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 2 }}>
-            <TextField
-              name="fechaHasta"
-              label="Fecha Hasta"
-              type="date"
-              value={filtros.fechaHasta}
-              onChange={handleFilterChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth
-              size="small"
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Autocomplete
-              options={especialidades}
-              getOptionLabel={(option) => option.Nombre}
-              onChange={(e, value) =>
-                setFiltros({
-                  ...filtros,
-                  idEspecialidad: value ? value.ID_Especialidad : null,
-                  idProfesional: null,
-                })
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Especialidad"
-                  size="small"
-                  fullWidth
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Autocomplete
-              options={profesionalesFiltrados}
-              value={
-                profesionales.find(
-                  (p) => p.ID_Medico === filtros.idProfesional
-                ) || null
-              }
-              getOptionLabel={(option) =>
-                `${option.Apellido}, ${option.Nombre}`
-              }
-              onChange={(e, value) =>
-                setFiltros({
-                  ...filtros,
-                  idProfesional: value ? value.ID_Medico : null,
-                })
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Profesional"
-                  size="small"
-                  fullWidth
-                />
-              )}
-              disabled={
-                !filtros.idEspecialidad &&
-                profesionalesFiltrados.length === profesionales.length &&
-                profesionales.length > 50
-              }
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<SearchIcon />}
-              onClick={handleGenerateReport}
-              disabled={loading}
-              fullWidth
-              sx={{ height: 40 }}
-            >
-              {loading ? "..." : "Generar"}
-            </Button>
-          </Grid>
+      <FilterBar onSearch={handleGenerateReport}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+          <TextField
+            name="fechaDesde"
+            label="Fecha desde"
+            type="date"
+            value={filtros.fechaDesde}
+            onChange={handleFilterChange}
+            slotProps={{ inputLabel: { shrink: true } }}
+            fullWidth
+          />
         </Grid>
-      </Paper>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+          <TextField
+            name="fechaHasta"
+            label="Fecha hasta"
+            type="date"
+            value={filtros.fechaHasta}
+            onChange={handleFilterChange}
+            slotProps={{ inputLabel: { shrink: true } }}
+            fullWidth
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Autocomplete
+            options={especialidades}
+            getOptionLabel={(option) => option.Nombre}
+            onChange={(e, value) =>
+              setFiltros({
+                ...filtros,
+                idEspecialidad: value ? value.ID_Especialidad : null,
+                idProfesional: null,
+              })
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Especialidad" fullWidth />
+            )}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Autocomplete
+            options={profesionalesFiltrados}
+            value={
+              profesionales.find(
+                (p) => p.ID_Medico === filtros.idProfesional
+              ) || null
+            }
+            getOptionLabel={(option) => `${option.Apellido}, ${option.Nombre}`}
+            onChange={(e, value) =>
+              setFiltros({
+                ...filtros,
+                idProfesional: value ? value.ID_Medico : null,
+              })
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Profesional" fullWidth />
+            )}
+            disabled={
+              !filtros.idEspecialidad &&
+              profesionalesFiltrados.length === profesionales.length &&
+              profesionales.length > 50
+            }
+          />
+        </Grid>
+      </FilterBar>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
       {loading && !reportGenerated && (
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={400}
-          sx={{ borderRadius: 2 }}
-        />
+        <Skeleton variant="rounded" width="100%" height={400} />
       )}
 
       {reportGenerated && summary && (
-        <Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              mb: 2,
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Typography variant="caption" color="text.secondary">
-              Actualizado: {reportDate.toLocaleTimeString()}
-            </Typography>
-            <Tooltip title="Refrescar">
-              <IconButton
-                onClick={handleGenerateReport}
-                size="small"
-                sx={{ bgcolor: theme.palette.background.trasparent }}
-              >
-                <RefreshIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid size={{ xs: 12, md: 7 }}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                  <KpiCard
-                    title="Tasa Ausentismo"
-                    value={`${summary.PorcentajeAusentismo}%`}
-                    icon={
-                      <EventBusyIcon
-                        sx={{ fontSize: 40, color: theme.palette.error.main }}
-                      />
-                    }
-                    colorText={theme.palette.error.main}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                  <KpiCard
-                    title="Total Turnos"
-                    value={summary.TotalTurnos}
-                    icon={
-                      <TotalIcon
-                        sx={{ fontSize: 40, color: theme.palette.primary.main }}
-                      />
-                    }
-                    colorText={theme.palette.primary.main}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 12, md: 4 }}>
-                  <KpiCard
-                    title="Completados"
-                    value={summary.TotalCompletados}
-                    icon={
-                      <EventAvailableIcon
-                        sx={{ fontSize: 40, color: theme.palette.accent.green }}
-                      />
-                    }
-                    colorText={theme.palette.accent.green}
-                  />
-                </Grid>
-              </Grid>
+        <>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <StatCard
+                title="Tasa de ausentismo"
+                value={`${summary.PorcentajeAusentismo}%`}
+                icon={EventBusyIcon}
+                tone="error"
+              />
             </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <StatCard
+                title="Total de turnos"
+                value={summary.TotalTurnos}
+                icon={TotalIcon}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <StatCard
+                title="Completados"
+                value={summary.TotalCompletados}
+                icon={EventAvailableIcon}
+                tone="success"
+              />
+            </Grid>
+          </Grid>
 
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Paper
-                elevation={3}
-                sx={{
-                  p: 2,
-                  height: "100%",
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <SectionCard title="Turnos por estado" sx={{ height: "100%" }}>
                 {pieData.length > 0 ? (
                   <PieChart
                     series={[
@@ -467,109 +357,52 @@ export const ReporteAusentismo = () => {
                         arcLabel: (item) => `${item.value}`,
                       },
                     ]}
-                    height={200}
-                    slotProps={{ legend: { hidden: false } }}
+                    height={220}
                     margin={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     sx={{
                       [`& .${pieArcLabelClasses.root}`]: {
-                        fill: "white",
+                        fill: theme.palette.common.white,
                         fontSize: 12,
-                        fontWeight: "bold",
+                        fontWeight: 600,
                       },
                     }}
                   />
                 ) : (
-                  <Box sx={{ textAlign: "center", color: "text.secondary" }}>
-                    <WarningIcon sx={{ fontSize: 40, mb: 1, opacity: 0.5 }} />
-                    <Typography>Sin datos para graficar</Typography>
-                  </Box>
+                  <EmptyState title="Sin datos para graficar" />
                 )}
-              </Paper>
+              </SectionCard>
             </Grid>
-          </Grid>
 
-          <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 2,
-                flexWrap: "wrap",
-                gap: 2,
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold">
-                Detalle de Turnos
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<AssessmentIcon />}
-                  onClick={handleExportExcel}
-                  disabled={details.length === 0}
-                  sx={{
-                    color: theme.palette.accent.green,
-                    borderColor: theme.palette.accent.green,
-                    "&:hover": {
-                      borderColor: theme.palette.accent.green,
-                      bgcolor: theme.palette.background.trasparent,
-                    },
-                  }}
-                >
-                  Excel
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PictureAsPdfIcon />}
-                  onClick={handleExportPDF}
-                  disabled={details.length === 0}
-                  sx={{
-                    color: theme.palette.error.main,
-                    borderColor: theme.palette.error.main,
-                    "&:hover": {
-                      borderColor: theme.palette.error.main,
-                      bgcolor: theme.palette.background.trasparent,
-                    },
-                  }}
-                >
-                  PDF
-                </Button>
-              </Box>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-
-            {details.length > 0 ? (
-              <>
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ fontWeight: "bold" }}>
-                          Paciente
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>Fecha</TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>
-                          Profesional
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: "bold" }}>
-                          Estado
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {details
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .map((item, index) => {
-                          const statusColor = cleanColor(
-                            getStatusColor(item.Estado)
-                          );
-                          return (
+            <Grid size={{ xs: 12, md: 8 }}>
+              <TableCard
+                summary={countLabel(details.length, "turno", "turnos")}
+                actions={
+                  details.length > 0 && (
+                    <ExportButtons
+                      onExcel={handleExportExcel}
+                      onPdf={handleExportPDF}
+                    />
+                  )
+                }
+              >
+                {details.length > 0 ? (
+                  <>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Paciente</TableCell>
+                          <TableCell>Fecha</TableCell>
+                          <TableCell>Profesional</TableCell>
+                          <TableCell>Estado</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {details
+                          .slice(
+                            page * rowsPerPage,
+                            page * rowsPerPage + rowsPerPage
+                          )
+                          .map((item, index) => (
                             <TableRow key={index} hover>
                               <TableCell>{`${item.PacienteApellido}, ${item.PacienteNombre}`}</TableCell>
                               <TableCell>
@@ -579,46 +412,33 @@ export const ReporteAusentismo = () => {
                               </TableCell>
                               <TableCell>{`${item.MedicoApellido}, ${item.MedicoNombre}`}</TableCell>
                               <TableCell>
-                                <Chip
-                                  label={item.Estado}
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{
-                                    fontWeight: "bold",
-                                    border: "1px solid",
-                                    borderColor: statusColor,
-                                    color: statusColor,
-                                    bgcolor:
-                                      theme.palette.background.trasparent,
-                                  }}
-                                />
+                                <StatusChip status={item.Estado} />
                               </TableCell>
                             </TableRow>
-                          );
-                        })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  component="div"
-                  count={details.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={(e, newPage) => setPage(newPage)}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  labelRowsPerPage="Filas:"
-                />
-              </>
-            ) : (
-              <Typography
-                sx={{ p: 4, textAlign: "center", color: "text.secondary" }}
-              >
-                No se encontraron turnos en el período seleccionado.
-              </Typography>
-            )}
-          </Paper>
-        </Box>
+                          ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={details.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={(e, newPage) => setPage(newPage)}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      {...paginationLabels}
+                    />
+                  </>
+                ) : (
+                  <EmptyState
+                    title="No se encontraron turnos"
+                    description="No hay turnos en el período seleccionado."
+                  />
+                )}
+              </TableCard>
+            </Grid>
+          </Grid>
+        </>
       )}
     </Box>
   );

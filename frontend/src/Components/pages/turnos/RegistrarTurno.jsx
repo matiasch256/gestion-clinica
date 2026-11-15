@@ -1,3 +1,8 @@
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import FormContainer from "../../common/FormContainer";
+import FormActions from "../../common/FormActions";
+import { Grid } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -140,112 +145,88 @@ const RegistrarTurno = () => {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Paper
-        elevation={4}
-        sx={{
-          mt: 8,
-          p: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-          {isEditMode ? "Editar Turno" : "Registrar Turno"}
-        </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          noValidate
-          sx={{ width: "100%", mt: 1 }}
-        >
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Paciente</InputLabel>
-            <Select
-              value={pacienteId}
-              label="Paciente"
-              onChange={(e) => setPacienteId(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>Seleccione un paciente</em>
-              </MenuItem>
-              {pacientes.map((p) => (
-                <MenuItem key={p.ID_Paciente} value={p.ID_Paciente}>
-                  {p.Nombre} {p.Apellido}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+    <>
+      <PageHeader
+        title={isEditMode ? "Editar turno" : "Registrar turno"}
+        subtitle="Asigná un paciente, un médico y un horario"
+        onBack={() => navigate(-1)}
+      />
 
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Médico</InputLabel>
-            <Select
-              value={medicoId}
-              label="Médico"
-              onChange={(e) => setMedicoId(e.target.value)}
-            >
-              <MenuItem value="">
-                <em>Seleccione un médico</em>
-              </MenuItem>
-              {medicos.map((m) => (
-                <MenuItem key={m.ID_Medico} value={m.ID_Medico}>
-                  {m.Nombre} {m.Apellido} ({m.Especialidad})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Fecha del Turno"
-            type="date"
-            value={fecha}
-            onChange={(e) => setFecha(e.target.value)}
-            InputLabelProps={{ shrink: true }}
+      <FormContainer onSubmit={handleSubmit}>
+        <SectionCard title="Datos del turno">
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                required
+                fullWidth
+                label="Paciente"
+                value={pacienteId}
+                onChange={(e) => setPacienteId(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              >
+                {pacientes.map((p) => (
+                  <MenuItem key={p.ID_Paciente} value={p.ID_Paciente}>
+                    {p.Nombre} {p.Apellido}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                select
+                required
+                fullWidth
+                label="Médico"
+                value={medicoId}
+                onChange={(e) => setMedicoId(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              >
+                {medicos.map((m) => (
+                  <MenuItem key={m.ID_Medico} value={m.ID_Medico}>
+                    {m.Nombre} {m.Apellido} ({m.Especialidad})
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <TextField
+                required
+                fullWidth
+                label="Fecha"
+                type="date"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <TextField
+                required
+                fullWidth
+                label="Hora"
+                type="time"
+                value={hora}
+                onChange={(e) => setHora(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4 }}>
+              <TextField
+                fullWidth
+                label="Consultorio (opcional)"
+                value={consultorio}
+                onChange={(e) => setConsultorio(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Grid>
+          </Grid>
+          <FormActions
+            onCancel={() => navigate(-1)}
+            submitLabel={isEditMode ? "Actualizar turno" : "Registrar turno"}
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Hora del Turno"
-            type="time"
-            value={hora}
-            onChange={(e) => setHora(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-
-          <TextField
-            margin="normal"
-            fullWidth
-            label="Consultorio (Opcional)"
-            type="text"
-            value={consultorio}
-            onChange={(e) => setConsultorio(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            sx={{
-              minWidth: 200,
-              "& .MuiInputBase-input": { minHeight: 56 },
-            }}
-          />
-
-          <Box sx={{ display: "flex", gap: 2, mt: 3, mb: 2 }}>
-            <Button
-              type="button"
-              fullWidth
-              variant="outlined"
-              onClick={() => navigate(-1)}
-            >
-              {isEditMode ? "Volver" : "Cancelar"}
-            </Button>
-            <Button type="submit" fullWidth variant="contained">
-              {isEditMode ? "Actualizar" : "Registrar"}
-            </Button>
-          </Box>
-        </Box>
-      </Paper>
+        </SectionCard>
+      </FormContainer>
 
       <Dialog open={dialog.open} onClose={handleCloseDialog}>
         <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
@@ -265,7 +246,7 @@ const RegistrarTurno = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </>
   );
 };
 

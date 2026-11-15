@@ -1,78 +1,92 @@
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import PeopleIcon from "@mui/icons-material/People";
-import FolderIcon from "@mui/icons-material/Folder";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import CategoryIcon from "@mui/icons-material/Category";
+import EventIcon from "@mui/icons-material/Event";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
-import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import AssessmentOutlinedIcon from "@mui/icons-material/AssessmentOutlined";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import { ROLES } from "../../utils/roles";
 
+// Cada acción lleva a una pantalla real. "roles" limita quién la ve.
 export const quickActionsHome = [
   {
-    title: "Nueva Compra",
-    description: "Registrar una nueva orden",
-    color: "#3B83F6",
-    colorHover: "#2564EB",
+    title: "Nuevo turno",
+    description: "Agendar un turno médico",
+    icon: EventIcon,
+    path: "/turnos/registrar",
+    roles: [ROLES.ADMIN, ROLES.RECEPCION],
+  },
+  {
+    title: "Nuevo paciente",
+    description: "Registrar un paciente",
+    icon: PersonAddIcon,
+    path: "/pacientes/registrar",
+    roles: [ROLES.ADMIN, ROLES.RECEPCION],
+  },
+  {
+    title: "Nueva factura",
+    description: "Facturar servicios a un paciente",
+    icon: ReceiptLongIcon,
+    path: "/facturacion/registrar",
+    roles: [ROLES.ADMIN, ROLES.RECEPCION],
+  },
+  {
+    title: "Nueva compra",
+    description: "Registrar una orden de compra",
     icon: ShoppingCartIcon,
-    action: () => alert("Registrando nueva compra..."),
+    path: "/compras/registrar",
+    roles: [ROLES.ADMIN],
   },
   {
-    title: "Agregar Producto",
+    title: "Agregar producto",
     description: "Nuevo producto al inventario",
-    color: "#4caf50",
-    colorHover: "#43a047",
     icon: InventoryIcon,
-    action: () => alert("Agregando producto..."),
+    path: "/productos/registrar",
+    roles: [ROLES.ADMIN, ROLES.DEPOSITO],
   },
   {
-    title: "Nuevo Proveedor",
-    description: "Registrar proveedor",
-    color: "#ab47bc",
-    colorHover: "#9c27b0",
-    icon: PeopleIcon,
-    action: () => alert("Registrando proveedor..."),
+    title: "Nueva categoría",
+    description: "Crear una categoría de productos",
+    icon: CategoryIcon,
+    path: "/categorias/registrar",
+    roles: [ROLES.ADMIN, ROLES.DEPOSITO],
   },
   {
-    title: "Nueva Categoría",
-    description: "Crear categoría",
-    color: "#ff9800",
-    colorHover: "#fb8c00",
-    icon: FolderIcon,
-    action: () => alert("Creando categoría..."),
+    title: "Nuevo proveedor",
+    description: "Registrar un proveedor",
+    icon: LocalShippingIcon,
+    path: "/proveedores/registrar",
+    roles: [ROLES.ADMIN],
   },
 ];
 
 export const quickActionsCompras = [
   {
-    title: "Registrar Compra",
-    description: "Crear nueva orden de compra",
-    color: "#3B83F6",
-    colorHover: "#2564EB",
+    title: "Registrar compra",
+    description: "Crear una nueva orden de compra",
     icon: AddShoppingCartOutlinedIcon,
-    action: () => alert("Registrando nueva compra..."),
+    path: "/compras/registrar",
   },
   {
-    title: "Ver Facturas",
-    description: "Consultar facturas recientes",
-    color: "#4caf50",
-    colorHover: "#43a047",
-    icon: ReceiptLongRoundedIcon,
-    action: () => alert("Consultando facturas..."),
+    title: "Ver compras",
+    description: "Consultar y gestionar las órdenes",
+    icon: ListAltIcon,
+    path: "/compras/listaCompras",
   },
   {
-    title: "Consultar Stock",
-    description: "Revisar inventario actual",
-    color: "#ab47bc",
-    colorHover: "#9c27b0",
+    title: "Consultar stock",
+    description: "Revisar el inventario actual",
     icon: Inventory2OutlinedIcon,
-    action: () => alert("Consultando stock..."),
+    path: "/productos/lista",
   },
   {
-    title: "Ver Órdenes",
-    description: "Gestionar órdenes pendientes",
-    color: "#ff9800",
-    colorHover: "#fb8c00",
-    icon: VisibilityIcon,
-    action: () => alert("Consultando órdenes..."),
+    title: "Reportes de compras",
+    description: "Gastos y productos más comprados",
+    icon: AssessmentOutlinedIcon,
+    path: "/compras/reportes",
   },
 ];

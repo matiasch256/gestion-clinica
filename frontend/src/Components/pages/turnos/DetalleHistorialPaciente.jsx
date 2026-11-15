@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
 import {
-  Box,
-  Typography,
-  Paper,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Skeleton,
 } from "@mui/material";
+import SectionCard from "../../common/SectionCard";
+import StatusChip from "../../common/StatusChip";
+import SkeletonRows from "../../common/SkeletonRows";
+import EmptyState from "../../common/EmptyState";
 
 export const DetalleHistorialPaciente = ({ paciente }) => {
   const [turnos, setTurnos] = useState([]);
@@ -29,54 +28,51 @@ export const DetalleHistorialPaciente = ({ paciente }) => {
   }, [paciente]);
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Historial de: {paciente.Nombre} {paciente.Apellido}
-      </Typography>
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
+    <SectionCard
+      title={`Historial de ${paciente.Nombre} ${paciente.Apellido}`}
+      description={`DNI: ${paciente.DNI || "No cargado"}`}
+      disablePadding
+    >
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Fecha y hora</TableCell>
+            <TableCell>Médico</TableCell>
+            <TableCell>Especialidad</TableCell>
+            <TableCell>Servicio</TableCell>
+            <TableCell align="center">Estado</TableCell>
+            <TableCell align="right">Costo</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {loading ? (
+            <SkeletonRows rows={3} columns={6} />
+          ) : turnos.length > 0 ? (
+            turnos.map((turno) => (
+              <TableRow key={turno.ID_TurnoMedico} hover>
+                <TableCell sx={{ fontWeight: 600 }}>
+                  {new Date(turno.FechaHora).toLocaleString("es-AR")}
+                </TableCell>
+                <TableCell>{turno.Medico}</TableCell>
+                <TableCell>{turno.Especialidad || "N/A"}</TableCell>
+                <TableCell>{turno.Servicio || "No especificado"}</TableCell>
+                <TableCell align="center">
+                  <StatusChip status={turno.Estado} />
+                </TableCell>
+                <TableCell align="right">
+                  ${turno.Costo ? turno.Costo.toFixed(2) : "0.00"}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
             <TableRow>
-              <TableCell>Fecha y Hora</TableCell>
-              <TableCell>Médico</TableCell>
-              <TableCell>Especialidad</TableCell>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Costo</TableCell>
+              <TableCell colSpan={6}>
+                <EmptyState title="Este paciente no tiene turnos registrados" />
+              </TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={6}>
-                  <Skeleton />
-                </TableCell>
-              </TableRow>
-            ) : turnos.length > 0 ? (
-              turnos.map((turno) => (
-                <TableRow key={turno.ID_TurnoMedico}>
-                  <TableCell>
-                    {new Date(turno.FechaHora).toLocaleString("es-AR")}
-                  </TableCell>
-                  <TableCell>{turno.Medico}</TableCell>
-                  <TableCell>{turno.Especialidad || "N/A"}</TableCell>
-                  <TableCell>{turno.Servicio || "No especificado"}</TableCell>
-                  <TableCell>{turno.Estado}</TableCell>
-                  <TableCell>
-                    ${turno.Costo ? turno.Costo.toFixed(2) : "0.00"}
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  Este paciente no tiene turnos registrados.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+          )}
+        </TableBody>
+      </Table>
+    </SectionCard>
   );
 };

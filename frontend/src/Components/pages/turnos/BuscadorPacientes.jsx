@@ -2,19 +2,22 @@ import { Paper, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 export const BuscadorPacientes = ({ onSearch }) => (
-  <Paper elevation={3} sx={{ p: 2 }}>
+  <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
     <TextField
       fullWidth
-      variant="outlined"
-      placeholder="Escriba el nombre, documento o teléfono del paciente..."
+      size="medium"
+      label="Paciente"
+      placeholder="Nombre, documento o teléfono (mínimo 3 caracteres)"
       onChange={(e) => onSearch(e.target.value)}
-      sx={{ "& .MuiInputBase-input": { minHeight: 50, border: "transparent" } }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon />
-          </InputAdornment>
-        ),
+      slotProps={{
+        inputLabel: { shrink: true },
+        input: {
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
+        },
       }}
     />
   </Paper>

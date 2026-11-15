@@ -1,115 +1,71 @@
-import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  Typography,
-  Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Box, Typography } from "@mui/material";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import SectionCard from "./SectionCard";
 
-const RecentActivity = () => {
-  return (
-    <Card>
-      <CardHeader
-        title={<Typography variant="h6">Actividad Reciente</Typography>}
-      />
-      <CardContent>
-        <List sx={{ padding: 0 }}>
-          {[
-            {
-              icon: CheckCircleIcon,
-              text: "Orden de compra aprobada",
-              detail: "ORD-001 - Proveedor ABC",
-              time: "Hace 2 horas",
-            },
-            {
-              icon: AddCircleOutlineIcon,
-              text: "Nuevo producto agregado",
-              detail: "Cuadernos Universitarios - 100 unidades",
-              time: "Hace 4 horas",
-            },
-            {
-              icon: WarningAmberIcon,
-              text: "Stock bajo detectado",
-              detail: "Papel A4 - Solo quedan 15 paquetes",
-              time: "Hace 6 horas",
-            },
-            {
-              icon: CheckCircleIcon,
-              text: "Factura procesada",
-              detail: "FAC-458 - $32,100",
-              time: "Ayer",
-            },
-          ].map((activity, index) => (
-            <ListItem
-              key={index}
-              sx={{
-                paddingY: 1,
-                borderBottom: index < 3 ? "1px solid #e0e0e0" : "none",
-                "&:last-child": { borderBottom: "none" },
-              }}
-            >
-              <ListItemIcon>
-                <activity.icon
-                  sx={{
-                    color:
-                      activity.icon === WarningAmberIcon
-                        ? "#f59e0b"
-                        : "#4caf50",
-                    fontSize: 20,
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Typography variant="body1" fontWeight="medium">
-                    {activity.text}
-                  </Typography>
-                }
-                secondary={
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 0.5,
-                      color: "#6b7280",
-                    }}
-                    secondaryTypographyProps={{ component: "div" }}
-                  >
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ flex: 1 }}
-                    >
-                      {activity.detail}
-                    </Typography>
+const ACTIVITY = [
+  {
+    icon: CheckCircleOutlineIcon,
+    tone: "success",
+    text: "Orden de compra aprobada",
+    detail: "ORD-001 - Proveedor ABC",
+    time: "Hace 2 horas",
+  },
+  {
+    icon: AddCircleOutlineIcon,
+    tone: "primary",
+    text: "Nuevo producto agregado",
+    detail: "Cuadernos Universitarios - 100 unidades",
+    time: "Hace 4 horas",
+  },
+  {
+    icon: WarningAmberIcon,
+    tone: "warning",
+    text: "Stock bajo detectado",
+    detail: "Papel A4 - Solo quedan 15 paquetes",
+    time: "Hace 6 horas",
+  },
+  {
+    icon: CheckCircleOutlineIcon,
+    tone: "success",
+    text: "Factura procesada",
+    detail: "FAC-458 - $32,100",
+    time: "Ayer",
+  },
+];
 
-                    <Box
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                    >
-                      <AccessTimeIcon sx={{ fontSize: 16 }} />
-                      <Typography variant="body2" color="text.secondary">
-                        {activity.time}
-                      </Typography>
-                    </Box>
-                  </Box>
-                }
-              />
-            </ListItem>
-          ))}
-        </List>
-      </CardContent>
-    </Card>
-  );
-};
+const RecentActivity = () => (
+  <SectionCard title="Actividad reciente" disablePadding>
+    {ACTIVITY.map((activity, index) => (
+      <Box
+        key={index}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          px: 3,
+          py: 1.5,
+          borderTop: index === 0 ? 0 : 1,
+          borderColor: "divider",
+        }}
+      >
+        <activity.icon
+          fontSize="small"
+          sx={{ color: `${activity.tone}.main` }}
+        />
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography variant="subtitle2">{activity.text}</Typography>
+          <Typography variant="body2" color="text.secondary" noWrap>
+            {activity.detail}
+          </Typography>
+        </Box>
+        <Typography variant="caption" color="text.secondary" noWrap>
+          {activity.time}
+        </Typography>
+      </Box>
+    ))}
+  </SectionCard>
+);
 
 export default RecentActivity;

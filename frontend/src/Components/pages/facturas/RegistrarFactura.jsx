@@ -1,3 +1,12 @@
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import FormContainer from "../../common/FormContainer";
+import FormActions from "../../common/FormActions";
+import ResultDialog from "../../common/ResultDialog";
+import EmptyState from "../../common/EmptyState";
+import { ActionButton } from "../../common/RowActions";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -47,7 +56,7 @@ export const RegistrarFactura = () => {
 
   const [numeroFactura, setNumeroFactura] = useState("");
   const [metodoPagoId, setMetodoPagoId] = useState("");
-  const [fechaEmision, setFechaEmision] = useState(getTodayDate());
+  const [fechaEmision] = useState(getTodayDate());
 
   const [dialog, setDialog] = useState({
     open: false,
@@ -157,72 +166,54 @@ export const RegistrarFactura = () => {
   };
 
   return (
-    <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-      <Paper elevation={4} sx={{ p: 4 }}>
-        <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-          Registrar Nueva Factura
-        </Typography>
+    <>
+      <PageHeader
+        title="Registrar factura"
+        subtitle="Elegí el paciente y agregá los servicios a facturar"
+        onBack={() => navigate(-1)}
+      />
 
-        <Grid container spacing={3}>
-          <Grid size={12} md={4}>
-            <Autocomplete
-              options={pacientes}
-              getOptionLabel={(option) =>
-                `${option.Apellido}, ${option.Nombre} (DNI: ${option.DNI})`
-              }
-              onChange={(event, newValue) => setSelectedPaciente(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Seleccionar Paciente *"
-                  sx={{ "& .MuiInputBase-input": { minHeight: 40 } }}
-                />
-              )}
-            />
-          </Grid>
-          <Grid size={12} md={4}>
-            <Autocomplete
-              options={servicios}
-              getOptionLabel={(option) =>
-                `${option.Nombre} ($${option.CostoBase})`
-              }
-              onChange={(event, newValue) => handleAddServicio(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Agregar Servicio a la Factura *"
-                  sx={{ "& .MuiInputBase-input": { minHeight: 40 } }}
-                />
-              )}
-              value={null}
-            />
-          </Grid>
-          <Grid size={12} md={6}>
-            <TextField
-              label="Número de Factura"
-              value={numeroFactura}
-              onChange={(e) => setNumeroFactura(e.target.value)}
-              placeholder="Ej: 0001-00001234"
-              fullWidth
-              required
-              sx={{ "& .MuiInputBase-input": { minHeight: 40 } }}
-            />
-          </Grid>
-
-          <Grid size={12} md={6}>
-            <FormControl
-              fullWidth
-              sx={{ "& .MuiOutlinedInput-root": { height: 56.5 } }}
-            >
-              <InputLabel>Método de Pago *</InputLabel>
-              <Select
+      <FormContainer
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleRegistrarFactura();
+        }}
+      >
+        <SectionCard title="Datos de la factura">
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Autocomplete
+                options={pacientes}
+                getOptionLabel={(option) =>
+                  `${option.Apellido}, ${option.Nombre} (DNI: ${option.DNI})`
+                }
+                onChange={(event, newValue) => setSelectedPaciente(newValue)}
+                renderInput={(params) => (
+                  <TextField {...params} label="Paciente" required />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                label="Número de factura"
+                value={numeroFactura}
+                onChange={(e) => setNumeroFactura(e.target.value)}
+                placeholder="Ej: 0001-00001234"
+                fullWidth
+                required
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <TextField
+                select
+                required
+                fullWidth
+                label="Método de pago"
                 value={metodoPagoId}
-                label="Método de Pago"
                 onChange={(e) => setMetodoPagoId(e.target.value)}
+                slotProps={{ inputLabel: { shrink: true } }}
               >
-                <MenuItem value="">
-                  <em>Seleccione un método</em>
-                </MenuItem>
                 {metodosPago.map((metodo) => (
                   <MenuItem
                     key={metodo.ID_MetodoPago}
@@ -231,101 +222,97 @@ export const RegistrarFactura = () => {
                     {metodo.Nombre}
                   </MenuItem>
                 ))}
-              </Select>
-            </FormControl>
+              </TextField>
+            </Grid>
           </Grid>
+        </SectionCard>
 
-          <Grid size={12} md={6}>
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              Detalle de la Factura
-            </Typography>
-            <TableContainer component={Paper} sx={{ mt: 1 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Servicio</TableCell>
-                    <TableCell align="right">Costo Unitario</TableCell>
-                    <TableCell align="center">Cantidad</TableCell>
-                    <TableCell align="right">Subtotal</TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {serviciosFactura.map((servicio, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{servicio.Nombre}</TableCell>
-                      <TableCell align="right">
-                        ${servicio.CostoBase.toFixed(2)}
-                      </TableCell>
-                      <TableCell align="center">1</TableCell>
-                      <TableCell align="right">
-                        ${(servicio.CostoBase * servicio.cantidad).toFixed(2)}
-                      </TableCell>
-                      <TableCell align="center">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleRemoveServicio(index)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow>
-                    <TableCell colSpan={3} align="right">
-                      <Typography fontWeight="bold">TOTAL:</Typography>
+        <SectionCard
+          title="Servicios"
+          description="Cada servicio que elijas se suma al detalle"
+          disablePadding
+        >
+          <Box sx={{ p: 3, pb: 2 }}>
+            <Autocomplete
+              options={servicios}
+              getOptionLabel={(option) =>
+                `${option.Nombre} ($${option.CostoBase})`
+              }
+              onChange={(event, newValue) => handleAddServicio(newValue)}
+              renderInput={(params) => (
+                <TextField {...params} label="Agregar servicio" />
+              )}
+              value={null}
+              sx={{ maxWidth: 480 }}
+            />
+          </Box>
+          {serviciosFactura.length === 0 ? (
+            <EmptyState
+              icon={ReceiptLongOutlinedIcon}
+              title="Todavía no agregaste servicios"
+            />
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Servicio</TableCell>
+                  <TableCell align="right">Costo unitario</TableCell>
+                  <TableCell align="right">Cantidad</TableCell>
+                  <TableCell align="right">Subtotal</TableCell>
+                  <TableCell />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {serviciosFactura.map((servicio, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{servicio.Nombre}</TableCell>
+                    <TableCell align="right">
+                      ${servicio.CostoBase.toFixed(2)}
+                    </TableCell>
+                    <TableCell align="right">1</TableCell>
+                    <TableCell align="right">
+                      ${(servicio.CostoBase * servicio.cantidad).toFixed(2)}
                     </TableCell>
                     <TableCell align="right">
-                      <Typography fontWeight="bold">
-                        ${calcularTotal().toFixed(2)}
-                      </Typography>
+                      <ActionButton
+                        title="Quitar servicio"
+                        hoverColor="error.main"
+                        onClick={() => handleRemoveServicio(index)}
+                      >
+                        <DeleteOutlineIcon fontSize="small" />
+                      </ActionButton>
                     </TableCell>
-                    <TableCell></TableCell>
                   </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 2,
-                mt: 3,
-              }}
-            >
-              <Button variant="outlined" onClick={() => navigate(-1)}>
-                Cancelar
-              </Button>
-              <Button variant="contained" onClick={handleRegistrarFactura}>
-                Registrar Factura
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
-      </Paper>
-
-      <Dialog open={dialog.open} onClose={handleCloseDialog}>
-        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          {dialog.isError ? (
-            <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
-          ) : (
-            <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+                ))}
+              </TableBody>
+            </Table>
           )}
-          {dialog.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>{dialog.message}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} autoFocus>
-            Aceptar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "baseline",
+              gap: 2,
+              px: 3,
+              py: 2,
+              borderTop: 1,
+              borderColor: "divider",
+            }}
+          >
+            <Typography color="text.secondary">Total</Typography>
+            <Typography variant="h5" component="p">
+              ${calcularTotal().toFixed(2)}
+            </Typography>
+          </Box>
+        </SectionCard>
+
+        <FormActions
+          onCancel={() => navigate(-1)}
+          submitLabel="Registrar factura"
+        />
+      </FormContainer>
+
+      <ResultDialog dialog={dialog} onClose={handleCloseDialog} />
+    </>
   );
 };

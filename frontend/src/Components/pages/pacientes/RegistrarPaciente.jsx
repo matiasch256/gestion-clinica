@@ -1,3 +1,8 @@
+import PageHeader from "../../common/PageHeader";
+import SectionCard from "../../common/SectionCard";
+import FormContainer from "../../common/FormContainer";
+import FormActions from "../../common/FormActions";
+import ResultDialog from "../../common/ResultDialog";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -33,33 +38,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/AccountCircle";
 import PhoneIcon from "@mui/icons-material/Phone";
 import ShieldIcon from "@mui/icons-material/Shield";
-
-const FormSection = ({ title, description, icon, children }) => (
-  <Paper
-    elevation={3}
-    sx={{
-      p: 3,
-      mb: 4,
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-    }}
-  >
-    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-      {icon}
-      <Box ml={2}>
-        <Typography variant="h6">{title}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {description}
-        </Typography>
-      </Box>
-    </Box>
-    <Divider sx={{ mb: 3 }} />
-    <Grid container spacing={3} sx={{ flexGrow: 1 }}>
-      {children}
-    </Grid>
-  </Paper>
-);
 
 export const RegistrarPaciente = () => {
   const [formData, setFormData] = useState({
@@ -383,405 +361,229 @@ export const RegistrarPaciente = () => {
     if (!formData.ID_Plan) return null;
     return planesList.find((p) => p.ID_Plan === formData.ID_Plan) || null;
   };
+  // Todos los campos de texto comparten tamaño, etiqueta fija y ancho completo.
+  const field = (name, label, props = {}) => (
+    <TextField
+      name={name}
+      label={label}
+      value={formData[name] || ""}
+      onChange={handleChange}
+      fullWidth
+      slotProps={{ inputLabel: { shrink: true } }}
+      {...props}
+    />
+  );
+  const third = { xs: 12, sm: 6, md: 4 };
+
   return (
-    <Container component="main" maxWidth="lg" sx={{ mb: 4 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 4 }}>
-        <IconButton onClick={() => navigate(-1)}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Box>
-          <Typography component="h1" variant="h4" gutterBottom>
-            {isEditMode ? "Editar Paciente" : "Registrar Nuevo Paciente"}
-          </Typography>
-          <Typography color="text.secondary">
-            Complete el formulario con toda la información del paciente.
-          </Typography>
-        </Box>
-      </Box>
+    <>
+      <PageHeader
+        title={isEditMode ? "Editar paciente" : "Registrar paciente"}
+        subtitle="Completá el formulario con la información del paciente"
+        onBack={() => navigate(-1)}
+      />
 
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-        <FormSection
-          title="Datos Personales"
+      <FormContainer onSubmit={handleSubmit}>
+        <SectionCard
+          title="Datos personales"
           description="Información de identificación del paciente"
-          icon={<PersonIcon color="primary" />}
+          icon={<PersonIcon />}
         >
-          <Grid size={6} md={4}>
-            <TextField
-              name="FechaNacimiento"
-              label="Fecha de Nacimiento"
-              type="date"
-              variant="outlined"
-              required
-              value={formData.FechaNacimiento || ""}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-              size="small"
-              sx={{
-                "& .MuiInputLabel-outlined": {
-                  backgroundColor: "white",
-                },
-              }}
-            />
+          <Grid container spacing={3}>
+            <Grid size={third}>
+              {field("Nombre", "Nombre", { required: true })}
+            </Grid>
+            <Grid size={third}>
+              {field("Apellido", "Apellido", { required: true })}
+            </Grid>
+            <Grid size={third}>
+              {field("DNI", "DNI", {
+                required: true,
+                type: "number",
+                disabled: isEditMode,
+              })}
+            </Grid>
+            <Grid size={third}>
+              {field("FechaNacimiento", "Fecha de nacimiento", {
+                required: true,
+                type: "date",
+              })}
+            </Grid>
+            <Grid size={third}>
+              {field("Genero", "Género", {
+                select: true,
+                children: ["Masculino", "Femenino", "Otro"].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                )),
+              })}
+            </Grid>
+            <Grid size={third}>
+              {field("EstadoCivil", "Estado civil", {
+                select: true,
+                children: [
+                  "Soltero/a",
+                  "Casado/a",
+                  "Divorciado/a",
+                  "Viudo/a",
+                ].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                )),
+              })}
+            </Grid>
           </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="DNI"
-              label="DNI"
-              type="number"
-              variant="outlined"
-              value={formData.DNI || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              size="small"
-              minHeight={24}
-              minWidth={193}
-              maxWidth={193}
-              maxHeight={24}
-              InputLabelProps={{ shrink: true }}
-              disabled={isEditMode}
-            />
-          </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="Nombre"
-              label="Nombre"
-              type="text"
-              variant="outlined"
-              value={formData.Nombre || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              minHeight={24}
-              minWidth={193}
-              maxWidth={193}
-              maxHeight={24}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="Apellido"
-              label="Apellido"
-              type="text"
-              variant="outlined"
-              value={formData.Apellido || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              minHeight={24}
-              minWidth={193}
-              maxWidth={193}
-              maxHeight={24}
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
+        </SectionCard>
 
-          <Grid size={6} md={4}>
-            <FormControl fullWidth>
-              <InputLabel>Género</InputLabel>
-              <Select
-                name="Genero"
-                value={formData.Genero || ""}
-                label="Género"
-                onChange={handleChange}
-              >
-                <MenuItem value="Masculino">Masculino</MenuItem>
-                <MenuItem value="Femenino">Femenino</MenuItem>
-                <MenuItem value="Otro">Otro</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={6} md={4}>
-            <FormControl fullWidth>
-              <InputLabel>Estado Civil</InputLabel>
-              <Select
-                name="EstadoCivil"
-                value={formData.EstadoCivil || ""}
-                label="Estado Civil"
-                onChange={handleChange}
-              >
-                <MenuItem value="Soltero/a">Soltero/a</MenuItem>
-                <MenuItem value="Casado/a">Casado/a</MenuItem>
-                <MenuItem value="Divorciado/a">Divorciado/a</MenuItem>
-                <MenuItem value="Viudo/a">Viudo/a</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-        </FormSection>
-
-        <FormSection
-          title="Datos de Contacto"
-          description="Información de contacto y domicilio"
-          icon={<PhoneIcon color="success" />}
+        <SectionCard
+          title="Datos de contacto"
+          description="Se requiere al menos un teléfono"
+          icon={<PhoneIcon />}
         >
-          <Grid size={6} md={4}>
-            <TextField
-              name="Email"
-              label="Email"
-              type="email"
-              variant="outlined"
-              value={formData.Email || ""}
-              onChange={handleChange}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              size="small"
-            />
+          <Grid container spacing={3}>
+            <Grid size={third}>
+              {field("Email", "Email", { type: "email" })}
+            </Grid>
+            <Grid size={third}>{field("Telefono", "Teléfono fijo")}</Grid>
+            <Grid size={third}>
+              {field("Celular", "Celular", { required: true })}
+            </Grid>
+            <Grid size={{ xs: 12, md: 8 }}>
+              {field("Direccion", "Dirección", { required: true })}
+            </Grid>
+            <Grid size={third}>{field("CodigoPostal", "Código postal")}</Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              {field("Ciudad", "Ciudad", { required: true })}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              {field("Provincia", "Provincia", { required: true })}
+            </Grid>
           </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="Telefono"
-              label="Teléfono Fijo"
-              variant="outlined"
-              value={formData.Telefono || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="Celular"
-              label="Celular"
-              variant="outlined"
-              value={formData.Celular || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
+        </SectionCard>
 
-          <Grid size={6} md={4}>
-            <TextField
-              name="Direccion"
-              label="Dirección"
-              variant="outlined"
-              value={formData.Direccion || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="Ciudad"
-              label="Ciudad"
-              variant="outlined"
-              value={formData.Ciudad || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="Provincia"
-              label="Provincia"
-              variant="outlined"
-              value={formData.Provincia || ""}
-              onChange={handleChange}
-              fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid size={6} md={4}>
-            <TextField
-              name="CodigoPostal"
-              label="Código Postal"
-              variant="outlined"
-              value={formData.CodigoPostal || ""}
-              onChange={handleChange}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-        </FormSection>
-
-        <FormSection
-          title="Obra Social / Prepaga"
+        <SectionCard
+          title="Obra social / Prepaga"
           description="Información de cobertura médica"
-          icon={<ShieldIcon color="secondary" />}
+          icon={<ShieldIcon />}
         >
-          <Grid size xs={12}>
-            <FormControl required component="fieldset">
-              <FormLabel component="legend">
-                ¿Tiene Obra Social / Prepaga? *
-              </FormLabel>
-              <RadioGroup
-                row
-                value={tieneObraSocial}
-                onChange={(e) => setTieneObraSocial(e.target.value)}
-              >
-                <FormControlLabel value="si" control={<Radio />} label="Sí" />
-                <FormControlLabel
-                  value="no"
-                  control={<Radio />}
-                  label="No (es Particular)"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          <Grid size xs={12}>
-            <Collapse
-              in={tieneObraSocial === "si"}
-              timeout="auto"
-              unmountOnExit
+          <FormControl required component="fieldset">
+            <FormLabel component="legend">
+              ¿Tiene obra social o prepaga?
+            </FormLabel>
+            <RadioGroup
+              row
+              value={tieneObraSocial}
+              onChange={(e) => setTieneObraSocial(e.target.value)}
             >
-              <Grid container spacing={3}>
-                <Grid size={12} md={4}>
-                  <Autocomplete
-                    disablePortal
-                    options={obrasSocialesList}
-                    getOptionLabel={(option) => option.Nombre}
-                    value={getObraSocialValue()}
-                    onChange={(event, newValue) => {
-                      setFormData({
-                        ...formData,
-                        ID_ObraSocial: newValue ? newValue.ID_ObraSocial : null,
-                        ID_Plan: null,
-                      });
-                    }}
-                    isOptionEqualToValue={(option, value) =>
-                      option.ID_ObraSocial === value.ID_ObraSocial
-                    }
-                    loading={loadingOS}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Obra Social / Prepaga"
-                        required={tieneObraSocial === "si"}
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
-                        InputProps={{
+              <FormControlLabel value="si" control={<Radio />} label="Sí" />
+              <FormControlLabel
+                value="no"
+                control={<Radio />}
+                label="No (es particular)"
+              />
+            </RadioGroup>
+          </FormControl>
+          <Collapse in={tieneObraSocial === "si"} timeout="auto" unmountOnExit>
+            <Grid container spacing={3} sx={{ mt: 0.5 }}>
+              <Grid size={third}>
+                <Autocomplete
+                  options={obrasSocialesList}
+                  getOptionLabel={(option) => option.Nombre}
+                  value={getObraSocialValue()}
+                  onChange={(event, newValue) => {
+                    setFormData({
+                      ...formData,
+                      ID_ObraSocial: newValue ? newValue.ID_ObraSocial : null,
+                      ID_Plan: null,
+                    });
+                  }}
+                  isOptionEqualToValue={(option, value) =>
+                    option.ID_ObraSocial === value.ID_ObraSocial
+                  }
+                  loading={loadingOS}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Obra social / Prepaga"
+                      required
+                      slotProps={{
+                        inputLabel: { shrink: true },
+                        input: {
                           ...params.InputProps,
                           endAdornment: (
                             <>
                               {loadingOS ? (
-                                <CircularProgress color="inherit" size={20} />
+                                <CircularProgress color="inherit" size={18} />
                               ) : null}
-
                               {params.InputProps.endAdornment}
                             </>
                           ),
-                        }}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid size={12} md={4}>
-                  <Autocomplete
-                    disablePortal
-                    options={planesList}
-                    getOptionLabel={(option) => option.Nombre}
-                    value={getPlanValue()}
-                    disabled={!formData.ID_ObraSocial || loadingPlanes}
-                    onChange={(event, newValue) => {
-                      setFormData({
-                        ...formData,
-                        ID_Plan: newValue ? newValue.ID_Plan : null,
-                      });
-                    }}
-                    isOptionEqualToValue={(option, value) =>
-                      option.ID_Plan === value.ID_Plan
-                    }
-                    loading={loadingPlanes}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Plan"
-                        variant="outlined"
-                        required={tieneObraSocial === "si"}
-                        fullWidth
-                        InputLabelProps={{ shrink: true }}
-                        InputProps={{
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid size={third}>
+                <Autocomplete
+                  options={planesList}
+                  getOptionLabel={(option) => option.Nombre}
+                  value={getPlanValue()}
+                  disabled={!formData.ID_ObraSocial || loadingPlanes}
+                  onChange={(event, newValue) => {
+                    setFormData({
+                      ...formData,
+                      ID_Plan: newValue ? newValue.ID_Plan : null,
+                    });
+                  }}
+                  isOptionEqualToValue={(option, value) =>
+                    option.ID_Plan === value.ID_Plan
+                  }
+                  loading={loadingPlanes}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Plan"
+                      required
+                      slotProps={{
+                        inputLabel: { shrink: true },
+                        input: {
                           ...params.InputProps,
-
                           endAdornment: (
                             <>
                               {loadingPlanes ? (
-                                <CircularProgress color="inherit" size={20} />
+                                <CircularProgress color="inherit" size={18} />
                               ) : null}
-
                               {params.InputProps.endAdornment}
                             </>
                           ),
-                        }}
-                      />
-                    )}
-                  />
-                               
-                </Grid>
-                             
-                <Grid size={12} md={4}>
-                                 
-                  <TextField
-                    name="NumeroAfiliado"
-                    label="Número de Afiliado"
-                    value={formData.NumeroAfiliado || ""}
-                    onChange={handleChange}
-                    fullWidth
-                    required={tieneObraSocial === "si"}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                                 
-                </Grid>
-                             
+                        },
+                      }}
+                    />
+                  )}
+                />
               </Grid>
-                         
-            </Collapse>
-                     
-          </Grid>
-                        
-        </FormSection>
+              <Grid size={third}>
+                {field("NumeroAfiliado", "Número de afiliado", {
+                  required: true,
+                })}
+              </Grid>
+            </Grid>
+          </Collapse>
+        </SectionCard>
 
-        <Box
-          size={6}
-          sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "end",
-          }}
-        >
-          <Box
-            sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mb: 4 }}
-          >
-            <Button variant="outlined" onClick={() => navigate(-1)}>
-              Cancelar
-            </Button>
-            <Button type="submit" variant="contained">
-              {isEditMode ? "Actualizar Paciente" : "Registrar Paciente"}
-            </Button>
-          </Box>
-        </Box>
-        <Box size={6}></Box>
-      </Box>
+        <FormActions
+          onCancel={() => navigate(-1)}
+          submitLabel={
+            isEditMode ? "Actualizar paciente" : "Registrar paciente"
+          }
+        />
+      </FormContainer>
 
-      <Dialog open={dialog.open} onClose={handleCloseDialog}>
-        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          {dialog.isError ? (
-            <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
-          ) : (
-            <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
-          )}
-          {dialog.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>{dialog.message}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} autoFocus>
-            Aceptar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+      <ResultDialog dialog={dialog} onClose={handleCloseDialog} />
+    </>
   );
 };
 

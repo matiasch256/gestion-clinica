@@ -1,6 +1,14 @@
+import PageHeader from "../../../common/PageHeader";
+import FilterBar from "../../../common/FilterBar";
+import TableCard, { ExportButtons } from "../../../common/TableCard";
+import RowActions from "../../../common/RowActions";
+import SkeletonRows from "../../../common/SkeletonRows";
+import EmptyState from "../../../common/EmptyState";
+import { paginationLabels, countLabel } from "../../../../utils/tableLabels";
+import { useFeedback } from "../../../../context/FeedbackProvider";
+import AddIcon from "@mui/icons-material/Add";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Typography,
@@ -34,7 +42,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export const ListadoCategorias = () => {
-  const theme = useTheme();
+  const { notify, confirm } = useFeedback();
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -68,17 +76,24 @@ export const ListadoCategorias = () => {
     navigate(`/categorias/actualizar/${categoria.id}`);
   };
 
-  const handleEliminar = (id) => {
-    if (!window.confirm("¿Estás seguro de eliminar esta categoría?")) return;
+  const handleEliminar = async (id) => {
+    const confirmado = await confirm({
+      title: "Eliminar categoría",
+      message: "¿Estás seguro de eliminar esta categoría?",
+      confirmLabel: "Eliminar",
+      destructive: true,
+    });
+    if (!confirmado) return;
 
     fetch(`http://localhost:3000/api/categorias/${id}`, {
       method: "DELETE",
     })
       .then((res) => {
         if (!res.ok) throw new Error("Error al eliminar categoría");
+        notify("Categoría eliminada correctamente");
         obtenerCategorias();
       })
-      .catch((err) => alert(err.message));
+      .catch((err) => notify(err.message, "error"));
   };
 
   const aplicarFiltros = () => {
@@ -142,318 +157,101 @@ export const ListadoCategorias = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, width: "100%" }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        {}
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          Listado de Categorías
-        </Typography>
-
-        {}
-        <Box
-          sx={{
-            p: 3,
-            mb: 4,
-            borderRadius: 2,
-            bgcolor: theme.palette.background.paper,
-            border: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1 }}>
-            <FilterListIcon color="action" />
-            <Typography
-              variant="subtitle2"
-              fontWeight="bold"
-              color="text.secondary"
-            >
-              Filtros de Búsqueda
-            </Typography>
-          </Box>
-
-          <Grid container spacing={3} alignItems="center">
-            {}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                label="Nombre"
-                name="nombre"
-                variant="outlined"
-                value={tempFiltro}
-                onChange={(e) => setTempFiltro(e.target.value)}
-                fullWidth
-                size="small"
-                slotProps={{ inputLabel: { shrink: true } }}
-                sx={{
-                  bgcolor: theme.palette.background.default,
-                  "& .MuiOutlinedInput-root": {
-                    paddingLeft: "8px",
-                    "& input": {
-                      paddingLeft: "8px",
-                      borderLeft: "none !important",
-                    },
-                  },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 0 }}>
-                      <SearchIcon color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-
-            {}
-            <Grid
-              size={{ xs: 12, md: 6 }}
-              sx={{
-                display: "flex",
-                gap: 2,
-                justifyContent: { xs: "flex-start", md: "flex-end" },
-              }}
-            >
-              <Button
-                variant="contained"
-                startIcon={<SearchIcon />}
-                onClick={aplicarFiltros}
-                sx={{
-                  bgcolor: theme.palette.primary.main,
-                  color: theme.palette.primary.contrastText,
-                  fontWeight: "bold",
-                  boxShadow: "none",
-                  "&:hover": {
-                    bgcolor: theme.palette.primary.main.hover,
-                    boxShadow: "none",
-                  },
-                }}
-              >
-                Buscar
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<FilterAltOffIcon />}
-                onClick={limpiarFiltros}
-                sx={{
-                  color: theme.palette.text.secondary,
-                  borderColor: theme.palette.divider,
-                  bgcolor: theme.palette.background.default,
-                  "&:hover": {
-                    borderColor: theme.palette.text.primary,
-                    bgcolor: theme.palette.background.trasparent,
-                  },
-                }}
-              >
-                Limpiar
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-
-        {}
-        <Box
-          sx={{ display: "flex", gap: 2, mb: 3, justifyContent: "flex-end" }}
-        >
+    <>
+      <PageHeader
+        title="Categorías"
+        subtitle="Agrupan los productos del depósito"
+        actions={
           <Button
-            variant="outlined"
-            startIcon={<DescriptionIcon />}
-            onClick={exportToExcel}
-            sx={{
-              color: theme.palette.accent.green,
-              borderColor: theme.palette.accent.green,
-              backgroundColor: theme.palette.background.trasparent,
-              fontWeight: "bold",
-              "&:hover": {
-                backgroundColor: `${theme.palette.accent.green}10 !important`,
-                borderColor: theme.palette.accent.green,
-              },
-            }}
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate("/categorias/registrar")}
           >
-            Exportar Excel
+            Registrar categoría
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<PictureAsPdfIcon />}
-            onClick={exportToPDF}
-            sx={{
-              color: theme.palette.error.main,
-              borderColor: theme.palette.error.main,
-              backgroundColor: theme.palette.background.trasparent,
-              fontWeight: "bold",
-              "&:hover": {
-                backgroundColor: `${theme.palette.error.main}10 !important`,
-                borderColor: theme.palette.error.main,
-              },
-            }}
-          >
-            Exportar PDF
-          </Button>
-        </Box>
+        }
+      />
 
-        {}
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 2,
-            overflowX: "auto",
-          }}
-        >
-          <Table>
-            <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  Nombre
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  Descripción
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                    textAlign: "center",
-                  }}
-                >
-                  Acciones
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: rowsPerPage }).map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Skeleton variant="text" width="60%" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="80%" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="rectangular" width={120} height={36} />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : getPaginatedCategorias().length > 0 ? (
-                getPaginatedCategorias().map((c) => (
-                  <TableRow key={c.id} hover>
-                    <TableCell>{c.nombre}</TableCell>
-                    <TableCell>{c.descripcion}</TableCell>
-                    <TableCell align="center">
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          gap: 1,
-                        }}
-                      >
-                        <Tooltip title="Editar">
-                          <IconButton
-                            onClick={() => handleEditar(c)}
-                            sx={{
-                              color: theme.palette.accent.orange || "#fd7e14",
-                              backgroundColor:
-                                theme.palette.background.trasparent,
-                              "&:hover": {
-                                backgroundColor:
-                                  theme.palette.background.trasparent,
-                                transform: "scale(1.1)",
-                              },
-                            }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-
-                        <Tooltip title="Eliminar">
-                          <IconButton
-                            onClick={() => handleEliminar(c.id)}
-                            sx={{
-                              color: theme.palette.error.main,
-                              backgroundColor:
-                                theme.palette.background.trasparent,
-                              "&:hover": {
-                                backgroundColor:
-                                  theme.palette.background.trasparent,
-                                color: "#c82333",
-                                transform: "scale(1.1)",
-                              },
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    align="center"
-                    sx={{ py: 3, color: theme.palette.text.secondary }}
-                  >
-                    {filtro
-                      ? "No se encontraron categorías con los filtros aplicados."
-                      : "No se encontraron categorías."}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={categoriasFiltradas.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Filas por página:"
-            labelDisplayedRows={({ from, to, count }) =>
-              `${from}-${to} de ${count !== -1 ? count : `más de ${to}`}`
-            }
-            sx={{
-              "& .MuiTablePagination-actions > button": {
-                backgroundColor: theme.palette.background.trasparent,
-                "&:hover": {
-                  backgroundColor: theme.palette.background.trasparent,
-                },
+      <FilterBar onSearch={aplicarFiltros} onClear={limpiarFiltros}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            label="Nombre"
+            placeholder="Buscar"
+            value={tempFiltro}
+            onChange={(e) => setTempFiltro(e.target.value)}
+            fullWidth
+            slotProps={{
+              inputLabel: { shrink: true },
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
               },
             }}
           />
-        </TableContainer>
-      </Paper>
-    </Box>
+        </Grid>
+      </FilterBar>
+
+      <TableCard
+        summary={
+          loading
+            ? "Cargando..."
+            : countLabel(categoriasFiltradas.length, "categoría", "categorías")
+        }
+        actions={<ExportButtons onExcel={exportToExcel} onPdf={exportToPDF} />}
+      >
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Descripción</TableCell>
+              <TableCell align="right">Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <SkeletonRows rows={5} columns={3} />
+            ) : getPaginatedCategorias().length > 0 ? (
+              getPaginatedCategorias().map((item) => (
+                <TableRow key={item.id} hover>
+                  <TableCell sx={{ fontWeight: 600 }}>{item.nombre}</TableCell>
+                  <TableCell>{item.descripcion}</TableCell>
+                  <TableCell align="right">
+                    <RowActions
+                      onEdit={() => handleEditar(item)}
+                      onDelete={() => handleEliminar(item.id)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <EmptyState
+                    title={
+                      filtro
+                        ? "No se encontraron categorías con ese filtro"
+                        : "Todavía no hay categorías registradas"
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          component="div"
+          count={categoriasFiltradas.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          {...paginationLabels}
+        />
+      </TableCard>
+    </>
   );
 };

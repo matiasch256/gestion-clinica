@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Grid, Skeleton, Box } from "@mui/material";
+import { Box, Grid, Skeleton } from "@mui/material";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
@@ -11,9 +10,13 @@ import QuickActionsCard from "../../../common/QuickActionsCard";
 import { quickActionsCompras } from "../../../common/quickActionsData";
 import RecentActivityCompras from "./../../../common/RecenActivityCompras";
 
-export const ComprasDashboard = () => {
-  const navigate = useNavigate();
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+  }).format(value);
 
+export const ComprasDashboard = () => {
   const [dashboardData, setDashboardData] = useState({
     ordenesPendientes: 0,
     facturasRecientes: 0,
@@ -37,25 +40,25 @@ export const ComprasDashboard = () => {
       });
   }, []);
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-    }).format(value);
-  };
+  const header = (
+    <DashboardHeader
+      title="Compras"
+      subtitle="Resumen de órdenes, stock y gasto del mes"
+    />
+  );
 
   if (loading) {
     return (
       <>
-        <DashboardHeader />
-        <Grid container spacing={4}>
+        {header}
+        <Grid container spacing={3}>
           {Array.from({ length: 4 }).map((_, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Skeleton variant="rectangular" height={120} />
+            <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
+              <Skeleton variant="rounded" height={120} />
             </Grid>
           ))}
-          <Grid item xs={12}>
-            <Skeleton variant="rectangular" height={200} />
+          <Grid size={{ xs: 12 }}>
+            <Skeleton variant="rounded" height={200} />
           </Grid>
         </Grid>
       </>
@@ -64,47 +67,39 @@ export const ComprasDashboard = () => {
 
   return (
     <>
-      <DashboardHeader />
-      <SystemMetricsGrid
-        systemMetrics={[
-          {
-            title: "Órdenes Pendientes",
-            value: dashboardData.ordenesPendientes.toString(),
-            description: "órdenes en estado pendiente",
-            icon: ShoppingCartOutlinedIcon,
-            color: "warning.main",
-            bgColor: "#FFF8E1",
-          },
-          {
-            title: "Facturas Recientes",
-            value: dashboardData.facturasRecientes.toString(),
-            description: "nuevas esta semana",
-            icon: ReceiptLongRoundedIcon,
-            color: "info.main",
-            bgColor: "#E3F2FD",
-          },
-          {
-            title: "Stock Crítico",
-            value: dashboardData.stockCritico.toString(),
-            description: "productos debajo del mínimo",
-            icon: ReportProblemOutlinedIcon,
-            color: "error.main",
-            bgColor: "#FFEBEE",
-          },
-          {
-            title: "Total Comprado (Mes)",
-            value: formatCurrency(dashboardData.totalCompradoMes),
-            description: "monto total del mes",
-            icon: AttachMoneyOutlinedIcon,
-            color: "success.main",
-            bgColor: "#E8F5E9",
-          },
-        ]}
-      />
-      <Box sx={{ mt: 4 }}>
+      {header}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <SystemMetricsGrid
+          systemMetrics={[
+            {
+              title: "Órdenes pendientes",
+              value: String(dashboardData.ordenesPendientes),
+              caption: "En estado pendiente",
+              icon: ShoppingCartOutlinedIcon,
+              tone: "warning",
+            },
+            {
+              title: "Stock crítico",
+              value: String(dashboardData.stockCritico),
+              caption: "Productos debajo del mínimo",
+              icon: ReportProblemOutlinedIcon,
+              tone: "error",
+            },
+            {
+              title: "Facturas recientes",
+              value: String(dashboardData.facturasRecientes),
+              caption: "Nuevas esta semana",
+              icon: ReceiptLongRoundedIcon,
+            },
+            {
+              title: "Total comprado (mes)",
+              value: formatCurrency(dashboardData.totalCompradoMes),
+              caption: "Monto total del mes",
+              icon: AttachMoneyOutlinedIcon,
+            },
+          ]}
+        />
         <QuickActionsCard quickActions={quickActionsCompras} />
-      </Box>
-      <Box sx={{ mt: 4 }}>
         <RecentActivityCompras
           ordenes={dashboardData.listaOrdenesRecientes}
           productos={dashboardData.listaStockCritico}

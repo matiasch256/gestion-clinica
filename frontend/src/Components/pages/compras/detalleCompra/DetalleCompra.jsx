@@ -1,6 +1,10 @@
+import SectionCard from "../../../common/SectionCard";
+import DetailItem from "../../../common/DetailItem";
+import StatusChip from "../../../common/StatusChip";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import PageHeader from "../../../common/PageHeader";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTheme } from "@mui/material/styles"; // Importar theme
 import {
   Table,
   TableBody,
@@ -24,7 +28,6 @@ import StoreIcon from "@mui/icons-material/Store";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 export default function DetalleCompra() {
-  const theme = useTheme();
   const { idCompra } = useParams();
   const navigate = useNavigate();
   const [compra, setCompra] = useState(null);
@@ -45,17 +48,17 @@ export default function DetalleCompra() {
 
   if (loading) {
     return (
-      <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
-        <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
+      <>
+        <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
           <Skeleton variant="text" width="40%" height={60} />
           <Grid container spacing={3} sx={{ mt: 2 }}>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <Skeleton variant="rectangular" height={100} />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <Skeleton variant="rectangular" height={100} />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <Skeleton variant="rectangular" height={100} />
             </Grid>
           </Grid>
@@ -66,17 +69,14 @@ export default function DetalleCompra() {
             sx={{ mt: 4 }}
           />
         </Paper>
-      </Box>
+      </>
     );
   }
 
   if (!compra) {
     return (
-      <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
-        <Paper
-          elevation={0}
-          sx={{ p: 4, borderRadius: 3, textAlign: "center" }}
-        >
+      <>
+        <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
           <Typography variant="h6" color="error" gutterBottom>
             No se encontró la compra solicitada.
           </Typography>
@@ -89,7 +89,7 @@ export default function DetalleCompra() {
             Volver al listado
           </Button>
         </Paper>
-      </Box>
+      </>
     );
   }
 
@@ -99,232 +99,78 @@ export default function DetalleCompra() {
   );
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 4, gap: 2 }}>
-          <Typography
-            variant="h5"
-            component="h1"
-            sx={{
-              fontWeight: "700",
-              color: theme.palette.text.primary,
-            }}
+    <>
+      <PageHeader
+        title={`Compra #${compra.id}`}
+        subtitle="Detalle de la orden de compra"
+        onBack={() => navigate(-1)}
+        actions={
+          <Button
+            variant="outlined"
+            startIcon={<EditOutlinedIcon />}
+            onClick={() => navigate(`/compras/modificar/${compra.id}`)}
           >
-            Detalle de Compra N° {compra.id}
-          </Typography>
-        </Box>
+            Editar
+          </Button>
+        }
+      />
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: theme.palette.background.paper,
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <CalendarTodayIcon
-                sx={{ color: theme.palette.primary.main, fontSize: 30 }}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <SectionCard title="Datos de la compra">
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <DetailItem
+                label="Fecha de compra"
+                value={new Date(compra.fecha).toLocaleDateString("es-AR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               />
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  fontWeight="bold"
-                >
-                  FECHA DE COMPRA
-                </Typography>
-                <Typography variant="body1" fontWeight="500">
-                  {new Date(compra.fecha).toLocaleDateString("es-AR", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: theme.palette.background.paper,
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <StoreIcon
-                sx={{
-                  color: theme.palette.accent.orange || "#fd7e14",
-                  fontSize: 30,
-                }}
-              />
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  fontWeight="bold"
-                >
-                  PROVEEDOR
-                </Typography>
-                <Typography variant="body1" fontWeight="500">
-                  {compra.proveedorNombre}
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          {/* Total */}
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2,
-                bgcolor: theme.palette.background.paper,
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <AttachMoneyIcon
-                sx={{ color: theme.palette.accent.green, fontSize: 30 }}
-              />
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  fontWeight="bold"
-                >
-                  MONTO TOTAL
-                </Typography>
-                <Typography variant="h6" fontWeight="bold" color="success.main">
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <DetailItem label="Proveedor" value={compra.proveedorNombre} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+              <DetailItem label="Estado">
+                <StatusChip status={compra.estado || "Activo"} />
+              </DetailItem>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <DetailItem label="Monto total">
+                <Typography variant="h5" component="span">
                   ${total.toFixed(2)}
                 </Typography>
-              </Box>
-            </Paper>
+              </DetailItem>
+            </Grid>
           </Grid>
-        </Grid>
+        </SectionCard>
 
-        <Divider sx={{ my: 4 }} />
-
-        <Typography
-          variant="h6"
-          component="h2"
-          sx={{
-            mb: 2,
-            fontWeight: "bold",
-            color: theme.palette.text.secondary,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <ReceiptLongIcon /> Productos Adquiridos
-        </Typography>
-
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 2,
-          }}
-        >
+        <SectionCard title="Productos adquiridos" disablePadding>
           <Table>
-            <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
+            <TableHead>
               <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  Producto
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  Precio Unit.
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  Cantidad
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: "bold",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  Subtotal
-                </TableCell>
+                <TableCell>Producto</TableCell>
+                <TableCell align="right">Precio unit.</TableCell>
+                <TableCell align="right">Cantidad</TableCell>
+                <TableCell align="right">Subtotal</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {compra.productos.map((p, i) => (
                 <TableRow key={i} hover>
                   <TableCell>{p.NombreProducto}</TableCell>
-                  <TableCell>${p.Precio.toFixed(2)}</TableCell>
-                  <TableCell>{p.Cantidad}</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>
+                  <TableCell align="right">${p.Precio.toFixed(2)}</TableCell>
+                  <TableCell align="right">{p.Cantidad}</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>
                     ${(p.Precio * p.Cantidad).toFixed(2)}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
-
-        <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
-            sx={{
-              color: theme.palette.primary.main,
-              borderColor: theme.palette.primary.main,
-              backgroundColor: theme.palette.background.trasparent,
-              fontWeight: "bold",
-              px: 3,
-              "&:hover": {
-                backgroundColor: `${theme.palette.primary.main}10`, // 10% opacidad
-                borderColor: theme.palette.primary.main,
-              },
-            }}
-          >
-            Volver
-          </Button>
-        </Box>
-      </Paper>
-    </Box>
+        </SectionCard>
+      </Box>
+    </>
   );
 }

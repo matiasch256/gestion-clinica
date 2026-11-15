@@ -1,45 +1,49 @@
-import { Box, Typography, Paper, Button, Chip } from "@mui/material";
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import TableCard from "../../common/TableCard";
+import { countLabel } from "../../../utils/tableLabels";
 
 export const ListaResultadosPacientes = ({ pacientes, onSelectPaciente }) => (
-  <Box sx={{ mt: 3 }}>
-    <Typography variant="h6" gutterBottom>
-      {pacientes.length} paciente(s) encontrado(s)
-    </Typography>
-    {pacientes.map((paciente) => (
-      <Paper
-        key={paciente.ID_Paciente}
-        elevation={2}
-        sx={{
-          mb: 2,
-          p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Box>
-          <Typography variant="h6">
-            {paciente.Apellido}, {paciente.Nombre}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            DNI: {paciente.DNI || "No cargado"} | Tel:{" "}
-            {paciente.Telefono || "No cargado"}
-          </Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Chip
-            label={paciente.ObraSocial || "Privado"}
-            color="primary"
-            variant="outlined"
-          />
-          <Button
-            variant="contained"
-            onClick={() => onSelectPaciente(paciente)}
-          >
-            Ver Historial
-          </Button>
-        </Box>
-      </Paper>
-    ))}
-  </Box>
+  <TableCard
+    summary={countLabel(
+      pacientes.length,
+      "paciente encontrado",
+      "pacientes encontrados"
+    )}
+  >
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Apellido y nombre</TableCell>
+          <TableCell>DNI</TableCell>
+          <TableCell>Teléfono</TableCell>
+          <TableCell>Obra social</TableCell>
+          <TableCell />
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {pacientes.map((paciente) => (
+          <TableRow key={paciente.ID_Paciente} hover>
+            <TableCell sx={{ fontWeight: 600 }}>
+              {paciente.Apellido}, {paciente.Nombre}
+            </TableCell>
+            <TableCell>{paciente.DNI || "No cargado"}</TableCell>
+            <TableCell>{paciente.Telefono || "No cargado"}</TableCell>
+            <TableCell>{paciente.ObraSocial || "Particular"}</TableCell>
+            <TableCell align="right">
+              <Button size="small" onClick={() => onSelectPaciente(paciente)}>
+                Ver historial
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableCard>
 );

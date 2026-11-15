@@ -1,6 +1,7 @@
+import PageHeader from "../../../common/PageHeader";
+import { FORM_MAX_WIDTH } from "../../../../theme/theme";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
 
 import {
   Table,
@@ -19,11 +20,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   Tooltip,
   Grid,
@@ -31,13 +27,11 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckIcon from "@mui/icons-material/Check";
 import CancelIcon from "@mui/icons-material/Cancel";
+import ResultDialog from "../../../common/ResultDialog";
 
 export const RegistrarCompras = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const [productos, setProductos] = useState([
@@ -183,8 +177,11 @@ export const RegistrarCompras = () => {
 
   if (loading) {
     return (
-      <Box sx={{ padding: 3, width: "100%", margin: "0 auto" }}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
+      <>
+        <Paper
+          variant="outlined"
+          sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
+        >
           <Skeleton variant="text" width="40%" height={60} />
           <Box sx={{ display: "flex", gap: 2, my: 3 }}>
             <Skeleton variant="rectangular" width="60%" height={56} />
@@ -192,37 +189,17 @@ export const RegistrarCompras = () => {
           </Box>
           <Skeleton variant="rectangular" width="100%" height={200} />
         </Paper>
-      </Box>
+      </>
     );
   }
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "100%", margin: "0 auto" }}>
+    <>
+      <PageHeader title="Registrar compra" onBack={() => navigate(-1)} />
       <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          bgcolor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
-        }}
+        variant="outlined"
+        sx={{ p: 3, borderRadius: 3, maxWidth: FORM_MAX_WIDTH }}
       >
-        {/* TÍTULO */}
-        <Typography
-          variant="h5"
-          component="h1"
-          sx={{
-            mb: 4,
-            fontWeight: "700",
-            color: theme.palette.text.primary,
-            borderLeft: `5px solid ${theme.palette.primary.main}`,
-            paddingLeft: 2,
-          }}
-        >
-          Registrar Nueva Compra
-        </Typography>
-
         {/* --- FORMULARIO SUPERIOR --- */}
         <Grid container spacing={3} sx={{ mb: 4 }} alignItems="center">
           <Grid size={{ xs: 12, md: 8 }}>
@@ -233,7 +210,6 @@ export const RegistrarCompras = () => {
                 onChange={(e) => setProveedor(e.target.value)}
                 label="Proveedor"
                 fullWidth
-                sx={{ bgcolor: theme.palette.background.default }}
               >
                 <MenuItem value="">Seleccionar proveedor</MenuItem>
                 {proveedores.map((prov) => (
@@ -253,7 +229,6 @@ export const RegistrarCompras = () => {
               onChange={(e) => setFecha(e.target.value)}
               fullWidth
               slotProps={{ inputLabel: { shrink: true } }}
-              sx={{ bgcolor: theme.palette.background.default }}
             />
           </Grid>
         </Grid>
@@ -264,8 +239,8 @@ export const RegistrarCompras = () => {
             variant="h6"
             sx={{
               mb: 2,
-              color: theme.palette.text.secondary,
-              fontWeight: "bold",
+              color: "text.secondary",
+              fontWeight: 600,
             }}
           >
             Detalle de Productos
@@ -275,18 +250,17 @@ export const RegistrarCompras = () => {
             component={Paper}
             elevation={0}
             sx={{
-              border: `1px solid ${theme.palette.divider}`,
+              border: 1,
+              borderColor: "divider",
               borderRadius: 2,
             }}
           >
             <Table>
-              <TableHead sx={{ bgcolor: theme.palette.background.paper }}>
+              <TableHead>
                 <TableRow>
                   <TableCell
                     sx={{
                       width: "35%",
-                      fontWeight: "bold",
-                      color: theme.palette.text.secondary,
                     }}
                   >
                     Producto
@@ -294,8 +268,6 @@ export const RegistrarCompras = () => {
                   <TableCell
                     sx={{
                       width: "15%",
-                      fontWeight: "bold",
-                      color: theme.palette.text.secondary,
                     }}
                   >
                     Cantidad
@@ -303,8 +275,6 @@ export const RegistrarCompras = () => {
                   <TableCell
                     sx={{
                       width: "15%",
-                      fontWeight: "bold",
-                      color: theme.palette.text.secondary,
                     }}
                   >
                     Precio Unit.
@@ -312,8 +282,6 @@ export const RegistrarCompras = () => {
                   <TableCell
                     sx={{
                       width: "15%",
-                      fontWeight: "bold",
-                      color: theme.palette.text.secondary,
                     }}
                   >
                     Subtotal
@@ -321,8 +289,6 @@ export const RegistrarCompras = () => {
                   <TableCell
                     sx={{
                       width: "10%",
-                      fontWeight: "bold",
-                      color: theme.palette.text.secondary,
                       textAlign: "center",
                     }}
                   >
@@ -345,7 +311,6 @@ export const RegistrarCompras = () => {
                               e.target.value
                             )
                           }
-                          sx={{ bgcolor: theme.palette.background.default }}
                         >
                           <MenuItem value="" disabled>
                             Seleccionar...
@@ -370,7 +335,6 @@ export const RegistrarCompras = () => {
                             e.target.value
                           )
                         }
-                        sx={{ bgcolor: theme.palette.background.default }}
                         fullWidth
                       />
                     </TableCell>
@@ -382,15 +346,14 @@ export const RegistrarCompras = () => {
                         onChange={(e) =>
                           handleProductoChange(index, "precio", e.target.value)
                         }
-                        sx={{ bgcolor: theme.palette.background.default }}
                         fullWidth
                       />
                     </TableCell>
                     <TableCell>
                       <Typography
                         variant="body2"
-                        fontWeight="bold"
-                        sx={{ color: theme.palette.text.primary }}
+                        fontWeight={600}
+                        sx={{ color: "text.primary" }}
                       >
                         ${(p.cantidad * p.precio).toFixed(2)}
                       </Typography>
@@ -399,21 +362,7 @@ export const RegistrarCompras = () => {
                     {/* AQUI ESTA EL ÍCONO DEL TACHO */}
                     <TableCell align="center">
                       <Tooltip title="Eliminar producto">
-                        <IconButton
-                          onClick={() => eliminarProducto(index)}
-                          sx={{
-                            color: theme.palette.text.secondary,
-
-                            backgroundColor:
-                              theme.palette.background.trasparent,
-                            "&:hover": {
-                              color: theme.palette.error.main,
-
-                              backgroundColor:
-                                theme.palette.background.trasparent,
-                            },
-                          }}
-                        >
+                        <IconButton onClick={() => eliminarProducto(index)}>
                           <DeleteIcon />
                         </IconButton>
                       </Tooltip>
@@ -432,16 +381,8 @@ export const RegistrarCompras = () => {
           fullWidth
           sx={{
             height: "48px",
-            border: `1px dashed ${theme.palette.primary.main}`,
-            color: theme.palette.primary.main,
-            backgroundColor: theme.palette.background.trasparent,
-            fontWeight: "600",
             borderRadius: 2,
             mb: 4,
-            "&:hover": {
-              border: `1px solid ${theme.palette.primary.main}`,
-              backgroundColor: `${theme.palette.primary.main}10`,
-            },
           }}
         >
           Agregar otro producto
@@ -456,7 +397,8 @@ export const RegistrarCompras = () => {
             flexWrap: "wrap",
             gap: 4,
             pt: 3,
-            borderTop: `1px solid ${theme.palette.divider}`,
+            borderTop: 1,
+            borderColor: "divider",
           }}
         >
           {/* Total */}
@@ -466,7 +408,7 @@ export const RegistrarCompras = () => {
             <Typography variant="h6" color="text.secondary">
               Total a Pagar:
             </Typography>
-            <Typography variant="h4" fontWeight="bold" color="primary.main">
+            <Typography variant="h4" fontWeight={600} color="primary.main">
               ${calcularTotal()}
             </Typography>
           </Box>
@@ -475,19 +417,11 @@ export const RegistrarCompras = () => {
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
               variant="outlined"
-              color="secondary"
-              startIcon={<CancelIcon />}
+              color="inherit"
               onClick={handleCancelar}
               sx={{
-                color: theme.palette.text.secondary,
-                borderColor: theme.palette.divider,
-                backgroundColor: theme.palette.background.trasparent,
                 px: 3,
                 py: 1,
-                "&:hover": {
-                  borderColor: theme.palette.text.primary,
-                  backgroundColor: theme.palette.background.trasparent,
-                },
               }}
             >
               Cancelar
@@ -498,17 +432,8 @@ export const RegistrarCompras = () => {
               startIcon={<CheckIcon />}
               onClick={registrarCompraEnBackend}
               sx={{
-                bgcolor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-                fontWeight: "bold",
-                boxShadow: "none",
                 px: 6,
                 py: 1,
-                "&:hover": {
-                  bgcolor:
-                    theme.palette.primary.hover || theme.palette.primary.dark,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                },
               }}
             >
               Guardar
@@ -516,57 +441,7 @@ export const RegistrarCompras = () => {
           </Box>
         </Box>
       </Paper>
-
-      {/* --- DIALOGOS MODALES --- */}
-      <Dialog
-        open={dialog.open}
-        onClose={handleCloseDialog}
-        PaperProps={{ sx: { borderRadius: 2, padding: 1 } }}
-      >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {dialog.isError ? (
-            <ErrorOutlineIcon
-              fontSize="large"
-              sx={{ color: theme.palette.error.main }}
-            />
-          ) : (
-            <CheckCircleOutlineIcon
-              fontSize="large"
-              sx={{ color: theme.palette.accent.green }}
-            />
-          )}
-          <span
-            style={{
-              color: dialog.isError
-                ? theme.palette.error.main
-                : theme.palette.accent.green,
-            }}
-          >
-            {dialog.title}
-          </span>
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ color: theme.palette.text.secondary }}>
-            {dialog.message}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={handleCloseDialog}
-            variant="contained"
-            autoFocus
-            sx={{
-              bgcolor: dialog.isError
-                ? theme.palette.error.main
-                : theme.palette.primary.main,
-              color: "#fff",
-              fontWeight: "bold",
-            }}
-          >
-            Aceptar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+      <ResultDialog dialog={dialog} onClose={handleCloseDialog} />
+    </>
   );
 };
