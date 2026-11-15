@@ -58,7 +58,7 @@ const divider = "rgba(15, 23, 42, 0.12)";
 const chartSeries = [
   primary.main,
   success.main,
-  "#e0a100",
+  warning.main,
   error.main,
   "#6f42c1",
   info.main,
